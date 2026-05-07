@@ -66,7 +66,7 @@ export default function DashboardPage({ currentPage, onNavigate }) {
 
         <section className="grid gap-4 lg:grid-cols-3">
           <article className="rounded-[32px] bg-white p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
+            <p className="text-sm font-semibold capitalized text-slate-500">
               Status risiko
             </p>
             <span className="mt-4 inline-flex rounded-full bg-[#dc2626] px-4 py-2 text-sm font-semibold text-white">
@@ -78,7 +78,7 @@ export default function DashboardPage({ currentPage, onNavigate }) {
           </article>
 
           <article className="rounded-[32px] bg-white p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
+            <p className="text-sm font-semibold capitalized text-slate-500">
               Skor risiko
             </p>
             <p className="mt-4 text-5xl font-bold text-[#dc2626]">90%</p>
@@ -86,7 +86,7 @@ export default function DashboardPage({ currentPage, onNavigate }) {
           </article>
 
           <article className="rounded-[32px] bg-white p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
+            <p className="text-sm font-semibold capitalized text-slate-500">
               Pengecekan terakhir
             </p>
             <p className="mt-4 text-2xl font-semibold text-slate-950">
