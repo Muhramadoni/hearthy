@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+
 # hearthy
 
 # history page
@@ -224,7 +225,61 @@ Pastikan desain responsif: Di layar mobile, ilustrasi dokter disembunyikan dan k
 
 Gunakan font Sans-serif yang modern dan bersih.
 
-Implementasikan logika state sederhana untuk toggle visibility password (show/hide).
-=======
+# Implementasikan logika state sederhana untuk toggle visibility password (show/hide).
+
 # hearthy
->>>>>>> a8fababbc6eb1668d44145e466437bba5b0d0345
+
+> > > > > > > a8fababbc6eb1668d44145e466437bba5b0d0345
+
+# profil saya
+
+tolong buatkan profil page dengan kriteria dibawah ini, buat agar desain 100% sama dengan gambar yang diberikan:
+Task: Implementasikan halaman "Profil Saya" sesuai desain menggunakan React dan Tailwind CSS.
+
+Layout & Header:
+
+Gunakan Navbar yang konsisten (Logo Hearthy di kiri, Navigasi di tengah, Nama profil di kanan).
+
+Berikan judul halaman "Profil Saya" di tengah bawah navbar dengan font bold.
+
+Kartu Identitas Atas (Profile Card):
+
+Buat kartu putih dengan rounded-xl dan shadow halus.
+
+Di dalamnya, buat layout flex:
+
+Sisi kiri: Foto profil (placeholder avatar bulat besar dengan border hitam tebal).
+
+Sisi tengah: Detail nama besar (Muhammad Ramadoni), pekerjaan (Mahasiswa), dan lokasi singkat (Jl. Teratatai).
+
+Sisi kanan: Tombol "Edit" kecil berwarna biru gelap (#1e3a5a) dengan icon pensil/edit di dalamnya.
+
+Kartu Data Pribadi (Detail Card):
+
+Buat kartu kedua di bawahnya dengan struktur yang sama (rounded-xl, shadow).
+
+Header Kartu: Judul "Data Pribadi" di kiri dan tombol "Edit" di kanan.
+
+Grid Form: Gunakan layout 2 kolom grid untuk menampilkan field data.
+
+Spesifikasi Field:
+
+Label di atas (Nama Depan, Nama Belakang, Email, Telepon).
+
+Value ditampilkan di dalam kotak berwarna abu-abu sangat muda (#f3f4f6) dengan rounded-lg (seperti input namun disabled/read-only).
+
+Field Alamat: Gunakan layout lebar penuh (full width) di bawah grid nama/kontak untuk menampilkan alamat lengkap.
+
+Spesifikasi Warna & Font:
+
+Background halaman: Abu-abu sangat muda/putih kusam agar kartu putih terlihat kontras.
+
+Warna teks utama: Biru gelap (#1e3a5a) untuk nama dan judul.
+
+Font: Sans-serif (poppins).
+
+Output: Berikan kode JSX yang rapi dengan Tailwind CSS utility classes.
+
+icon yang digunakan:
+icon-user.svg
+icon-edit.svg
