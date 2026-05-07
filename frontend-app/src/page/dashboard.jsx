@@ -100,8 +100,9 @@ export default function DashboardPage() {
                 <h2 className="text-base font-semibold text-slate-900">
                   {metric.title}
                 </h2>
-                <p className="mt-6 text-3xl font-bold text-[#dc2626]">
-                  {metric.value}
+                <p className="mt-6 font-bold text-[#dc2626]">
+                  <span className="text-4xl">{metric.value.split(' /')[0]}</span>
+                  <span className="text-2xl"> /{metric.value.split(' /')[1]}</span>
                 </p>
                 <span className="mt-8 inline-flex rounded-full bg-[#1e3a5a] px-4 py-2 text-sm font-semibold text-white">
                   {metric.unit}

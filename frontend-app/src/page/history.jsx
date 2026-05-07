@@ -42,7 +42,7 @@ export default function HistoryPage() {
           <div className="rounded-[32px] bg-white px-6 py-8 shadow-[0_24px_80px_-38px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
             <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
               <div className="max-w-2xl">
-                <h1 className="text-3xl font-bold text-slate-950 sm:text-4xl">
+                <h1 className="text-3xl font-bold text-slate-950 sm:text-4xl text-[#1b4062]">
                   Semua History
                 </h1>
                 <p className="mt-3 max-w-xl text-sm leading-7 text-slate-600">
