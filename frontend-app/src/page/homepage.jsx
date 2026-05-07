@@ -1,4 +1,5 @@
 import logoSrc from '../image/logo-hearthy.png'
+import iconUser from '../icon/icon-user.svg'
 import iconInputDataKlinis from '../icon/icon-input-data-klinis.svg'
 import iconAI from '../icon/icon-AI.svg'
 import iconHasilSkrining from '../icon/icon-hasil-skrining.svg'
@@ -199,29 +200,48 @@ function IconRating({ className = 'h-5 w-5' }) {
 
 
 
-function App() {
+export function MainNavbar({ currentPage, onNavigate, username = 'Ramadoni' }) {
+  return (
+    <header className="px-6 py-6">
+      <div className="mx-auto flex max-w-screen-2xl items-center gap-6 rounded-[32px] bg-white px-6 py-4 shadow-[0_20px_60px_-20px_rgba(15,23,42,0.12)]">
+        <img src={logoSrc} alt="Hearthy logo" className="h-10 w-auto cursor-pointer" onClick={() => onNavigate('home')} />
+        <nav className="hidden flex-1 items-center justify-center gap-8 text-sm font-semibold text-slate-700 md:flex">
+          <button
+            onClick={() => onNavigate('dashboard')}
+            className={`transition ${currentPage === 'dashboard' ? 'text-slate-950 font-bold' : 'hover:text-slate-900'}`}
+          >
+            Dashboard
+          </button>
+          <button
+            onClick={() => onNavigate('assessment')}
+            className={`transition ${currentPage === 'assessment' ? 'text-slate-950 font-bold' : 'hover:text-slate-900'}`}
+          >
+            Assessment
+          </button>
+          <button
+            onClick={() => onNavigate('history')}
+            className={`transition ${currentPage === 'history' ? 'text-slate-950 font-bold' : 'hover:text-slate-900'}`}
+          >
+            History
+          </button>
+        </nav>
+        <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-950 shadow-sm shadow-slate-200/50">
+          <span>{username}</span>
+          <img src={iconUser} alt="User icon" className="h-6 w-6 rounded-full" />
+        </div>
+      </div>
+    </header>
+  )
+}
+
+function HomePage({ onNavigate, currentPage = 'home' }) {
   useEffect(() => {
     document.title = 'Home - Web Hearty'
   }, [])
 
   return (
     <div className="min-h-screen bg-[#f0f0f0] text-slate-950">
-      <header className="px-6 py-6">
-        <div className="mx-auto flex max-w-screen-2xl items-center gap-6 rounded-[32px] bg-white px-6 py-4 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.45)] ring-1 ring-slate-200/80">
-          <img src={logoSrc} alt="Hearthy logo" className="h-10 w-auto" />
-          <nav className="hidden flex-1 items-center justify-center gap-8 text-sm font-semibold text-slate-700 md:flex">
-            <a href="#home" className="transition hover:text-slate-900">Dashboard</a>
-            <a href="#assessment" className="transition hover:text-slate-900">Assessment</a>
-            <a href="#history" className="transition hover:text-slate-900">History</a>
-          </nav>
-          <a
-            href="#login"
-            className="rounded-full bg-[#1b4062] px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-[#1b4062]/20 transition hover:bg-[#173652]"
-          >
-            Login
-          </a>
-        </div>
-      </header>
+      <MainNavbar currentPage={currentPage} onNavigate={onNavigate} />
 
       <main className="pt-8">
         <section id="home" className="mx-auto max-w-screen-2xl px-6 pt-16 pb-16">
@@ -234,12 +254,12 @@ function App() {
               Hearthy adalah platform preventive healthcare berbasis web yang menggunakan teknologi Deep Learning untuk mendeteksi dini risiko penyakit jantung secara instan.
             </p>
             <div className="mt-16 flex justify-center">
-              <a
-                href="#assessment"
+              <button
+                onClick={() => onNavigate("assessment")}
                 className="inline-flex items-center justify-center rounded-full bg-[#1b4062] px-8 py-5 text-lg font-semibold capitalized text-white shadow-lg shadow-[#1b4062]/15 transition hover:bg-[#173652]"
               >
                 Mulai Sekarang
-              </a>
+              </button>
             </div>
           </div>
         </section>
@@ -407,4 +427,4 @@ function App() {
   )
 }
 
-export default App
+export default HomePage
