@@ -5,10 +5,10 @@ export default function Navbar({ currentPage, onNavigate }) {
   return (
     <header className="px-6 py-6">
       <div className="mx-auto flex max-w-screen-2xl items-center gap-6 rounded-[32px] bg-black px-6 py-4 shadow-[0_20px_60px_-20px_rgba(15,23,42,0.12)]">
-        <img 
-          src={logoSrc} 
-          alt="Hearthy logo" 
-          className="h-10 w-auto cursor-pointer" 
+        <img
+          src={logoSrc}
+          alt="Hearthy logo"
+          className="h-10 w-auto cursor-pointer"
           onClick={() => onNavigate("home")}
         />
         <nav className="hidden flex-1 items-center justify-center gap-8 text-sm font-semibold text-slate-700 md:flex">

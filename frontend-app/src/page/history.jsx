@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { MainNavbar } from "./homepage.jsx";
 import iconLaporan from "../icon/icon-laporan.svg";
 
 const historyGroups = [
@@ -28,7 +29,7 @@ const historyGroups = [
   },
 ];
 
-export default function HistoryPage() {
+export default function HistoryPage({ currentPage, onNavigate }) {
   const [selectedDate, setSelectedDate] = useState("");
 
   const handleDateChange = (event) => {
@@ -37,6 +38,10 @@ export default function HistoryPage() {
 
   return (
     <div className="min-h-screen bg-[#f0f0f0] text-slate-900">
+      <MainNavbar
+        currentPage={currentPage ?? "history"}
+        onNavigate={onNavigate ?? (() => {})}
+      />
       <main className="mx-auto max-w-screen-2xl px-6 py-10">
         <section className="mx-auto max-w-screen-2xl">
           <div className="rounded-[32px] bg-white px-6 py-8 shadow-[0_24px_80px_-38px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
@@ -60,7 +65,7 @@ export default function HistoryPage() {
                     className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
                   />
                 </div>
-                <button className="inline-flex min-w-[120px] items-center justify-center rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800">
+                <button className="inline-flex min-w-[120px] items-center justify-center rounded-2xl bg-[#1b4062] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#163551]">
                   Filter
                 </button>
               </div>

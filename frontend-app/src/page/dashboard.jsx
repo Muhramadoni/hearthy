@@ -1,3 +1,4 @@
+import { MainNavbar } from "./homepage.jsx";
 import iconGrafik from "../icon/icon-grafik.svg";
 
 const metricItems = [
@@ -40,23 +41,26 @@ const chartPoints = chartValues.map((value, index) => {
 });
 const linePath = chartPoints
   .map((point, index) =>
-    index === 0 ? `M ${point.x} ${point.y}` : `L ${point.x} ${point.y}`
+    index === 0 ? `M ${point.x} ${point.y}` : `L ${point.x} ${point.y}`,
   )
   .join(" ");
 
-export default function DashboardPage() {
+export default function DashboardPage({ currentPage, onNavigate }) {
   return (
     <div className="min-h-screen bg-[#f0f0f0] text-slate-950">
+      <MainNavbar
+        currentPage={currentPage ?? "dashboard"}
+        onNavigate={onNavigate ?? (() => {})}
+      />
       <main className="mx-auto max-w-screen-2xl px-6 py-10">
         <section className="mb-8">
           <p className="text-sm font-semibold text-slate-600">
             Ringkasan kesehatan anda
           </p>
-          <h1 className="mt-2 text-4xl font-bold text-slate-950">
-            Dashboard
-          </h1>
+          <h1 className="mt-2 text-4xl font-bold text-slate-950">Dashboard</h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600">
-            Lihat performa kesehatan jantung anda, perbandingan risiko, dan rekomendasi preventif dalam satu tampilan.
+            Lihat performa kesehatan jantung anda, perbandingan risiko, dan
+            rekomendasi preventif dalam satu tampilan.
           </p>
         </section>
 
@@ -85,7 +89,9 @@ export default function DashboardPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
               Pengecekan terakhir
             </p>
-            <p className="mt-4 text-2xl font-semibold text-slate-950">30 April 2026</p>
+            <p className="mt-4 text-2xl font-semibold text-slate-950">
+              30 April 2026
+            </p>
             <p className="mt-3 text-sm text-slate-600">Pemeriksaan terakhir</p>
           </article>
         </section>
@@ -101,8 +107,13 @@ export default function DashboardPage() {
                   {metric.title}
                 </h2>
                 <p className="mt-6 font-bold text-[#dc2626]">
-                  <span className="text-4xl">{metric.value.split(' /')[0]}</span>
-                  <span className="text-2xl"> /{metric.value.split(' /')[1]}</span>
+                  <span className="text-4xl">
+                    {metric.value.split(" /")[0]}
+                  </span>
+                  <span className="text-2xl">
+                    {" "}
+                    /{metric.value.split(" /")[1]}
+                  </span>
                 </p>
                 <span className="mt-8 inline-flex rounded-full bg-[#1e3a5a] px-4 py-2 text-sm font-semibold text-white">
                   {metric.unit}
@@ -142,7 +153,13 @@ export default function DashboardPage() {
                 </defs>
                 <g opacity="0.55" stroke="#94a3b8" strokeWidth="1">
                   {[0, 1, 2, 3, 4].map((row) => (
-                    <line key={row} x1="40" y1={40 + row * 45} x2="680" y2={40 + row * 45} />
+                    <line
+                      key={row}
+                      x1="40"
+                      y1={40 + row * 45}
+                      x2="680"
+                      y2={40 + row * 45}
+                    />
                   ))}
                 </g>
                 <path
@@ -160,7 +177,14 @@ export default function DashboardPage() {
                 />
                 {chartPoints.map((point, index) => (
                   <g key={point.x}>
-                    <circle cx={point.x} cy={point.y} r="6" fill="#fff" stroke="#dc2626" strokeWidth="4" />
+                    <circle
+                      cx={point.x}
+                      cy={point.y}
+                      r="6"
+                      fill="#fff"
+                      stroke="#dc2626"
+                      strokeWidth="4"
+                    />
                     <circle cx={point.x} cy={point.y} r="3" fill="#dc2626" />
                     <text
                       x={point.x}
@@ -189,9 +213,15 @@ export default function DashboardPage() {
 
         <section className="mt-8 grid gap-6 xl:grid-cols-[1.5fr_1fr]">
           <article className="rounded-[32px] bg-white p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
-            <h2 className="text-xl font-semibold text-slate-950">Rekomendasi</h2>
+            <h2 className="text-xl font-semibold text-slate-950">
+              Rekomendasi
+            </h2>
             <div className="mt-5 rounded-[28px] bg-slate-50 p-6 text-sm leading-7 text-slate-600">
-              Batasi konsumsi gula dan lebih memperhatikan pola makan harian agar kadar gula darah serta tekanan darah tetap stabil. Selain itu, sempatkan untuk berolahraga secara rutin guna menjaga kesehatan jantung dan membantu menurunkan tingkat risiko kesehatan yang saat ini sedang tinggi.
+              Batasi konsumsi gula dan lebih memperhatikan pola makan harian
+              agar kadar gula darah serta tekanan darah tetap stabil. Selain
+              itu, sempatkan untuk berolahraga secara rutin guna menjaga
+              kesehatan jantung dan membantu menurunkan tingkat risiko kesehatan
+              yang saat ini sedang tinggi.
             </div>
           </article>
 
