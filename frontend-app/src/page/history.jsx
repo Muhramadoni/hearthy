@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MainNavbar } from "./homepage.jsx";
+import Navbar from "../components/Navbar.jsx";
 import iconLaporan from "../icon/icon-laporan.svg";
 
 const historyGroups = [
@@ -38,7 +38,7 @@ export default function HistoryPage({ currentPage, onNavigate }) {
 
   return (
     <div className="min-h-screen bg-[#f0f0f0] text-slate-900">
-      <MainNavbar
+      <Navbar
         currentPage={currentPage ?? "history"}
         onNavigate={onNavigate ?? (() => {})}
       />

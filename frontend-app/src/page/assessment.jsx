@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MainNavbar } from "./homepage.jsx";
+import Navbar from "../components/Navbar.jsx";
 import iconProfilAsasment from "../icon/icon-profil-asasment.svg";
 import iconDetakJantung from "../icon/icon-detak jantung.svg";
 
@@ -8,7 +8,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
 
   return (
     <div className="min-h-screen bg-[#f0f0f0] text-slate-950">
-      <MainNavbar
+      <Navbar
         currentPage={currentPage ?? "assessment"}
         onNavigate={onNavigate ?? (() => {})}
       />

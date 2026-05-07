@@ -1,4 +1,4 @@
-import { MainNavbar } from "./homepage.jsx";
+import Navbar from "../components/Navbar.jsx";
 import iconGrafik from "../icon/icon-grafik.svg";
 
 const metricItems = [
@@ -48,7 +48,7 @@ const linePath = chartPoints
 export default function DashboardPage({ currentPage, onNavigate }) {
   return (
     <div className="min-h-screen bg-[#f0f0f0] text-slate-950">
-      <MainNavbar
+      <Navbar
         currentPage={currentPage ?? "dashboard"}
         onNavigate={onNavigate ?? (() => {})}
       />

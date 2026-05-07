@@ -1,10 +1,15 @@
+import { useState } from "react";
 import logoSrc from "../image/logo-hearthy.png";
 import iconUser from "../icon/icon-user.svg";
+import iconSetting from "../icon/icon-setting.svg";
+import iconLogout from "../icon/icon-logout.svg";
 
-export default function Navbar({ currentPage, onNavigate }) {
+export default function Navbar({ currentPage = "home", onNavigate, showLoginButton = false, username = "Ramadoni" }) {
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+
   return (
     <header className="px-6 py-6">
-      <div className="mx-auto flex max-w-screen-2xl items-center gap-6 rounded-[32px] bg-black px-6 py-4 shadow-[0_20px_60px_-20px_rgba(15,23,42,0.12)]">
+      <div className="mx-auto flex max-w-screen-2xl items-center gap-6 rounded-[32px] bg-white px-6 py-4 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
         <img
           src={logoSrc}
           alt="Hearthy logo"
@@ -14,39 +19,72 @@ export default function Navbar({ currentPage, onNavigate }) {
         <nav className="hidden flex-1 items-center justify-center gap-8 text-sm font-semibold text-slate-700 md:flex">
           <button
             onClick={() => onNavigate("dashboard")}
-            className={`transition ${
-              currentPage === "dashboard"
-                ? "text-slate-950 font-bold"
-                : "hover:text-slate-900"
+            className={`px-4 py-2 rounded-lg transition ${
+              currentPage === "dashboard" ? "bg-[#1b4062] text-white font-bold" : "hover:bg-[#1b4062] hover:text-white"
             }`}
           >
             Dashboard
           </button>
           <button
             onClick={() => onNavigate("assessment")}
-            className={`transition ${
-              currentPage === "assessment"
-                ? "text-slate-950 font-bold"
-                : "hover:text-slate-900"
+            className={`px-4 py-2 rounded-lg transition ${
+              currentPage === "assessment" ? "bg-[#1b4062] text-white font-bold" : "hover:bg-[#1b4062] hover:text-white"
             }`}
           >
             Assessment
           </button>
           <button
             onClick={() => onNavigate("history")}
-            className={`transition ${
-              currentPage === "history"
-                ? "text-slate-950 font-bold"
-                : "hover:text-slate-900"
+            className={`px-4 py-2 rounded-lg transition ${
+              currentPage === "history" ? "bg-[#1b4062] text-white font-bold" : "hover:bg-[#1b4062] hover:text-white"
             }`}
           >
             History
           </button>
         </nav>
-        <div className="inline-flex items-center gap-2 text-sm font-semibold text-slate-950 transition hover:text-slate-900">
-          <span>Ramadoni</span>
-          <img src={iconUser} alt="User icon" className="h-6 w-6" />
-        </div>
+        {showLoginButton ? (
+          <button
+            type="button"
+            onClick={() => onNavigate("login")}
+            className="inline-flex items-center justify-center rounded-full bg-[#1e3a5a] px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-[#1e3a5a]/20 transition hover:bg-[#173652]"
+          >
+            Login
+          </button>
+        ) : (
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+              className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-950 shadow-sm shadow-slate-200/50 transition hover:bg-slate-200"
+            >
+              <span>{username}</span>
+              <img src={iconUser} alt="User icon" className="h-6 w-6 rounded-full" />
+            </button>
+
+            {isProfileMenuOpen && (
+              <div className="absolute right-0 mt-2 w-48 overflow-hidden rounded-2xl bg-white shadow-[0_20px_60px_-20px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70 z-50">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onNavigate("profile");
+                    setIsProfileMenuOpen(false);
+                  }}
+                  className="block w-full px-4 py-3 text-left bg-white text-sm font-medium text-slate-900 hover:bg-[#1b4062]/15 hover:text-slate-950 transition flex items-center gap-3"
+                >
+                  <img src={iconSetting} alt="Setting icon" className="h-5 w-5" />
+                  Pengaturan
+                </button>
+                <button
+                  type="button"
+                  className="block w-full px-4 py-3 text-left bg-white text-sm font-medium text-red-600 hover:bg-red-50 transition flex items-center gap-3"
+                >
+                  <img src={iconLogout} alt="Logout icon" className="h-5 w-5" />
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </header>
   );

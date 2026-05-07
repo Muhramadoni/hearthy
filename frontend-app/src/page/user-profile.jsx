@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MainNavbar } from "./homepage.jsx";
+import Navbar from "../components/Navbar.jsx";
 import iconUser from "../icon/icon-user.svg";
 import iconEdit from "../icon/icon-edit.svg";
 
@@ -33,9 +33,9 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
   return (
     <div className="min-h-screen bg-[#f3f4f6] text-slate-950">
       <div
-        className={`relative z-10 transition-all duration-200 ${isEditModalOpen ? "blur-sm pointer-events-none" : ""}`}
+        className={`relative z-10 transition-all duration-200 ${isEditModalOpen ? "blur-lg pointer-events-none" : ""}`}
       >
-        <MainNavbar
+        <Navbar
           currentPage={currentPage ?? "profile"}
           onNavigate={onNavigate ?? (() => {})}
           username="Ramadoni"
@@ -141,7 +141,8 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
       {/* Edit Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-2xl rounded-[28px] bg-white p-8 shadow-[0_20px_60px_-20px_rgba(15,23,42,0.12),_inset_0_1px_0_0_rgba(255,255,255,0.5)] ring-1 ring-slate-200 my-8">
+          <div className="fixed inset-0 bg-black/80 z-40"></div>
+          <div className="relative z-50 w-full max-w-2xl rounded-[28px] bg-white p-8 shadow-[0_20px_60px_-20px_rgba(15,23,42,0.12),_inset_0_1px_0_0_rgba(255,255,255,0.5)] ring-1 ring-slate-200 my-8">
             <h2 className="text-2xl font-semibold text-[#1e3a5a] mb-6">
               Edit Data Pribadi
             </h2>

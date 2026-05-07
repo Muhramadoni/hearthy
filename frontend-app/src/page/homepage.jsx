@@ -1,5 +1,5 @@
 import logoSrc from "../image/logo-hearthy.png";
-import iconUser from "../icon/icon-user.svg";
+import Navbar from "../components/Navbar.jsx";
 import iconInputDataKlinis from "../icon/icon-input-data-klinis.svg";
 import iconAI from "../icon/icon-AI.svg";
 import iconHasilSkrining from "../icon/icon-hasil-skrining.svg";
@@ -231,48 +231,6 @@ function IconRating({ className = "h-5 w-5" }) {
   );
 }
 
-export function MainNavbar({ currentPage, onNavigate, username = "Ramadoni" }) {
-  return (
-    <header className="px-6 py-6">
-      <div className="mx-auto flex max-w-screen-2xl items-center gap-6 rounded-[32px] bg-white px-6 py-4 shadow-[0_20px_60px_-20px_rgba(15,23,42,0.12)]">
-        <img
-          src={logoSrc}
-          alt="Hearthy logo"
-          className="h-10 w-auto cursor-pointer"
-          onClick={() => onNavigate("home")}
-        />
-        <nav className="hidden flex-1 items-center justify-center gap-8 text-sm font-semibold text-slate-700 md:flex">
-          <button
-            onClick={() => onNavigate("dashboard")}
-            className={`transition ${currentPage === "dashboard" ? "text-slate-950 font-bold" : "hover:text-slate-900"}`}
-          >
-            Dashboard
-          </button>
-          <button
-            onClick={() => onNavigate("assessment")}
-            className={`transition ${currentPage === "assessment" ? "text-slate-950 font-bold" : "hover:text-slate-900"}`}
-          >
-            Assessment
-          </button>
-          <button
-            onClick={() => onNavigate("history")}
-            className={`transition ${currentPage === "history" ? "text-slate-950 font-bold" : "hover:text-slate-900"}`}
-          >
-            History
-          </button>
-        </nav>
-        <button
-          type="button"
-          onClick={() => onNavigate("login")}
-          className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
-        >
-          Login
-        </button>
-      </div>
-    </header>
-  );
-}
-
 function HomePage({ onNavigate, currentPage = "home" }) {
   useEffect(() => {
     document.title = "Home - Web Hearty";
@@ -280,7 +238,7 @@ function HomePage({ onNavigate, currentPage = "home" }) {
 
   return (
     <div className="min-h-screen bg-[#f0f0f0] text-slate-950">
-      <MainNavbar currentPage={currentPage} onNavigate={onNavigate} />
+      <Navbar currentPage={currentPage} onNavigate={onNavigate} showLoginButton />
 
       <main className="pt-8">
         <section
