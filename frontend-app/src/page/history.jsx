@@ -30,12 +30,6 @@ const historyGroups = [
   },
 ];
 
-function formatDate(value) {
-  if (!value) return "";
-  const [year, month, day] = value.split("-");
-  return `${day}/${month}/${year}`;
-}
-
 export default function HistoryPage() {
   const [selectedDate, setSelectedDate] = useState("");
 
