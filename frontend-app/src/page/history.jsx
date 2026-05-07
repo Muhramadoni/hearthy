@@ -2,7 +2,6 @@ import { useState } from "react";
 import logoSrc from "../image/logo-hearthy.png";
 import iconUser from "../icon/icon-user.svg";
 import iconLaporan from "../icon/icon-laporan.svg";
-import iconKalender from "../icon/icon-kalender.svg";
 
 const historyGroups = [
   {
