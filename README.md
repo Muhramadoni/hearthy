@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # hearthy
 
 # history page
@@ -224,3 +225,6 @@ Pastikan desain responsif: Di layar mobile, ilustrasi dokter disembunyikan dan k
 Gunakan font Sans-serif yang modern dan bersih.
 
 Implementasikan logika state sederhana untuk toggle visibility password (show/hide).
+=======
+# hearthy
+>>>>>>> a8fababbc6eb1668d44145e466437bba5b0d0345
