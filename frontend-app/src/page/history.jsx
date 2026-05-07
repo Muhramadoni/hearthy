@@ -1,6 +1,4 @@
 import { useState } from "react";
-import logoSrc from "../image/logo-hearthy.png";
-import iconUser from "../icon/icon-user.svg";
 import iconLaporan from "../icon/icon-laporan.svg";
 
 const historyGroups = [
@@ -39,27 +37,6 @@ export default function HistoryPage() {
 
   return (
     <div className="min-h-screen bg-[#f0f0f0] text-slate-900">
-      <header className="px-6 py-6">
-        <div className="mx-auto flex max-w-screen-2xl items-center gap-6 rounded-[32px] bg-white px-6 py-4 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.45)] ring-1 ring-slate-200/80">
-          <img src={logoSrc} alt="Hearthy logo" className="h-10 w-auto" />
-          <nav className="hidden flex-1 items-center justify-center gap-8 text-sm font-semibold text-slate-700 md:flex">
-            <a href="#dashboard" className="transition hover:text-slate-900">
-              Dashboard
-            </a>
-            <a href="#assessment" className="transition hover:text-slate-900">
-              Assessment
-            </a>
-            <a href="#history" className="text-slate-950 font-bold transition">
-              History
-            </a>
-          </nav>
-          <div className="inline-flex items-center gap-2 text-sm font-semibold text-slate-950 transition hover:text-slate-900">
-            <span>Ramadoni</span>
-            <img src={iconUser} alt="User icon" className="h-6 w-6" />
-          </div>
-        </div>
-      </header>
-
       <main className="mx-auto max-w-screen-2xl px-6 py-10">
         <section className="mx-auto max-w-screen-2xl">
           <div className="rounded-[32px] bg-white px-6 py-8 shadow-[0_24px_80px_-38px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
