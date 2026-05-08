@@ -1,11 +1,16 @@
 import logoHearthy from '../image/logo-hearthy.png'
 import doctorImage from '../image/doctor-image.png'
-import { useEffect } from 'react'
+import iconShow from '../icon/icon-show.svg'
+import iconHide from '../icon/icon-hide.svg'
+import { useEffect, useState } from 'react'
 
 export default function Login({ onNavigate }) {
+  const [showPassword, setShowPassword] = useState(false)
+
   useEffect(() => {
     document.title = 'Login - Web Hearty'
   }, [])
+
   return (
     <div className="min-h-screen flex overflow-hidden bg-white">
       <div className="hidden lg:flex lg:w-1/2 bg-[#e8ecef] flex-col relative overflow-hidden">
@@ -46,17 +51,31 @@ export default function Login({ onNavigate }) {
               <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
               <input
                 type="email"
-                placeholder="nama@email.com"
+                placeholder="Masukkan email"
                 className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Masukkan password"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none pr-12"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute inset-y-0 right-3 flex items-center justify-center p-2 text-gray-500 hover:text-gray-700"
+                  aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                >
+                  <img
+                    src={showPassword ? iconShow : iconHide}
+                    alt={showPassword ? 'Icon show password' : 'Icon hide password'}
+                    className="h-5 w-5"
+                  />
+                </button>
+              </div>
             </div>
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center text-gray-600">
