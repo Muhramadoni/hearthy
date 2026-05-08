@@ -115,7 +115,7 @@ export default function DashboardPage({ currentPage, onNavigate }) {
                   <span className="text-4xl">
                     {metric.value.split(" /")[0]}
                   </span>
-                  <span className="text-2xl">
+                  <span className="text-2xl text-[#000000]">
                     {" "}
                     /{metric.value.split(" /")[1]}
                   </span>
@@ -217,11 +217,11 @@ export default function DashboardPage({ currentPage, onNavigate }) {
         </section>
 
         <section className="mt-8 grid gap-6 xl:grid-cols-[1.5fr_1fr]">
-          <article className="rounded-[32px] bg-white p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
+          <article className="rounded-[32px] bg-[#ffffff] p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
             <h2 className="text-xl font-semibold text-slate-950">
               Rekomendasi
             </h2>
-            <div className="mt-5 rounded-[28px] bg-slate-50 p-6 text-sm leading-7 text-slate-600">
+            <div className="mt-5 rounded-[15px] bg-[#E8EBEE] p-6 text-sm leading-7 text-slate-600">
               Batasi konsumsi gula dan lebih memperhatikan pola makan harian
               agar kadar gula darah serta tekanan darah tetap stabil. Selain
               itu, sempatkan untuk berolahraga secara rutin guna menjaga
@@ -230,7 +230,7 @@ export default function DashboardPage({ currentPage, onNavigate }) {
             </div>
           </article>
 
-          <article className="rounded-[32px] bg-white p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
+          <article className="rounded-[30px] bg-white p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
             <h2 className="text-xl font-semibold text-slate-950">Penyebab</h2>
             <div className="mt-5 space-y-3">
               {causes.map((cause) => (
