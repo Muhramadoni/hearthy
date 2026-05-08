@@ -214,7 +214,7 @@ export default function DashboardPage({ currentPage, onNavigate }) {
               </svg>
             </div>
           </article>
-        </section>q
+        </section>
 
         <section className="mt-8 grid gap-6 xl:grid-cols-[1.5fr_1fr]">
           <article className="rounded-[32px] bg-white p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
