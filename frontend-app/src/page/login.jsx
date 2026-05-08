@@ -1,115 +1,88 @@
-// import { useState } from "react";
-// import logoSrc from "../image/logo-hearthy.png";
-// import doctorImage from "../image/doctor-image.png";
+import logoHearthy from '../image/logo-hearthy.png'
+import doctorImage from '../image/doctor-image.png'
+import { useEffect } from 'react'
 
-// export default function LoginPage() {
-//   const [showPassword, setShowPassword] = useState(false);
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
+export default function Login({ onNavigate }) {
+  useEffect(() => {
+    document.title = 'Login - Web Hearty'
+  }, [])
+  return (
+    <div className="min-h-screen flex overflow-hidden bg-white">
+      <div className="hidden lg:flex lg:w-1/2 bg-[#e8ecef] flex-col relative overflow-hidden">
+        <div className="p-10 absolute top-0 left-0">
+          <img 
+            src={logoHearthy} 
+            alt="Hearthy logo" 
+            className="h-10 cursor-pointer" 
+            onClick={() => onNavigate?.("home")}
+          />
+        </div>
 
-//   return (
-//     <div className="relative min-h-screen overflow-hidden bg-[#f5f7fb] text-slate-950">
-//       <div className="mx-auto flex min-h-screen max-w-screen-2xl flex-col px-6 py-6">
-//         <header className="flex items-center justify-between">
-//           <div className="flex items-center gap-3">
-//             <img src={logoSrc} alt="Hearthy logo" className="h-10 w-auto" />
-//             <span className="text-xl font-semibold tracking-tight text-slate-950">
-//               Hearthy
-//             </span>
-//           </div>
-//         </header>
+        <div className="flex-1 flex items-end justify-center">
+          <img
+            src={doctorImage}
+            alt="Doctor illustration"
+            className="h-[90vh] w-auto object-contain"
+          />
+        </div>
+      </div>
 
-//         <main className="relative mt-8 flex flex-1 items-center justify-center overflow-hidden px-4">
-//           <div className="relative flex w-full max-w-[1320px] items-center justify-between gap-8">
-//             <div className="hidden lg:flex lg:w-[649px] items-center justify-center overflow-hidden">
-//               <img
-//                 src={doctorImage}
-//                 alt="Doctor illustration"
-//                 width={649}
-//                 height={860}
-//                 className="h-[860px] w-[649px] object-contain"
-//               />
-//             </div>
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
+        <div className="w-full max-w-md">
+          <div className="lg:hidden mb-8 flex justify-center">
+            <img 
+              src={logoHearthy} 
+              alt="Hearthy logo" 
+              className="h-10 cursor-pointer" 
+              onClick={() => onNavigate?.("home")}
+            />
+          </div>
 
-//             <div className="w-full max-w-[470px] rounded-[32px] border border-slate-200 bg-white p-8 shadow-[0_24px_80px_-38px_rgba(15,23,42,0.16)]">
-//               <h1 className="text-center text-3xl font-bold text-slate-950">
-//                 Login
-//               </h1>
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">Selamat Datang</h2>
+          <p className="text-gray-500 mb-8">Silakan masuk ke akun Hearthy Anda</p>
 
-//               <div className="mt-10 space-y-6">
-//                 <div>
-//                   <label className="block text-sm font-medium text-slate-700 mb-2">
-//                     Email
-//                   </label>
-//                   <input
-//                     type="email"
-//                     value={email}
-//                     onChange={(event) => setEmail(event.target.value)}
-//                     placeholder="Masukkan Email"
-//                     className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
-//                   />
-//                 </div>
-
-//                 <div>
-//                   <label className="block text-sm font-medium text-slate-700 mb-2">
-//                     Password
-//                   </label>
-//                   <div className="relative">
-//                     <input
-//                       type={showPassword ? "text" : "password"}
-//                       value={password}
-//                       onChange={(event) => setPassword(event.target.value)}
-//                       placeholder="Masukkan Password"
-//                       className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 pr-12 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
-//                     />
-//                     <button
-//                       type="button"
-//                       onClick={() => setShowPassword(!showPassword)}
-//                       className="absolute inset-y-0 right-3 flex items-center text-slate-500"
-//                     >
-//                       {showPassword ? (
-//                         <span className="text-lg">🙈</span>
-//                       ) : (
-//                         <span className="text-lg">👁️</span>
-//                       )}
-//                     </button>
-//                   </div>
-//                 </div>
-
-//                 <div className="flex items-center justify-between text-sm">
-//                   <label className="inline-flex items-center gap-2 text-slate-700">
-//                     <input
-//                       type="checkbox"
-//                       className="h-4 w-4 rounded border-slate-300 text-slate-950 focus:ring-slate-950"
-//                     />
-//                     Ingat saya
-//                   </label>
-//                   <a
-//                     href="#"
-//                     className="font-medium text-sky-700 hover:text-sky-800"
-//                   >
-//                     Lupa password?
-//                   </a>
-//                 </div>
-
-//                 <button className="w-full rounded-2xl bg-[#1e3a5a] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#172c45]">
-//                   Masuk
-//                 </button>
-//               </div>
-
-//               <p className="mt-8 text-center text-sm text-slate-600">
-//                 Belum punya akun?{" "}
-//                 <a
-//                   href="#"
-//                   className="font-semibold text-sky-700 hover:text-sky-800"
-//                 >
-//                   Daftar sekarang
-//                 </a>
-//               </p>
-//             </div>
-//           </div>
-//         </main>
-//       </div>
-//     </div>
-//   );
-// }
+          <form className="space-y-5">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+              <input
+                type="email"
+                placeholder="nama@email.com"
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <label className="flex items-center text-gray-600">
+                <input type="checkbox" className="mr-2" /> Ingat saya
+              </label>
+              <a href="#" className="text-blue-600 font-semibold">Lupa password?</a>
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-[#1e3a5f] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-900/20"
+            >
+              Masuk
+            </button>
+          </form>
+          <p className="text-center text-sm text-gray-500 mt-8">
+            Belum punya akun?{' '}
+            <button
+              type="button"
+              onClick={() => onNavigate?.('register')}
+              className="text-blue-600 font-bold"
+            >
+              Daftar sekarang
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}

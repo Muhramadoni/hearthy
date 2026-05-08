@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
 import iconLaporan from "../icon/icon-laporan.svg";
 
@@ -31,6 +31,10 @@ const historyGroups = [
 
 export default function HistoryPage({ currentPage, onNavigate }) {
   const [selectedDate, setSelectedDate] = useState("");
+
+  useEffect(() => {
+    document.title = 'History - Web Hearty'
+  }, [])
 
   const handleDateChange = (event) => {
     setSelectedDate(event.target.value);

@@ -31,7 +31,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#f3f4f6] text-slate-950">
+    <div className="min-h-screen bg-[#f0f0f0] text-slate-950">
       <div
         className={`relative z-10 transition-all duration-200 ${isEditModalOpen ? "blur-lg pointer-events-none" : ""}`}
       >
@@ -76,7 +76,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
               <button
                 type="button"
                 onClick={() => setIsEditModalOpen(true)}
-                className="inline-flex items-center gap-2 rounded-2xl bg-[#1e3a5a] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#173652]"
+                className="inline-flex items-center gap-2 rounded-2xl bg-[#1e3a5a] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#173652] cursor-pointer"
               >
                 <img src={iconEdit} alt="Edit profile" className="h-4 w-4" />
                 Edit
@@ -157,7 +157,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleInputChange}
-                  className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
+                  className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
                 />
               </div>
               <div>
@@ -169,7 +169,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleInputChange}
-                  className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
+                  className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
                 />
               </div>
               <div>
@@ -181,7 +181,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
+                  className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
                 />
               </div>
               <div>
@@ -193,7 +193,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
+                  className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
                 />
               </div>
               <div className="sm:col-span-2">
@@ -205,7 +205,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                   name="address"
                   value={formData.address}
                   onChange={handleInputChange}
-                  className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
+                  className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
                 />
               </div>
             </div>

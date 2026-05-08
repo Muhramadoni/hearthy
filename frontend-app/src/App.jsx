@@ -4,9 +4,10 @@ import DashboardPage from "./page/dashboard.jsx";
 import AssessmentPage from "./page/assessment.jsx";
 import HistoryPage from "./page/history.jsx";
 import UserProfilePage from "./page/user-profile.jsx";
+import LoginPage from "./page/login.jsx";
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState("dashboard");
+  const [currentPage, setCurrentPage] = useState("home");
 
   const handleNavigate = (page) => {
     setCurrentPage(page);
@@ -32,6 +33,9 @@ export default function App() {
           currentPage={currentPage}
           onNavigate={handleNavigate}
         />
+      )}
+      {currentPage === "login" && (
+        <LoginPage currentPage={currentPage} onNavigate={handleNavigate} />
       )}
     </div>
   );

@@ -19,7 +19,7 @@ export default function Navbar({ currentPage = "home", onNavigate, showLoginButt
         <nav className="hidden flex-1 items-center justify-center gap-8 text-sm font-semibold text-slate-700 md:flex">
           <button
             onClick={() => onNavigate("dashboard")}
-            className={`px-4 py-2 rounded-lg transition ${
+            className={`px-4 py-2 rounded-lg transition cursor-pointer ${
               currentPage === "dashboard" ? "bg-[#1b4062] text-white font-bold" : "hover:bg-[#1b4062] hover:text-white"
             }`}
           >
@@ -27,7 +27,7 @@ export default function Navbar({ currentPage = "home", onNavigate, showLoginButt
           </button>
           <button
             onClick={() => onNavigate("assessment")}
-            className={`px-4 py-2 rounded-lg transition ${
+            className={`px-4 py-2 rounded-lg transition cursor-pointer ${
               currentPage === "assessment" ? "bg-[#1b4062] text-white font-bold" : "hover:bg-[#1b4062] hover:text-white"
             }`}
           >
@@ -35,7 +35,7 @@ export default function Navbar({ currentPage = "home", onNavigate, showLoginButt
           </button>
           <button
             onClick={() => onNavigate("history")}
-            className={`px-4 py-2 rounded-lg transition ${
+            className={`px-4 py-2 rounded-lg transition cursor-pointer ${
               currentPage === "history" ? "bg-[#1b4062] text-white font-bold" : "hover:bg-[#1b4062] hover:text-white"
             }`}
           >

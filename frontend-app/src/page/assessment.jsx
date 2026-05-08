@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
 import iconProfilAsasment from "../icon/icon-profil-asasment.svg";
 import iconDetakJantung from "../icon/icon-detak jantung.svg";
 
 export default function AssessmentPage({ currentPage, onNavigate }) {
   const [familyHistory, setFamilyHistory] = useState("Ya");
+
+  useEffect(() => {
+    document.title = 'Assessment - Web Hearty'
+  }, [])
 
   return (
     <div className="min-h-screen bg-[#f0f0f0] text-slate-950">
@@ -54,7 +58,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                 <input
                   type="number"
                   placeholder="Masukkan usia"
-                  className="mt-3 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
+                  className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
                 />
               </label>
               <label className="block">
@@ -64,7 +68,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                 <input
                   type="text"
                   placeholder="Masukkan berat badan"
-                  className="mt-3 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
+                  className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
                 />
               </label>
               <label className="block">
@@ -74,7 +78,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                 <input
                   type="text"
                   placeholder="Masukkan tekanan darah"
-                  className="mt-3 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
+                  className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
                 />
               </label>
               <label className="block">
@@ -84,7 +88,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                 <input
                   type="text"
                   placeholder="Contoh < 200"
-                  className="mt-3 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
+                  className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
                 />
               </label>
               <label className="block">
@@ -94,7 +98,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                 <input
                   type="text"
                   placeholder="Contoh 60 - 100"
-                  className="mt-3 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
+                  className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
                 />
               </label>
             </div>
@@ -147,7 +151,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                   Tingkatan diet
                 </span>
                 <div className="relative mt-3">
-                  <select className="w-full appearance-none rounded-2xl border border-slate-300 bg-white px-4 py-3 pr-12 text-sm text-slate-900 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10">
+                  <select className="w-full appearance-none rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 pr-12 text-sm text-slate-900 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10">
                     <option>Normal</option>
                     <option>Sedang</option>
                     <option>Tinggi</option>
@@ -165,7 +169,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                 <input
                   type="text"
                   placeholder="Berapa kali anda konsumsi alkohol"
-                  className="mt-3 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
+                  className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
                 />
               </label>
 
@@ -176,7 +180,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                 <input
                   type="text"
                   placeholder="Rata-rata langkah harian contoh > 5000"
-                  className="mt-3 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
+                  className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
                 />
               </label>
 
@@ -185,7 +189,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                   Level stress
                 </span>
                 <div className="relative mt-3">
-                  <select className="w-full appearance-none rounded-2xl border border-slate-300 bg-white px-4 py-3 pr-12 text-sm text-slate-900 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10">
+                  <select className="w-full appearance-none rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 pr-12 text-sm text-slate-900 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10">
                     <option>Normal 0 - 14</option>
                     <option>Sedang 15 - 21</option>
                     <option>Tinggi 22+</option>
@@ -203,7 +207,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                 <input
                   type="text"
                   placeholder="Contoh 1 jam 15 menit"
-                  className="mt-3 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
+                  className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
                 />
               </label>
 
@@ -214,7 +218,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                 <input
                   type="text"
                   placeholder="Contoh 8 jam 10 menit"
-                  className="mt-3 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
+                  className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
                 />
               </label>
             </div>

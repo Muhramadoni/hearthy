@@ -1,5 +1,6 @@
 import Navbar from "../components/Navbar.jsx";
 import iconGrafik from "../icon/icon-grafik.svg";
+import { useEffect } from "react";
 
 const metricItems = [
   {
@@ -46,6 +47,10 @@ const linePath = chartPoints
   .join(" ");
 
 export default function DashboardPage({ currentPage, onNavigate }) {
+  useEffect(() => {
+    document.title = 'Dashboard - Web Hearty'
+  }, [])
+
   return (
     <div className="min-h-screen bg-[#f0f0f0] text-slate-950">
       <Navbar
