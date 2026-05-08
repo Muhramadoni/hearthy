@@ -9,7 +9,7 @@ export default function Navbar({ currentPage = "home", onNavigate, showLoginButt
 
   return (
     <header className="px-6 py-6">
-      <div className="mx-auto flex max-w-screen-2xl items-center gap-6 rounded-[32px] bg-white px-6 py-4 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
+      <div className="mx-auto flex max-w-screen-2xl items-center gap-6 rounded-[32px] bg-white px-6 py-4 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.16)] shadow-lg ring-1 ring-slate-200/70">
         <img
           src={logoSrc}
           alt="Hearthy logo"
