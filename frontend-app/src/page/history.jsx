@@ -88,7 +88,7 @@ export default function HistoryPage({ currentPage, onNavigate }) {
                   {group.records.map((record, index) => (
                     <article
                       key={`${group.label}-${index}`}
-                      className="rounded-3xl bg-white p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.2)]"
+                      className="rounded-3xl bg-white p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.2)] transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-105 hover:shadow-xl"
                     >
                       <div className="flex items-center gap-3">
                         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-100">
