@@ -5,6 +5,9 @@ import AssessmentPage from "./page/assessment.jsx";
 import HistoryPage from "./page/history.jsx";
 import UserProfilePage from "./page/user-profile.jsx";
 import LoginPage from "./page/login.jsx";
+import RegisterPage from "./page/register.jsx";
+import ResetPasswordPage from "./page/reset.jsx";
+import HistoryDetailPage from "./page/history-detail.jsx";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState("home");
@@ -28,6 +31,12 @@ export default function App() {
       {currentPage === "history" && (
         <HistoryPage currentPage={currentPage} onNavigate={handleNavigate} />
       )}
+      {currentPage === "history-detail" && (
+        <HistoryDetailPage
+          currentPage={currentPage}
+          onNavigate={handleNavigate}
+        />
+      )}
       {currentPage === "profile" && (
         <UserProfilePage
           currentPage={currentPage}
@@ -36,6 +45,15 @@ export default function App() {
       )}
       {currentPage === "login" && (
         <LoginPage currentPage={currentPage} onNavigate={handleNavigate} />
+      )}
+      {currentPage === "register" && (
+        <RegisterPage currentPage={currentPage} onNavigate={handleNavigate} />
+      )}
+      {currentPage === "reset" && (
+        <ResetPasswordPage
+          currentPage={currentPage}
+          onNavigate={handleNavigate}
+        />
       )}
     </div>
   );

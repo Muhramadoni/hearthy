@@ -6,8 +6,7 @@ import iconEdit from "../icon/icon-edit.svg";
 export default function UserProfilePage({ currentPage, onNavigate }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: "Muhammad",
-    lastName: "Ramadoni",
+    username: "MuhammadRamadoni",
     email: "MuhRama123@gmail.com",
     phone: "+62882123987",
     address: "Jl. Teratai Gg. Hj. Dona Rt/Rw 01/02 kota Tangerang",
@@ -64,12 +63,11 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                 </div>
                 <div>
                   <h2 className="text-2xl font-semibold text-[#1e3a5a]">
-                    Muhammad Ramadoni
+                    {formData.username}
                   </h2>
                   <p className="mt-2 text-base font-medium text-slate-600">
-                    Mahasiswa
+                    {formData.email}
                   </p>
-                  <p className="mt-1 text-sm text-slate-500">Jl. Teratatai</p>
                 </div>
               </div>
 
@@ -90,36 +88,28 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
             </h2>
 
             <div className="mt-8 grid gap-6 sm:grid-cols-2">
-              <div>
+              <div className="sm:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-500">
-                  Nama Depan
+                  Username
                 </label>
                 <div className="rounded-2xl bg-[#f3f4f6] px-4 py-4 text-sm text-slate-900">
-                  Muhammad
+                  {formData.username}
                 </div>
               </div>
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-500">
-                  Nama Belakang
-                </label>
-                <div className="rounded-2xl bg-[#f3f4f6] px-4 py-4 text-sm text-slate-900">
-                  Ramadoni
-                </div>
-              </div>
-              <div>
+              <div className="sm:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-500">
                   Email
                 </label>
                 <div className="rounded-2xl bg-[#f3f4f6] px-4 py-4 text-sm text-slate-900">
-                  MuhRama123@gmail.com
+                  {formData.email}
                 </div>
               </div>
-              <div>
+              <div className="sm:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-500">
                   Telepon
                 </label>
                 <div className="rounded-2xl bg-[#f3f4f6] px-4 py-4 text-sm text-slate-900">
-                  +62882123987
+                  {formData.phone}
                 </div>
               </div>
               <div className="sm:col-span-2">
@@ -130,7 +120,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                   readOnly
                   rows={4}
                   className="w-full rounded-2xl bg-[#f3f4f6] px-4 py-4 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
-                  value="Jl. Teratai Gg. Hj. Dona Rt/Rw 01/02 kota Tangerang"
+                  value={formData.address}
                 />
               </div>
             </div>
@@ -148,31 +138,19 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
             </h2>
 
             <div className="grid gap-6 sm:grid-cols-2">
-              <div>
+              <div className="sm:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-500">
-                  Nama Depan
+                  Username
                 </label>
                 <input
                   type="text"
-                  name="firstName"
-                  value={formData.firstName}
+                  name="username"
+                  value={formData.username}
                   onChange={handleInputChange}
                   className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
                 />
               </div>
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-500">
-                  Nama Belakang
-                </label>
-                <input
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
-                />
-              </div>
-              <div>
+              <div className="sm:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-500">
                   Email
                 </label>
@@ -184,7 +162,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                   className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
                 />
               </div>
-              <div>
+              <div className="sm:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-500">
                   Telepon
                 </label>
@@ -201,8 +179,8 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                   Alamat
                 </label>
                 <textarea
-                  rows={4}
                   name="address"
+                  rows={4}
                   value={formData.address}
                   onChange={handleInputChange}
                   className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"

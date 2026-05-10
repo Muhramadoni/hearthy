@@ -33,8 +33,8 @@ export default function HistoryPage({ currentPage, onNavigate }) {
   const [selectedDate, setSelectedDate] = useState("");
 
   useEffect(() => {
-    document.title = 'History - Web Hearty'
-  }, [])
+    document.title = "History - Web Hearty";
+  }, []);
 
   const handleDateChange = (event) => {
     setSelectedDate(event.target.value);
@@ -104,12 +104,13 @@ export default function HistoryPage({ currentPage, onNavigate }) {
                       </div>
                       <div className="mt-6 flex items-center justify-between text-sm text-slate-600">
                         <span>{record.time}</span>
-                        <a
-                          href="#"
+                        <button
+                          type="button"
+                          onClick={() => onNavigate?.("history-detail")}
                           className="font-medium text-sky-700 transition hover:text-sky-800"
                         >
                           Lihat Selengkapnya
-                        </a>
+                        </button>
                       </div>
                     </article>
                   ))}
