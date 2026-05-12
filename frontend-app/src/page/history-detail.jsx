@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
+import Chatbot from "../components/Chatbot.jsx";
 
 const detailItems = [
   "23 Tahun",
@@ -155,6 +156,7 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
           </div>
         </div>
       </main>
+      <Chatbot />
     </div>
   );
 }

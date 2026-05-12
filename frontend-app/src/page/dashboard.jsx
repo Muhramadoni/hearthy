@@ -1,4 +1,5 @@
 import Navbar from "../components/Navbar.jsx";
+import Chatbot from "../components/Chatbot.jsx";
 import iconGrafik from "../icon/icon-grafik.svg";
 import { useEffect } from "react";
 
@@ -48,8 +49,8 @@ const linePath = chartPoints
 
 export default function DashboardPage({ currentPage, onNavigate }) {
   useEffect(() => {
-    document.title = 'Dashboard - Web Hearty'
-  }, [])
+    document.title = "Dashboard - Web Hearty";
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#f0f0f0] text-slate-950">
@@ -246,6 +247,7 @@ export default function DashboardPage({ currentPage, onNavigate }) {
           </article>
         </section>
       </main>
+      <Chatbot />
     </div>
   );
 }

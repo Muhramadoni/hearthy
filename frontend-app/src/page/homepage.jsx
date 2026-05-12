@@ -4,6 +4,7 @@ import iconAI from "../icon/icon-AI.svg";
 import iconHasilSkrining from "../icon/icon-hasil-skrining.svg";
 import { useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
+import Chatbot from "../components/Chatbot.jsx";
 
 const steps = [
   {
@@ -475,6 +476,7 @@ function App({ currentPage, onNavigate }) {
           </div>
         </div>
       </footer>
+      <Chatbot />
     </div>
   );
 }

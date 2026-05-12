@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
+import Chatbot from "../components/Chatbot.jsx";
 import iconLaporan from "../icon/icon-laporan.svg";
 
 const historyGroups = [
@@ -120,6 +121,7 @@ export default function HistoryPage({ currentPage, onNavigate }) {
           </div>
         </section>
       </main>
+      <Chatbot />
     </div>
   );
 }

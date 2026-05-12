@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar.jsx";
+import Chatbot from "../components/Chatbot.jsx";
 import iconUser from "../icon/icon-user.svg";
 import iconEdit from "../icon/icon-edit.svg";
 
@@ -207,6 +208,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
           </div>
         </div>
       )}
+      <Chatbot />
     </div>
   );
 }

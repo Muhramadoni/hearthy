@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
+import Chatbot from "../components/Chatbot.jsx";
 import iconProfilAsasment from "../icon/icon-profil-asasment.svg";
 import iconDetakJantung from "../icon/icon-detak jantung.svg";
 
@@ -304,8 +305,9 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
       </main>
 
       {isStressTestOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="max-h-[80vh] w-full max-w-2xl overflow-hidden rounded-3xl bg-white p-8 shadow-lg">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/80 z-40"></div>
+          <div className="relative z-50 w-full max-w-2xl rounded-[28px] bg-white p-8 shadow-[0_20px_60px_-20px_rgba(15,23,42,0.12),_inset_0_1px_0_0_rgba(255,255,255,0.5)] ring-1 ring-slate-200 my-8 overflow-hidden">
             <h2 className="mb-6 text-xl font-semibold text-slate-950">
               Test Level Stress
             </h2>
@@ -351,6 +353,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
           </div>
         </div>
       )}
+      <Chatbot />
     </div>
   );
 }
