@@ -5,10 +5,72 @@ import iconDetakJantung from "../icon/icon-detak jantung.svg";
 
 export default function AssessmentPage({ currentPage, onNavigate }) {
   const [familyHistory, setFamilyHistory] = useState("Ya");
+  const [stressLevel, setStressLevel] = useState("");
+  const [isStressTestOpen, setIsStressTestOpen] = useState(false);
+  const [stressAnswers, setStressAnswers] = useState({});
+
+  const stressQuestions = [
+    {
+      id: 1,
+      question:
+        "Apakah Anda sering merasa cemas atau khawatir tanpa alasan yang jelas?",
+      options: ["Tidak pernah", "Kadang-kadang", "Sering", "Selalu"],
+    },
+    {
+      id: 2,
+      question:
+        "Apakah Anda mengalami kesulitan tidur karena pikiran yang terus berputar?",
+      options: ["Tidak pernah", "Kadang-kadang", "Sering", "Selalu"],
+    },
+    {
+      id: 3,
+      question:
+        "Apakah Anda merasa lelah atau kelelahan meskipun sudah beristirahat cukup?",
+      options: ["Tidak pernah", "Kadang-kadang", "Sering", "Selalu"],
+    },
+    {
+      id: 4,
+      question: "Apakah Anda sering merasa mudah marah atau frustrasi?",
+      options: ["Tidak pernah", "Kadang-kadang", "Sering", "Selalu"],
+    },
+    {
+      id: 5,
+      question:
+        "Apakah Anda mengalami penurunan nafsu makan atau perubahan berat badan?",
+      options: ["Tidak pernah", "Kadang-kadang", "Sering", "Selalu"],
+    },
+  ];
+
+  const handleStressAnswer = (questionId, answer) => {
+    setStressAnswers((prev) => ({ ...prev, [questionId]: answer }));
+  };
+
+  const calculateStressLevel = () => {
+    const scores = {
+      "Tidak pernah": 0,
+      "Kadang-kadang": 1,
+      Sering: 2,
+      Selalu: 3,
+    };
+    const totalScore = Object.values(stressAnswers).reduce(
+      (sum, answer) => sum + scores[answer],
+      0,
+    );
+    if (totalScore <= 5) return "Normal (0-5)";
+    if (totalScore <= 10) return "Sedang (6-10)";
+    return "Tinggi (11+)";
+  };
+
+  const handleProcessStressTest = () => {
+    const level = calculateStressLevel();
+    setStressLevel(level);
+    setIsStressTestOpen(false);
+    setStressAnswers({});
+  };
 
   useEffect(() => {
-    document.title = 'Assessment - Web Hearty'
-  }, [])
+    document.title = "Assessment - Web Hearty";
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#f0f0f0] text-slate-950">
@@ -188,15 +250,21 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                 <span className="text-sm font-semibold text-slate-900">
                   Level stress
                 </span>
-                <div className="relative mt-3">
-                  <select className="w-full appearance-none rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 pr-12 text-sm text-slate-900 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10">
-                    <option>Normal 0 - 14</option>
-                    <option>Sedang 15 - 21</option>
-                    <option>Tinggi 22+</option>
-                  </select>
-                  <span className="pointer-events-none absolute inset-y-0 right-4 inline-flex items-center text-slate-400">
-                    ▼
-                  </span>
+                <div className="mt-3 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsStressTestOpen(true)}
+                    className="rounded-2xl bg-[#1e3a5a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#173652]"
+                  >
+                    Test level stress
+                  </button>
+                  <input
+                    type="text"
+                    value={stressLevel}
+                    readOnly
+                    placeholder="Hasil test akan muncul di sini"
+                    className="flex-1 rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
+                  />
                 </div>
               </label>
 
@@ -234,6 +302,55 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
           </button>
         </div>
       </main>
+
+      {isStressTestOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="max-h-[80vh] w-full max-w-2xl overflow-hidden rounded-3xl bg-white p-8 shadow-lg">
+            <h2 className="mb-6 text-xl font-semibold text-slate-950">
+              Test Level Stress
+            </h2>
+            <div className="max-h-96 overflow-y-auto space-y-6">
+              {stressQuestions.map((q) => (
+                <div key={q.id}>
+                  <p className="mb-3 text-sm font-semibold text-slate-900">
+                    {q.question}
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {q.options.map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        onClick={() => handleStressAnswer(q.id, option)}
+                        className={`rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
+                          stressAnswers[q.id] === option
+                            ? "border-[#1e3a5a] bg-[#1e3a5a] text-white"
+                            : "border-slate-300 bg-white text-slate-700"
+                        }`}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setIsStressTestOpen(false)}
+                className="rounded-2xl bg-slate-300 px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-400"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleProcessStressTest}
+                className="rounded-2xl bg-[#1e3a5a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#173652]"
+              >
+                Proses
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
