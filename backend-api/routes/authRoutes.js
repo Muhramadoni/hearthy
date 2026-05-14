@@ -18,4 +18,10 @@ router.get('/me', authenticate, authController.me);
 // POST /api/auth/refresh
 router.post('/refresh', authController.refreshToken);
 
+// POST /api/auth/check-email
+router.post('/check-email', authController.checkEmail);
+
+// POST /api/auth/reset-password
+router.post('/reset-password', authController.resetPassword);
+
 module.exports = router;

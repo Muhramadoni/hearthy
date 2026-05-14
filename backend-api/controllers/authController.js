@@ -104,6 +104,43 @@ const authController = {
       next(err);
     }
   },
+  // POST /api/auth/check-email
+  checkEmail: async (req, res, next) => {
+    try {
+      const { email } = req.body;
+      if (!email) return res.status(400).json({ status: 'error', message: 'Email wajib diisi.' });
+
+      const user = await userModel.findByEmail(email);
+      if (!user) {
+        return res.status(404).json({ status: 'error', message: 'Email tidak terdaftar.' });
+      }
+
+      res.json({ status: 'success', message: 'Email terdaftar.' });
+    } catch (err) { next(err); }
+  },
+
+  // POST /api/auth/reset-password
+  resetPassword: async (req, res, next) => {
+    try {
+      const { email, newPassword } = req.body;
+      if (!email || !newPassword) {
+        return res.status(400).json({ status: 'error', message: 'Email dan password baru wajib diisi.' });
+      }
+      if (newPassword.length < 6) {
+        return res.status(400).json({ status: 'error', message: 'Password minimal 6 karakter.' });
+      }
+
+      const user = await userModel.findByEmail(email);
+      if (!user) {
+        return res.status(404).json({ status: 'error', message: 'Email tidak terdaftar.' });
+      }
+
+      const hashed = await bcrypt.hash(newPassword, 12);
+      await userModel.updatePassword(user.id, hashed);
+
+      res.json({ status: 'success', message: 'Password berhasil direset. Silakan login kembali.' });
+    } catch (err) { next(err); }
+  },
 };
 
 module.exports = authController;

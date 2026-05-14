@@ -3,9 +3,20 @@ import logoSrc from "../image/logo-hearthy.png";
 import iconUser from "../icon/icon-user.svg";
 import iconSetting from "../icon/icon-setting.svg";
 import iconLogout from "../icon/icon-logout.svg";
+import { getCurrentUser, logout } from "../services/authService";
 
-export default function Navbar({ currentPage = "home", onNavigate, showLoginButton = false, username = "Ramadoni" }) {
+export default function Navbar({ currentPage = "home", onNavigate, showLoginButton = false }) {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+
+  // Ambil data user dari localStorage
+  const user = getCurrentUser();
+  const username = user?.name ?? "Pengguna";
+
+  const handleLogout = async () => {
+    await logout();
+    setIsProfileMenuOpen(false);
+    onNavigate("home");
+  };
 
   return (
     <header className="px-6 py-6">
@@ -54,6 +65,7 @@ export default function Navbar({ currentPage = "home", onNavigate, showLoginButt
           <div className="relative">
             <button
               type="button"
+              id="navbar-profile-btn"
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
               className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-950 shadow-sm shadow-slate-200/50 transition hover:bg-slate-200"
             >
@@ -75,7 +87,9 @@ export default function Navbar({ currentPage = "home", onNavigate, showLoginButt
                   Pengaturan
                 </button>
                 <button
+                  id="navbar-logout-btn"
                   type="button"
+                  onClick={handleLogout}
                   className="block w-full px-4 py-3 text-left bg-white text-sm font-medium text-red-600 hover:bg-red-50 transition flex items-center gap-3"
                 >
                   <img src={iconLogout} alt="Logout icon" className="h-5 w-5" />
