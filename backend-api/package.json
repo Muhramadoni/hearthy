@@ -6,7 +6,11 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "migrate": "node database/runMigrations.js",
+    "migrate": "node database/runMigrations.js up",
+    "migrate:up": "node database/runMigrations.js up",
+    "migrate:down": "node database/runMigrations.js down",
+    "migrate:down:all": "node database/runMigrations.js down all",
+    "migrate:fresh": "node database/runMigrations.js down all && node database/runMigrations.js up",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
