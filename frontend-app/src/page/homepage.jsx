@@ -5,6 +5,7 @@ import iconHasilSkrining from "../icon/icon-hasil-skrining.svg";
 import { useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
 import Chatbot from "../components/Chatbot.jsx";
+import { isAuthenticated } from "../services/authService";
 
 const steps = [
   {
@@ -242,7 +243,7 @@ function App({ currentPage, onNavigate }) {
       <Navbar
         currentPage={currentPage}
         onNavigate={onNavigate}
-        showLoginButton={true}
+        showLoginButton={!isAuthenticated()}
       />
 
       <main className="pt-8">

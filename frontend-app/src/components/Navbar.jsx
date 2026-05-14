@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import logoSrc from "../image/logo-hearthy.png";
 import iconUser from "../icon/icon-user.svg";
 import iconSetting from "../icon/icon-setting.svg";
@@ -7,14 +7,22 @@ import { getCurrentUser, logout } from "../services/authService";
 
 export default function Navbar({ currentPage = "home", onNavigate, showLoginButton = false }) {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [user, setUser] = useState(getCurrentUser());
 
-  // Ambil data user dari localStorage
-  const user = getCurrentUser();
+  useEffect(() => {
+    const handleStorage = () => setUser(getCurrentUser());
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  const isLoggedIn = !!user;
   const username = user?.name ?? "Pengguna";
+  const shouldShowLoginButton = showLoginButton || !isLoggedIn;
 
   const handleLogout = async () => {
     await logout();
     setIsProfileMenuOpen(false);
+    setUser(null);
     onNavigate("home");
   };
 
@@ -53,7 +61,7 @@ export default function Navbar({ currentPage = "home", onNavigate, showLoginButt
             History
           </button>
         </nav>
-        {showLoginButton ? (
+        {shouldShowLoginButton ? (
           <button
             type="button"
             onClick={() => onNavigate("login")}
