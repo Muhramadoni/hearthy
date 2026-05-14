@@ -4,6 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "migrate": "node src/migrations/migrate.js up",
+    "migrate:down": "node src/migrations/migrate.js down",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
