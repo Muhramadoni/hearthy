@@ -4,11 +4,27 @@ import Chatbot from "../components/Chatbot.jsx";
 import iconProfilAsasment from "../icon/icon-profil-asasment.svg";
 import iconDetakJantung from "../icon/icon-detak jantung.svg";
 
+const getDietCategory = (level) => {
+  const categories = {
+    1: "Sangat Buruk",
+    2: "Buruk",
+    3: "Kurang",
+    4: "Cukup / Normal",
+    5: "Sedang",
+    6: "Baik",
+    7: "Sangat Baik",
+  };
+  return categories[level] || "";
+};
+
 export default function AssessmentPage({ currentPage, onNavigate }) {
   const [familyHistory, setFamilyHistory] = useState("Ya");
   const [stressLevel, setStressLevel] = useState("");
   const [isStressTestOpen, setIsStressTestOpen] = useState(false);
   const [stressAnswers, setStressAnswers] = useState({});
+  const [physicalActivity, setPhysicalActivity] = useState(12);
+  const [sleepDuration, setSleepDuration] = useState(8);
+  const [dietLevel, setDietLevel] = useState("");
 
   const stressQuestions = [
     {
@@ -134,16 +150,24 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                   className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
                 />
               </label>
-              <label className="block">
+              <div className="block">
                 <span className="text-sm font-semibold text-slate-900">
                   Tekanan darah
                 </span>
-                <input
-                  type="text"
-                  placeholder="Masukkan tekanan darah"
-                  className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
-                />
-              </label>
+                <div className="mt-3 flex items-center gap-3">
+                  <input
+                    type="number"
+                    placeholder="Sistolik (cth: 120)"
+                    className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
+                  />
+                  <span className="text-xl font-medium text-slate-400">/</span>
+                  <input
+                    type="number"
+                    placeholder="Diastolik (cth: 80)"
+                    className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
+                  />
+                </div>
+              </div>
               <label className="block">
                 <span className="text-sm font-semibold text-slate-900">
                   Kolestrol
@@ -213,16 +237,20 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                 <span className="text-sm font-semibold text-slate-900">
                   Tingkatan diet
                 </span>
-                <div className="relative mt-3">
-                  <select className="w-full appearance-none rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 pr-12 text-sm text-slate-900 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10">
-                    <option>Normal</option>
-                    <option>Sedang</option>
-                    <option>Tinggi</option>
-                  </select>
-                  <span className="pointer-events-none absolute inset-y-0 right-4 inline-flex items-center text-slate-400">
-                    ▼
-                  </span>
-                </div>
+                <input
+                  type="number"
+                  min="1"
+                  max="7"
+                  value={dietLevel}
+                  onChange={(e) => setDietLevel(e.target.value)}
+                  placeholder="contoh: 1-7"
+                  className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
+                />
+                {dietLevel && getDietCategory(dietLevel) && (
+                  <p className="mt-2 text-sm text-slate-500">
+                    Kategori: <span className="font-semibold text-slate-700">{getDietCategory(dietLevel)}</span>
+                  </p>
+                )}
               </label>
 
               <label className="block">
@@ -269,27 +297,63 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                 </div>
               </label>
 
-              <label className="block">
+              <div className="block">
                 <span className="text-sm font-semibold text-slate-900">
-                  Jumlah jam aktivitas fisik per-minggu
+                  Aktivitas Fisik (jam/minggu)
                 </span>
-                <input
-                  type="text"
-                  placeholder="Contoh 1 jam 15 menit"
-                  className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
-                />
-              </label>
+                <div className="mt-3 flex items-center gap-4">
+                  <input
+                    type="range"
+                    min="0"
+                    max="168"
+                    value={physicalActivity}
+                    onChange={(e) => setPhysicalActivity(e.target.value)}
+                    className="flex-1 h-2 cursor-pointer appearance-none rounded-lg bg-slate-200 accent-[#1e3a5a]"
+                  />
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="number"
+                      min="0"
+                      max="168"
+                      value={physicalActivity}
+                      onChange={(e) => setPhysicalActivity(e.target.value)}
+                      className="w-20 rounded-xl border-2 border-slate-300 bg-white px-3 py-2 text-center text-sm text-slate-900 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
+                    />
+                    <span className="text-sm font-medium text-slate-900">
+                      jam/minggu
+                    </span>
+                  </div>
+                </div>
+              </div>
 
-              <label className="block">
+              <div className="block">
                 <span className="text-sm font-semibold text-slate-900">
-                  Rata-rata durasi tidur per-malam
+                  Durasi Tidur (jam/malam)
                 </span>
-                <input
-                  type="text"
-                  placeholder="Contoh 8 jam 10 menit"
-                  className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
-                />
-              </label>
+                <div className="mt-3 flex items-center gap-4">
+                  <input
+                    type="range"
+                    min="0"
+                    max="24"
+                    value={sleepDuration}
+                    onChange={(e) => setSleepDuration(e.target.value)}
+                    className="flex-1 h-2 cursor-pointer appearance-none rounded-lg bg-slate-200 accent-[#1e3a5a]"
+                  />
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="number"
+                      min="0"
+                      max="24"
+                      value={sleepDuration}
+                      onChange={(e) => setSleepDuration(e.target.value)}
+                      className="w-20 rounded-xl border-2 border-slate-300 bg-white px-3 py-2 text-center text-sm text-slate-900 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
+                    />
+                    <span className="text-sm font-medium text-slate-900">
+                      jam/malam
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>

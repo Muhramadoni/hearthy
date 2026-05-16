@@ -22,7 +22,7 @@ const metricItems = [
   {
     title: "Kolesterol",
     value: "100 /90",
-    unit: "mmHg",
+    unit: "mg/dL",
   },
 ];
 
@@ -33,7 +33,7 @@ const causes = [
 ];
 
 const chartValues = [12, 16, 22, 29, 25, 20, 14];
-const chartLabels = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
+const chartLabels = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul"];
 const minValue = Math.min(...chartValues) - 2;
 const maxValue = Math.max(...chartValues) + 2;
 const chartPoints = chartValues.map((value, index) => {
@@ -143,10 +143,7 @@ export default function DashboardPage({ currentPage, onNavigate }) {
                   </p>
                 </div>
               </div>
-              <button className="inline-flex items-center justify-center rounded-2xl bg-[#1e3a5a] px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-slate-900/10 transition hover:bg-[#173652]">
-                Hari ini
-                <span className="ml-2">▾</span>
-              </button>
+
             </div>
 
             <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-slate-50 p-4">
