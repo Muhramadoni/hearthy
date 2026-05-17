@@ -24,7 +24,8 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "pg": "^8.20.0"
+    "pg": "^8.20.0",
+    "sweetalert2": "^11.26.24"
   },
   "devDependencies": {
     "bcryptjs": "^3.0.3",
