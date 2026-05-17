@@ -48,23 +48,15 @@ const userController = {
   // GET /api/users/stats
   getStats: async (req, res, next) => {
     try {
-      const total    = await assessmentModel.countByUser(req.user.id);
-      const recent   = await assessmentModel.findAllByUser(req.user.id, 5, 0);
-      const profile  = await profileModel.findByUserId(req.user.id);
-
-      // BMI calc if data available
-      let bmi = null;
-      if (profile?.height && profile?.weight) {
-        const hm = profile.height / 100;
-        bmi = parseFloat((profile.weight / (hm * hm)).toFixed(1));
-      }
+      const total   = await assessmentModel.countByUser(req.user.id);
+      const recent  = await assessmentModel.findAllByUser(req.user.id, 5, 0);
+      const profile = await profileModel.findByUserId(req.user.id);
 
       res.json({
         status: 'success',
         data: {
           totalAssessments: total,
           recentAssessments: recent,
-          bmi,
           profile,
         },
       });

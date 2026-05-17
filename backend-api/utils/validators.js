@@ -35,34 +35,21 @@ const validateLogin = ({ email, password } = {}) => {
 
 // ── Profile Validator ─────────────────────────────────────────────────────────
 
-const VALID_GENDERS        = ['male', 'female', 'non-binary', 'prefer_not_to_say'];
-const VALID_BLOOD_TYPES    = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-const VALID_ACTIVITY_LEVELS= ['sedentary', 'lightly_active', 'moderate', 'very_active', 'extra_active'];
-
 const validateProfileUpdate = (data = {}) => {
-  const { age, gender, height, weight, blood_type, activity_level } = data;
+  const { phone, address } = data;
 
-  if (age !== undefined) {
-    const n = Number(age);
-    if (isNaN(n) || n < 1 || n > 150) return createError('Age must be between 1 and 150.');
+  if (phone !== undefined && phone !== null && phone !== '') {
+    if (typeof phone !== 'string') return createError('Nomor telepon harus berupa teks.');
+    if (!/^[\d\s\+\-\(\)]{7,20}$/.test(phone.trim())) {
+      return createError('Nomor telepon tidak valid (7-20 karakter, boleh berisi angka, +, -, spasi, kurung).');
+    }
   }
-  if (gender !== undefined && !VALID_GENDERS.includes(gender)) {
-    return createError(`Gender must be one of: ${VALID_GENDERS.join(', ')}`);
+
+  if (address !== undefined && address !== null && address !== '') {
+    if (typeof address !== 'string') return createError('Alamat harus berupa teks.');
+    if (address.trim().length > 500) return createError('Alamat maksimal 500 karakter.');
   }
-  if (height !== undefined) {
-    const n = Number(height);
-    if (isNaN(n) || n < 50 || n > 300) return createError('Height must be between 50 and 300 cm.');
-  }
-  if (weight !== undefined) {
-    const n = Number(weight);
-    if (isNaN(n) || n < 1 || n > 700) return createError('Weight must be between 1 and 700 kg.');
-  }
-  if (blood_type !== undefined && !VALID_BLOOD_TYPES.includes(blood_type)) {
-    return createError(`Blood type must be one of: ${VALID_BLOOD_TYPES.join(', ')}`);
-  }
-  if (activity_level !== undefined && !VALID_ACTIVITY_LEVELS.includes(activity_level)) {
-    return createError(`Activity level must be one of: ${VALID_ACTIVITY_LEVELS.join(', ')}`);
-  }
+
   return { error: null };
 };
 

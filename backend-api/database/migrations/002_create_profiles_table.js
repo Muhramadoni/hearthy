@@ -1,27 +1,19 @@
 /**
  * Migration: 002_create_profiles_table
  * Creates: profiles table (linked to users)
+ * Columns: id, user_id, phone, address, created_at, updated_at
  */
 
 module.exports = {
   up: async (pool) => {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS profiles (
-        id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id            UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        age                INTEGER,
-        gender             VARCHAR(20)  CHECK (gender IN ('male', 'female', 'other')),
-        height             NUMERIC(5,2),
-        weight             NUMERIC(5,2),
-        blood_type         VARCHAR(5),
-        activity_level     VARCHAR(30)  CHECK (activity_level IN ('sedentary','light','moderate','active','very_active')),
-        health_goals       JSONB        DEFAULT '[]',
-        medical_conditions JSONB        DEFAULT '[]',
-        medications        JSONB        DEFAULT '[]',
-        avatar_url         TEXT,
-        bio                TEXT,
-        created_at         TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-        updated_at         TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id    UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        phone      VARCHAR(20),
+        address    TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       );
     `);
 

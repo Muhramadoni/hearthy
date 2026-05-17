@@ -4,6 +4,7 @@ import iconUser from "../icon/icon-user.svg";
 import iconSetting from "../icon/icon-setting.svg";
 import iconLogout from "../icon/icon-logout.svg";
 import { getCurrentUser, logout } from "../services/authService";
+import Swal from "sweetalert2";
 
 export default function Navbar({ currentPage = "home", onNavigate, showLoginButton = false }) {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -20,6 +21,25 @@ export default function Navbar({ currentPage = "home", onNavigate, showLoginButt
   const shouldShowLoginButton = showLoginButton || !isLoggedIn;
 
   const handleLogout = async () => {
+    const result = await Swal.fire({
+      title: "Keluar dari akun?",
+      text: "Kamu perlu login lagi untuk mengakses fitur Hearthy.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, Logout",
+      cancelButtonText: "Batal",
+      confirmButtonColor: "#1e3a5a",
+      cancelButtonColor: "#e2e8f0",
+      customClass: {
+        cancelButton: "!text-slate-900",
+        popup: "!rounded-3xl",
+        title: "!text-[#1e3a5a]",
+      },
+      reverseButtons: true,
+    });
+
+    if (!result.isConfirmed) return;
+
     await logout();
     setIsProfileMenuOpen(false);
     setUser(null);

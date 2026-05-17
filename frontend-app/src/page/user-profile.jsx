@@ -3,31 +3,75 @@ import Navbar from "../components/Navbar.jsx";
 import Chatbot from "../components/Chatbot.jsx";
 import iconUser from "../icon/icon-user.svg";
 import iconEdit from "../icon/icon-edit.svg";
+import { fetchProfile, updateProfile } from "../services/userService";
 
 export default function UserProfilePage({ currentPage, onNavigate }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    username: "MuhammadRamadoni",
-    email: "MuhRama123@gmail.com",
-    phone: "+62882123987",
-    address: "Jl. Teratai Gg. Hj. Dona Rt/Rw 01/02 kota Tangerang",
-  });
+  const [loading, setLoading]                 = useState(true);
+  const [saving, setSaving]                   = useState(false);
+  const [errorMsg, setErrorMsg]               = useState("");
+  const [successMsg, setSuccessMsg]           = useState("");
+
+  // Data yang ditampilkan (dari API)
+  const [userData, setUserData] = useState({ name: "", email: "" });
+  const [formData, setFormData] = useState({ phone: "", address: "" });
+  // Salinan sementara untuk modal edit
+  const [editData, setEditData] = useState({ phone: "", address: "" });
 
   useEffect(() => {
     document.title = "Profil Saya - Hearthy";
+    let cancelled = false;
+    const load = async () => {
+      try {
+        setLoading(true);
+        const { user, profile } = await fetchProfile();
+        if (cancelled) return;
+        setUserData({ name: user.name, email: user.email });
+        setFormData({
+          phone:   profile?.phone   ?? "",
+          address: profile?.address ?? "",
+        });
+      } catch (_err) {
+        if (!cancelled) setErrorMsg("Gagal memuat profil. Silakan coba lagi.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    load();
+    return () => { cancelled = true; };
   }, []);
+
+  const openEdit = () => {
+    setEditData({ phone: formData.phone, address: formData.address });
+    setErrorMsg("");
+    setSuccessMsg("");
+    setIsEditModalOpen(true);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setEditData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    // TODO: Save data to backend
-    setIsEditModalOpen(false);
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      setErrorMsg("");
+      const updated = await updateProfile({
+        phone:   editData.phone.trim()   || null,
+        address: editData.address.trim() || null,
+      });
+      setFormData({
+        phone:   updated.phone   ?? "",
+        address: updated.address ?? "",
+      });
+      setSuccessMsg("Profil berhasil diperbarui.");
+      setIsEditModalOpen(false);
+    } catch (err) {
+      setErrorMsg(err.message || "Gagal menyimpan profil.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -38,7 +82,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
         <Navbar
           currentPage={currentPage ?? "profile"}
           onNavigate={onNavigate ?? (() => {})}
-          username="Ramadoni"
+          username={userData.name}
         />
       </div>
 
@@ -51,80 +95,106 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
           </h1>
         </div>
 
-        <section className="mt-10 space-y-8">
+        {/* Toast sukses */}
+        {successMsg && (
+          <div className="mx-auto mt-4 max-w-3xl rounded-2xl bg-green-50 border border-green-200 px-5 py-3 text-sm text-green-700 flex items-center justify-between">
+            <span>{successMsg}</span>
+            <button onClick={() => setSuccessMsg("")} className="ml-4 font-bold text-green-500 hover:text-green-700">✕</button>
+          </div>
+        )}
+
+        <section className="mt-6 space-y-8">
+          {/* Card avatar + nama */}
           <article className="rounded-[28px] bg-white p-8 shadow-[0_20px_60px_-20px_rgba(15,23,42,0.12)]">
-            <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex items-center gap-6">
-                <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-slate-950 bg-[#f8fafc]">
-                  <img
-                    src={iconUser}
-                    alt="Avatar placeholder"
-                    className="h-16 w-16"
-                  />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-semibold text-[#1e3a5a]">
-                    {formData.username}
-                  </h2>
-                  <p className="mt-2 text-base font-medium text-slate-600">
-                    {formData.email}
-                  </p>
+            {loading ? (
+              <div className="flex items-center gap-6 animate-pulse">
+                <div className="h-28 w-28 rounded-full bg-slate-200" />
+                <div className="space-y-3">
+                  <div className="h-5 w-48 rounded-full bg-slate-200" />
+                  <div className="h-4 w-64 rounded-full bg-slate-200" />
                 </div>
               </div>
+            ) : (
+              <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex items-center gap-6">
+                  <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-slate-950 bg-[#f8fafc]">
+                    <img src={iconUser} alt="Avatar" className="h-16 w-16" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-semibold text-[#1e3a5a]">
+                      {userData.name}
+                    </h2>
+                    <p className="mt-2 text-base font-medium text-slate-600">
+                      {userData.email}
+                    </p>
+                  </div>
+                </div>
 
-              <button
-                type="button"
-                onClick={() => setIsEditModalOpen(true)}
-                className="inline-flex items-center gap-2 rounded-2xl bg-[#1e3a5a] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#173652] cursor-pointer"
-              >
-                <img src={iconEdit} alt="Edit profile" className="h-4 w-4" />
-                Edit
-              </button>
-            </div>
+                <button
+                  type="button"
+                  onClick={openEdit}
+                  className="inline-flex items-center gap-2 rounded-2xl bg-[#1e3a5a] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#173652] cursor-pointer"
+                >
+                  <img src={iconEdit} alt="Edit profil" className="h-4 w-4" />
+                  Edit
+                </button>
+              </div>
+            )}
           </article>
 
+          {/* Card data pribadi */}
           <article className="rounded-[28px] bg-white p-8 shadow-[0_20px_60px_-20px_rgba(15,23,42,0.12)]">
-            <h2 className="text-xl font-semibold text-[#1e3a5a]">
-              Data Pribadi
-            </h2>
+            <h2 className="text-xl font-semibold text-[#1e3a5a]">Data Pribadi</h2>
 
-            <div className="mt-8 grid gap-6 sm:grid-cols-2">
-              <div className="sm:col-span-2">
-                <label className="mb-2 block text-sm font-medium text-slate-500">
-                  Username
-                </label>
-                <div className="rounded-2xl bg-[#f3f4f6] px-4 py-4 text-sm text-slate-900">
-                  {formData.username}
+            {loading ? (
+              <div className="mt-8 space-y-4 animate-pulse">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="h-12 rounded-2xl bg-slate-100" />
+                ))}
+              </div>
+            ) : (
+              <div className="mt-8 grid gap-6 sm:grid-cols-2">
+                {/* Username (read-only) */}
+                <div className="sm:col-span-2">
+                  <label className="mb-2 block text-sm font-medium text-slate-500">
+                    Username
+                  </label>
+                  <div className="rounded-2xl bg-[#f3f4f6] px-4 py-4 text-sm text-slate-900">
+                    {userData.name}
+                  </div>
+                </div>
+
+                {/* Email (read-only) */}
+                <div className="sm:col-span-2">
+                  <label className="mb-2 block text-sm font-medium text-slate-500">
+                    Email
+                  </label>
+                  <div className="rounded-2xl bg-[#f3f4f6] px-4 py-4 text-sm text-slate-900">
+                    {userData.email}
+                  </div>
+                </div>
+
+                {/* Telepon */}
+                <div className="sm:col-span-2">
+                  <label className="mb-2 block text-sm font-medium text-slate-500">
+                    Telepon
+                  </label>
+                  <div className={`rounded-2xl bg-[#f3f4f6] px-4 py-4 text-sm ${formData.phone ? "text-slate-900" : "text-slate-400 italic"}`}>
+                    {formData.phone || "Belum diisi"}
+                  </div>
+                </div>
+
+                {/* Alamat */}
+                <div className="sm:col-span-2">
+                  <label className="mb-2 block text-sm font-medium text-slate-500">
+                    Alamat
+                  </label>
+                  <div className={`min-h-[96px] rounded-2xl bg-[#f3f4f6] px-4 py-4 text-sm whitespace-pre-wrap ${formData.address ? "text-slate-900" : "text-slate-400 italic"}`}>
+                    {formData.address || "Belum diisi"}
+                  </div>
                 </div>
               </div>
-              <div className="sm:col-span-2">
-                <label className="mb-2 block text-sm font-medium text-slate-500">
-                  Email
-                </label>
-                <div className="rounded-2xl bg-[#f3f4f6] px-4 py-4 text-sm text-slate-900">
-                  {formData.email}
-                </div>
-              </div>
-              <div className="sm:col-span-2">
-                <label className="mb-2 block text-sm font-medium text-slate-500">
-                  Telepon
-                </label>
-                <div className="rounded-2xl bg-[#f3f4f6] px-4 py-4 text-sm text-slate-900">
-                  {formData.phone}
-                </div>
-              </div>
-              <div className="sm:col-span-2">
-                <label className="mb-2 block text-sm font-medium text-slate-500">
-                  Alamat
-                </label>
-                <textarea
-                  readOnly
-                  rows={4}
-                  className="w-full rounded-2xl bg-[#f3f4f6] px-4 py-4 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
-                  value={formData.address}
-                />
-              </div>
-            </div>
+            )}
           </article>
         </section>
       </main>
@@ -132,82 +202,100 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
       {/* Edit Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black/80 z-40"></div>
+          <div className="fixed inset-0 bg-black/80 z-40" onClick={() => !saving && setIsEditModalOpen(false)} />
           <div className="relative z-50 w-full max-w-2xl rounded-[28px] bg-white p-8 shadow-[0_20px_60px_-20px_rgba(15,23,42,0.12),_inset_0_1px_0_0_rgba(255,255,255,0.5)] ring-1 ring-slate-200 my-8">
             <h2 className="text-2xl font-semibold text-[#1e3a5a] mb-6">
               Edit Data Pribadi
             </h2>
 
+            {/* Error dalam modal */}
+            {errorMsg && (
+              <div className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+                {errorMsg}
+              </div>
+            )}
+
+            {/* Username & Email — read-only dalam modal */}
             <div className="grid gap-6 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-500">
-                  Username
+                  Username <span className="text-xs text-slate-400">(tidak dapat diubah)</span>
                 </label>
-                <input
-                  type="text"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleInputChange}
-                  className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
-                />
+                <div className="w-full rounded-2xl bg-[#f3f4f6] px-4 py-3 text-sm text-slate-500">
+                  {userData.name}
+                </div>
               </div>
+
               <div className="sm:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-500">
-                  Email
+                  Email <span className="text-xs text-slate-400">(tidak dapat diubah)</span>
                 </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
-                />
+                <div className="w-full rounded-2xl bg-[#f3f4f6] px-4 py-3 text-sm text-slate-500">
+                  {userData.email}
+                </div>
               </div>
+
+              {/* Telepon — editable */}
               <div className="sm:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-500">
                   Telepon
                 </label>
                 <input
+                  id="edit-phone"
                   type="tel"
                   name="phone"
-                  value={formData.phone}
+                  value={editData.phone}
                   onChange={handleInputChange}
+                  placeholder="Contoh: +6281234567890"
                   className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
                 />
               </div>
+
+              {/* Alamat — editable */}
               <div className="sm:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-500">
                   Alamat
                 </label>
                 <textarea
+                  id="edit-address"
                   name="address"
                   rows={4}
-                  value={formData.address}
+                  value={editData.address}
                   onChange={handleInputChange}
-                  className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
+                  placeholder="Masukkan alamat lengkap Anda"
+                  className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20 resize-none"
                 />
               </div>
             </div>
 
-            <div className="mt-8 flex gap-3 justify-end sm:flex-row">
+            <div className="mt-8 flex gap-3 justify-end">
               <button
                 type="button"
                 onClick={() => setIsEditModalOpen(false)}
-                className="rounded-2xl border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
+                disabled={saving}
+                className="rounded-2xl border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50 disabled:opacity-50"
               >
                 Batal
               </button>
               <button
                 type="button"
                 onClick={handleSave}
-                className="rounded-2xl bg-[#1e3a5a] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#173652]"
+                disabled={saving}
+                className="rounded-2xl bg-[#1e3a5a] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#173652] disabled:opacity-60 flex items-center gap-2"
               >
-                Simpan
+                {saving && (
+                  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                  </svg>
+                )}
+                {saving ? "Menyimpan…" : "Simpan"}
               </button>
             </div>
           </div>
         </div>
       )}
+
       <Chatbot />
     </div>
   );
