@@ -23,7 +23,7 @@ export default function Navbar({ currentPage = "home", onNavigate, showLoginButt
   const handleLogout = async () => {
     const result = await Swal.fire({
       title: "Keluar dari akun?",
-      text: "Kamu perlu login lagi untuk mengakses fitur Hearthy.",
+      text: "Apakah kamu yakin ingin keluar?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Ya, Logout",
