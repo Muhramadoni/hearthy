@@ -48,7 +48,7 @@ const assessmentController = {
       // Check for required features
       const requiredFeatures = [
         'age', 'bmi', 'systolic_bp', 'diastolic_bp', 'cholesterol_mg_dl', 
-        'resting_heart_rate', 'smoking_status', 'daily_steps', 'stress_level', 
+        'resting_heart_rate', 'daily_steps', 'stress_level', 
         'physical_activity_hours_per_week', 'sleep_hours', 
         'family_history_heart_disease', 'diet_quality_score', 'alcohol_units_per_week'
       ];

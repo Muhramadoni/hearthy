@@ -22,7 +22,7 @@ def main():
         # Required features based on the training dataset
         required_features = [
             'age', 'bmi', 'systolic_bp', 'diastolic_bp', 'cholesterol_mg_dl', 
-            'resting_heart_rate', 'smoking_status', 'daily_steps', 'stress_level', 
+            'resting_heart_rate', 'daily_steps', 'stress_level', 
             'physical_activity_hours_per_week', 'sleep_hours', 
             'family_history_heart_disease', 'diet_quality_score', 'alcohol_units_per_week'
         ]
@@ -42,7 +42,7 @@ def main():
         dia_bp = features['diastolic_bp'][0]
         chol = features['cholesterol_mg_dl'][0]
         steps = features['daily_steps'][0]
-        smoke = features['smoking_status'][0]
+        smoke = 2 # Default to non-smoker (2) since it was removed from UI
         diet = features['diet_quality_score'][0]
         sleep = features['sleep_hours'][0]
         alc = features['alcohol_units_per_week'][0]
@@ -138,6 +138,7 @@ def main():
         ]
 
         # 2. Convert to DataFrame with explicit order
+        features['smoking_status'] = [smoke]
         df = pd.DataFrame(features)[column_order]
         
         # 3. Load Models and Encoders

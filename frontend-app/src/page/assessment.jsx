@@ -33,7 +33,6 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
   const [diastolicBp, setDiastolicBp] = useState("");
   const [cholesterol, setCholesterol] = useState("");
   const [heartRate, setHeartRate] = useState("");
-  const [smokingStatus, setSmokingStatus] = useState("Tidak");
   const [alcoholUnits, setAlcoholUnits] = useState("");
   const [dailySteps, setDailySteps] = useState("");
 
@@ -108,7 +107,6 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
       return;
     }
 
-    const smokingVal = smokingStatus === "Ya" ? 0 : 2;
     const familyVal = familyHistory === "Ya" ? 1 : 0;
     
     let stressVal = 0;
@@ -124,7 +122,6 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
         diastolic_bp: parseInt(diastolicBp),
         cholesterol_mg_dl: parseInt(cholesterol),
         resting_heart_rate: parseInt(heartRate),
-        smoking_status: smokingVal,
         daily_steps: parseInt(dailySteps),
         stress_level: stressVal,
         physical_activity_hours_per_week: parseInt(physicalActivity),
@@ -353,28 +350,6 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                       onClick={() => setFamilyHistory(option)}
                       className={`rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
                         familyHistory === option
-                          ? "border-[#1e3a5a] bg-[#1e3a5a] text-white"
-                          : "border-slate-300 bg-white text-slate-700"
-                      }`}
-                    >
-                      {option}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              <div>
-                <p className="mb-3 text-sm font-semibold text-slate-900">
-                  Status Merokok
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  {["Ya", "Tidak"].map((option) => (
-                    <button
-                      key={`smoke-${option}`}
-                      type="button"
-                      onClick={() => setSmokingStatus(option)}
-                      className={`rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
-                        smokingStatus === option
                           ? "border-[#1e3a5a] bg-[#1e3a5a] text-white"
                           : "border-slate-300 bg-white text-slate-700"
                       }`}
