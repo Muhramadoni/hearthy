@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar.jsx";
 import Chatbot from "../components/Chatbot.jsx";
 import iconProfilAsasment from "../icon/icon-profil-asasment.svg";
 import iconDetakJantung from "../icon/icon-detak jantung.svg";
+import Swal from "sweetalert2";
 
 const getDietCategory = (level) => {
   const categories = {
@@ -25,6 +26,16 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
   const [physicalActivity, setPhysicalActivity] = useState(12);
   const [sleepDuration, setSleepDuration] = useState(8);
   const [dietLevel, setDietLevel] = useState("");
+
+  const [age, setAge] = useState("");
+  const [bmi, setBmi] = useState("");
+  const [systolicBp, setSystolicBp] = useState("");
+  const [diastolicBp, setDiastolicBp] = useState("");
+  const [cholesterol, setCholesterol] = useState("");
+  const [heartRate, setHeartRate] = useState("");
+  const [smokingStatus, setSmokingStatus] = useState("Tidak");
+  const [alcoholUnits, setAlcoholUnits] = useState("");
+  const [dailySteps, setDailySteps] = useState("");
 
   const stressQuestions = [
     {
@@ -85,6 +96,112 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
     setStressAnswers({});
   };
 
+  const handleSubmit = async () => {
+    // Basic validation
+    if (!age || !bmi || !systolicBp || !diastolicBp || !cholesterol || !heartRate || !dietLevel || !alcoholUnits || !dailySteps || !stressLevel) {
+      Swal.fire({
+        icon: "warning",
+        title: "Data Tidak Lengkap",
+        text: "Harap isi semua field dan lakukan Test Level Stress sebelum menyimpan.",
+        confirmButtonColor: "#1e3a5a",
+      });
+      return;
+    }
+
+    const smokingVal = smokingStatus === "Ya" ? 0 : 2;
+    const familyVal = familyHistory === "Ya" ? 1 : 0;
+    
+    let stressVal = 0;
+    if (stressLevel.includes("Normal")) stressVal = 3;
+    else if (stressLevel.includes("Sedang")) stressVal = 6;
+    else if (stressLevel.includes("Tinggi")) stressVal = 9;
+
+    const payload = {
+      answers: {
+        age: parseInt(age),
+        bmi: parseFloat(bmi),
+        systolic_bp: parseInt(systolicBp),
+        diastolic_bp: parseInt(diastolicBp),
+        cholesterol_mg_dl: parseInt(cholesterol),
+        resting_heart_rate: parseInt(heartRate),
+        smoking_status: smokingVal,
+        daily_steps: parseInt(dailySteps),
+        stress_level: stressVal,
+        physical_activity_hours_per_week: parseInt(physicalActivity),
+        sleep_hours: parseFloat(sleepDuration),
+        family_history_heart_disease: familyVal,
+        diet_quality_score: parseInt(dietLevel),
+        alcohol_units_per_week: parseFloat(alcoholUnits),
+      }
+    };
+
+    try {
+      Swal.fire({
+        title: "Sedang Menganalisis...",
+        text: "AI sedang mengkalkulasi risiko kardiovaskular Anda.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      const token = localStorage.getItem("hearthy_token");
+      const res = await fetch("http://localhost:5000/api/assessments/predict", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.message || "Gagal melakukan prediksi");
+      }
+
+      const pred = data.data.prediction;
+      const severity = pred.severity_mapped;
+      const score = pred.score;
+      
+      let icon = "success";
+      let color = "#10b981"; 
+      
+      if (severity === "moderate") {
+        icon = "warning";
+        color = "#f59e0b"; 
+      } else if (severity === "high" || severity === "very_high") {
+        icon = "error";
+        color = "#ef4444"; 
+      }
+
+      Swal.fire({
+        icon: icon,
+        title: "Hasil Analisis AI",
+        html: `
+          <div class="mt-4 text-left">
+            <p class="mb-2 text-slate-700">Tingkat Risiko: <strong style="color: ${color}">${severity.toUpperCase()}</strong></p>
+            <p class="mb-2 text-slate-700">Probabilitas: <strong>${score}%</strong></p>
+            <hr class="my-3"/>
+            <p class="text-sm text-slate-600">Data penilaian Anda telah disimpan ke riwayat kesehatan.</p>
+          </div>
+        `,
+        confirmButtonColor: "#1e3a5a",
+      }).then(() => {
+        if(onNavigate) onNavigate("dashboard");
+      });
+
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Terjadi Kesalahan",
+        text: error.message,
+        confirmButtonColor: "#1e3a5a",
+      });
+    }
+  };
+
   useEffect(() => {
     document.title = "Assessment - Web Hearty";
   }, []);
@@ -137,6 +254,8 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                 <input
                   type="number"
                   placeholder="Masukkan usia"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
                   className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
                 />
               </label>
@@ -145,8 +264,11 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                   BMI
                 </span>
                 <input
-                  type="text"
-                  placeholder="Masukkan berat badan"
+                  type="number"
+                  step="0.1"
+                  placeholder="Masukkan BMI"
+                  value={bmi}
+                  onChange={(e) => setBmi(e.target.value)}
                   className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
                 />
               </label>
@@ -158,12 +280,16 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                   <input
                     type="number"
                     placeholder="Sistolik (cth: 120)"
+                    value={systolicBp}
+                    onChange={(e) => setSystolicBp(e.target.value)}
                     className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
                   />
                   <span className="text-xl font-medium text-slate-400">/</span>
                   <input
                     type="number"
                     placeholder="Diastolik (cth: 80)"
+                    value={diastolicBp}
+                    onChange={(e) => setDiastolicBp(e.target.value)}
                     className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
                   />
                 </div>
@@ -173,8 +299,10 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                   Kolestrol
                 </span>
                 <input
-                  type="text"
-                  placeholder="Contoh < 200"
+                  type="number"
+                  placeholder="Contoh 200"
+                  value={cholesterol}
+                  onChange={(e) => setCholesterol(e.target.value)}
                   className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
                 />
               </label>
@@ -183,8 +311,10 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                   Detak jantung
                 </span>
                 <input
-                  type="text"
-                  placeholder="Contoh 60 - 100"
+                  type="number"
+                  placeholder="Contoh 60"
+                  value={heartRate}
+                  onChange={(e) => setHeartRate(e.target.value)}
                   className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
                 />
               </label>
@@ -232,6 +362,28 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                   ))}
                 </div>
               </div>
+              
+              <div>
+                <p className="mb-3 text-sm font-semibold text-slate-900">
+                  Status Merokok
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  {["Ya", "Tidak"].map((option) => (
+                    <button
+                      key={`smoke-${option}`}
+                      type="button"
+                      onClick={() => setSmokingStatus(option)}
+                      className={`rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
+                        smokingStatus === option
+                          ? "border-[#1e3a5a] bg-[#1e3a5a] text-white"
+                          : "border-slate-300 bg-white text-slate-700"
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               <label className="block">
                 <span className="text-sm font-semibold text-slate-900">
@@ -258,8 +410,10 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                   Konsumsi alcohol per-minggu
                 </span>
                 <input
-                  type="text"
+                  type="number"
                   placeholder="Berapa kali anda konsumsi alkohol"
+                  value={alcoholUnits}
+                  onChange={(e) => setAlcoholUnits(e.target.value)}
                   className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
                 />
               </label>
@@ -269,8 +423,10 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                   Rata-rata jumlah langkah per-hari
                 </span>
                 <input
-                  type="text"
-                  placeholder="Rata-rata langkah harian contoh > 5000"
+                  type="number"
+                  placeholder="Rata-rata langkah harian contoh 5000"
+                  value={dailySteps}
+                  onChange={(e) => setDailySteps(e.target.value)}
                   className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a]/10"
                 />
               </label>
@@ -362,7 +518,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
           <button className="inline-flex items-center justify-center rounded-full bg-[#dddddd] px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-300">
             Lihat ringkasan
           </button>
-          <button className="inline-flex items-center justify-center rounded-full bg-[#1e3a5a] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#173652]">
+          <button onClick={handleSubmit} className="inline-flex items-center justify-center rounded-full bg-[#1e3a5a] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#173652]">
             Simpan dan lihat hasil
           </button>
         </div>

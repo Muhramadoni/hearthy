@@ -11,6 +11,7 @@
     "migrate:down": "node database/runMigrations.js down",
     "migrate:down:all": "node database/runMigrations.js down all",
     "migrate:fresh": "node database/runMigrations.js down all && node database/runMigrations.js up",
+    "ai:setup": "pip install tensorflow scikit-learn numpy pandas joblib",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

@@ -1,6 +1,7 @@
 const assessmentModel = require('../models/assessmentModel');
 const { calculateScore } = require('../utils/mockAI');
 const { getRecommendationsByScore } = require('../utils/mockAI');
+const { predictCardiovascularRisk } = require('../utils/aiService');
 
 const assessmentController = {
   // POST /api/assessments
@@ -32,6 +33,59 @@ const assessmentController = {
         status: 'success',
         message: 'Assessment submitted successfully! 🌿',
         data: { assessment },
+      });
+    } catch (err) { next(err); }
+  },
+
+  // POST /api/assessments/predict
+  predictCardiovascularRisk: async (req, res, next) => {
+    try {
+      const { answers } = req.body;
+      if (!answers || typeof answers !== 'object') {
+        return res.status(400).json({ status: 'error', message: 'Answers are required for prediction.' });
+      }
+
+      // Check for required features
+      const requiredFeatures = [
+        'age', 'bmi', 'systolic_bp', 'diastolic_bp', 'cholesterol_mg_dl', 
+        'resting_heart_rate', 'smoking_status', 'daily_steps', 'stress_level', 
+        'physical_activity_hours_per_week', 'sleep_hours', 
+        'family_history_heart_disease', 'diet_quality_score', 'alcohol_units_per_week'
+      ];
+
+      for (const feature of requiredFeatures) {
+        if (answers[feature] === undefined) {
+          return res.status(400).json({
+            status: 'error',
+            message: `Missing required feature for prediction: ${feature}`,
+          });
+        }
+      }
+
+      // Call the AI Service
+      const predictionResult = await predictCardiovascularRisk(answers);
+      
+      const { risk_category, score, severity_mapped } = predictionResult;
+
+      // Save to database
+      const assessment = await assessmentModel.create({
+        userId: req.user.id,
+        type: 'cardiovascular',
+        answers,
+        score: Math.round(score), // This is the probability percentage, must be integer
+        maxScore: 100, // Probability max is 100
+        severity: severity_mapped,
+        recommendations: [`Your predicted cardiovascular risk category is: ${risk_category}.`],
+        aiInsights: `The AI model analyzed your inputs and predicted a score of ${score}%. Risk category: ${risk_category}.`,
+      });
+
+      res.status(201).json({
+        status: 'success',
+        message: 'Cardiovascular risk prediction completed successfully! ❤️',
+        data: { 
+          prediction: predictionResult,
+          assessment
+        },
       });
     } catch (err) { next(err); }
   },
