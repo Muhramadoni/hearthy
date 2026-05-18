@@ -114,15 +114,15 @@ export default function DashboardPage({ currentPage, onNavigate }) {
 
   const getStatusColor = (status) => {
     const s = status.toLowerCase();
-    if (s.includes("tinggi") || s.includes("high")) return "bg-[#dc2626]";
-    if (s.includes("sedang") || s.includes("moderate")) return "bg-orange-500";
+    if (s.includes("tinggi") || s.includes("high")) return "bg-red-500";
+    if (s.includes("sedang") || s.includes("moderate")) return "bg-yellow-500";
     if (s.includes("rendah") || s.includes("low")) return "bg-green-500";
     return "bg-slate-500";
   };
   const getStatusTextColor = (status) => {
     const s = status.toLowerCase();
-    if (s.includes("tinggi") || s.includes("high")) return "text-[#dc2626]";
-    if (s.includes("sedang") || s.includes("moderate")) return "text-orange-500";
+    if (s.includes("tinggi") || s.includes("high")) return "text-red-500";
+    if (s.includes("sedang") || s.includes("moderate")) return "text-yellow-500";
     if (s.includes("rendah") || s.includes("low")) return "text-green-500";
     return "text-slate-500";
   };

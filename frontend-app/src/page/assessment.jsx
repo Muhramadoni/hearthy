@@ -36,36 +36,19 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
   const [alcoholUnits, setAlcoholUnits] = useState("");
   const [dailySteps, setDailySteps] = useState("");
 
+  const stressOptions = ["Tidak pernah", "Hampir tidak pernah", "Kadang-kadang", "Cukup sering", "Sangat sering"];
+
   const stressQuestions = [
-    {
-      id: 1,
-      question:
-        "Apakah Anda sering merasa cemas atau khawatir tanpa alasan yang jelas?",
-      options: ["Tidak pernah", "Kadang-kadang", "Sering", "Selalu"],
-    },
-    {
-      id: 2,
-      question:
-        "Apakah Anda mengalami kesulitan tidur karena pikiran yang terus berputar?",
-      options: ["Tidak pernah", "Kadang-kadang", "Sering", "Selalu"],
-    },
-    {
-      id: 3,
-      question:
-        "Apakah Anda merasa lelah atau kelelahan meskipun sudah beristirahat cukup?",
-      options: ["Tidak pernah", "Kadang-kadang", "Sering", "Selalu"],
-    },
-    {
-      id: 4,
-      question: "Apakah Anda sering merasa mudah marah atau frustrasi?",
-      options: ["Tidak pernah", "Kadang-kadang", "Sering", "Selalu"],
-    },
-    {
-      id: 5,
-      question:
-        "Apakah Anda mengalami penurunan nafsu makan atau perubahan berat badan?",
-      options: ["Tidak pernah", "Kadang-kadang", "Sering", "Selalu"],
-    },
+    { id: 1, question: "Seberapa sering kamu merasa kesal karena sesuatu yang terjadi secara tidak terduga?", options: stressOptions, reverse: false },
+    { id: 2, question: "Seberapa sering kamu merasa tidak mampu mengendalikan hal-hal penting dalam hidupmu?", options: stressOptions, reverse: false },
+    { id: 3, question: "Seberapa sering kamu merasa gugup dan tertekan?", options: stressOptions, reverse: false },
+    { id: 4, question: "Seberapa sering kamu merasa yakin dengan kemampuanmu menangani masalah pribadi?", options: stressOptions, reverse: true },
+    { id: 5, question: "Seberapa sering kamu merasa bahwa segala sesuatu berjalan sesuai keinginanmu?", options: stressOptions, reverse: true },
+    { id: 6, question: "Seberapa sering kamu merasa tidak mampu mengatasi semua hal yang harus kamu lakukan?", options: stressOptions, reverse: false },
+    { id: 7, question: "Seberapa sering kamu mampu mengendalikan rasa jengkel dalam hidupmu?", options: stressOptions, reverse: true },
+    { id: 8, question: "Seberapa sering kamu merasa bahwa kamu menguasai keadaan?", options: stressOptions, reverse: true },
+    { id: 9, question: "Seberapa sering kamu merasa marah karena hal-hal di luar kendalimu?", options: stressOptions, reverse: false },
+    { id: 10, question: "Seberapa sering kamu merasa kesulitan yang menumpuk begitu banyak sehingga kamu tidak bisa mengatasinya?", options: stressOptions, reverse: false },
   ];
 
   const handleStressAnswer = (questionId, answer) => {
@@ -75,17 +58,27 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
   const calculateStressLevel = () => {
     const scores = {
       "Tidak pernah": 0,
-      "Kadang-kadang": 1,
-      Sering: 2,
-      Selalu: 3,
+      "Hampir tidak pernah": 1,
+      "Kadang-kadang": 2,
+      "Cukup sering": 3,
+      "Sangat sering": 4,
     };
-    const totalScore = Object.values(stressAnswers).reduce(
-      (sum, answer) => sum + scores[answer],
-      0,
-    );
-    if (totalScore <= 5) return "Normal (0-5)";
-    if (totalScore <= 10) return "Sedang (6-10)";
-    return "Tinggi (11+)";
+    
+    let totalScore = 0;
+    stressQuestions.forEach(q => {
+      const answer = stressAnswers[q.id];
+      if (answer) {
+        let score = scores[answer];
+        if (q.reverse) {
+          score = 4 - score;
+        }
+        totalScore += score;
+      }
+    });
+
+    if (totalScore <= 13) return `Stres Rendah (${totalScore})`;
+    if (totalScore <= 26) return `Stres Sedang (${totalScore})`;
+    return `Stres Tinggi (${totalScore})`;
   };
 
   const handleProcessStressTest = () => {
@@ -110,7 +103,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
     const familyVal = familyHistory === "Ya" ? 1 : 0;
     
     let stressVal = 0;
-    if (stressLevel.includes("Normal")) stressVal = 3;
+    if (stressLevel.includes("Rendah") || stressLevel.includes("Normal")) stressVal = 3;
     else if (stressLevel.includes("Sedang")) stressVal = 6;
     else if (stressLevel.includes("Tinggi")) stressVal = 9;
 
@@ -158,35 +151,17 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
         throw new Error(data.message || "Gagal melakukan prediksi");
       }
 
-      const pred = data.data.prediction;
-      const severity = pred.severity_mapped;
-      const score = pred.score;
+      const newAssessmentId = data.data.assessment.id;
       
-      let icon = "success";
-      let color = "#10b981"; 
-      
-      if (severity === "moderate") {
-        icon = "warning";
-        color = "#f59e0b"; 
-      } else if (severity === "high" || severity === "very_high") {
-        icon = "error";
-        color = "#ef4444"; 
-      }
-
       Swal.fire({
-        icon: icon,
-        title: "Hasil Analisis AI",
-        html: `
-          <div class="mt-4 text-left">
-            <p class="mb-2 text-slate-700">Tingkat Risiko: <strong style="color: ${color}">${severity.toUpperCase()}</strong></p>
-            <p class="mb-2 text-slate-700">Probabilitas: <strong>${score}%</strong></p>
-            <hr class="my-3"/>
-            <p class="text-sm text-slate-600">Data penilaian Anda telah disimpan ke riwayat kesehatan.</p>
-          </div>
-        `,
-        confirmButtonColor: "#1e3a5a",
+        icon: "success",
+        title: "Prediksi Berhasil",
+        text: "Mengarahkan ke detail prediksi...",
+        timer: 1500,
+        showConfirmButton: false,
       }).then(() => {
-        if(onNavigate) onNavigate("dashboard");
+        localStorage.setItem("selected_history_id", newAssessmentId);
+        if(onNavigate) onNavigate("history-detail");
       });
 
     } catch (error) {
@@ -512,7 +487,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                   <p className="mb-3 text-sm font-semibold text-slate-900">
                     {q.question}
                   </p>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                     {q.options.map((option) => (
                       <button
                         key={option}
@@ -540,7 +515,8 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
               </button>
               <button
                 onClick={handleProcessStressTest}
-                className="rounded-2xl bg-[#1e3a5a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#173652]"
+                disabled={Object.keys(stressAnswers).length < 10}
+                className={`rounded-2xl px-4 py-3 text-sm font-semibold transition ${Object.keys(stressAnswers).length < 10 ? 'bg-slate-300 text-slate-500 cursor-not-allowed' : 'bg-[#1e3a5a] text-white hover:bg-[#173652]'}`}
               >
                 Proses
               </button>

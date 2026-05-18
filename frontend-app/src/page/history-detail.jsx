@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar.jsx";
 import Chatbot from "../components/Chatbot.jsx";
 import { getAssessmentById } from "../services/assessmentService.js";
+import Swal from "sweetalert2";
 
 export default function HistoryDetailPage({ currentPage, onNavigate }) {
   const [assessment, setAssessment] = useState(null);
@@ -78,17 +79,34 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
     ? assessment.recommendations 
     : [assessment.recommendations || "Belum ada rekomendasi."];
 
-  return (
-    <div className="min-h-screen bg-[#f0f0f0] text-slate-950">
-      <Navbar
-        currentPage={currentPage ?? "history"}
-        onNavigate={onNavigate ?? (() => {})}
-      />
+  const handleDownloadPDF = () => {
+    // We use native browser print which correctly supports Tailwind v4 (oklch/oklab colors)
+    // The user can select "Save as PDF" in the print dialog.
+    window.print();
+  };
 
-      <main className="mx-auto max-w-screen-2xl px-6 py-10">
-        <div className="rounded-[32px] bg-white px-6 py-8 shadow-[0_24px_80px_-38px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
+  return (
+    <div className="min-h-screen bg-[#f0f0f0] text-slate-950 print:bg-white">
+      <style>{`
+        @media print {
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          @page { margin: 1cm; }
+        }
+      `}</style>
+      <div className="print:hidden">
+        <Navbar
+          currentPage={currentPage ?? "history"}
+          onNavigate={onNavigate ?? (() => {})}
+        />
+      </div>
+
+      <main className="mx-auto max-w-screen-2xl px-6 py-10 print:p-0 print:m-0">
+        <div id="pdf-content" className="rounded-[32px] bg-white px-6 py-8 shadow-[0_24px_80px_-38px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70 print:shadow-none print:ring-0 print:rounded-none print:p-0">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-2xl">
+            <div className="max-w-2xl print:hidden">
               <h1 className="text-3xl font-bold text-slate-950 sm:text-4xl">
                 Detail Hasil Prediksi
               </h1>
@@ -98,7 +116,14 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
                 Anda.
               </p>
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center print:hidden">
+              <button
+                type="button"
+                onClick={handleDownloadPDF}
+                className="inline-flex items-center justify-center rounded-2xl bg-[#1e3a5a] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#173652]"
+              >
+                Download PDF
+              </button>
               <button
                 type="button"
                 onClick={() => onNavigate?.("history")}
@@ -109,8 +134,8 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
             </div>
           </div>
 
-          <div className="mt-10 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-            <div className="rounded-[28px] bg-slate-50 p-8 shadow-[0_18px_60px_-28px_rgba(15,23,42,0.2)]">
+          <div className="mt-10 grid gap-6 lg:grid-cols-[1.2fr_0.8fr] print:flex print:flex-col">
+            <div className="rounded-[28px] bg-slate-50 p-8 shadow-[0_18px_60px_-28px_rgba(15,23,42,0.2)] print:bg-white print:shadow-none print:border-b print:border-slate-200 print:rounded-none print:p-0 print:pb-8">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -120,7 +145,12 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
                     Skor risiko anda sekitar {assessment.score || 0}%
                   </h2>
                 </div>
-                <span className="rounded-full bg-[#f7d4c5] px-4 py-2 text-sm font-semibold text-[#b02408] capitalize">
+                <span className={`rounded-full px-4 py-2 text-sm font-semibold capitalize ${
+                  assessment.severity === 'high' ? 'bg-red-100 text-red-700' :
+                  assessment.severity === 'moderate' ? 'bg-yellow-100 text-yellow-700' :
+                  assessment.severity === 'low' ? 'bg-green-100 text-green-700' :
+                  'bg-slate-100 text-slate-700'
+                }`}>
                   {assessment.severity || "Unknown"}
                 </span>
               </div>
@@ -140,25 +170,25 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
                 </div>
               </div>
 
-              <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                <div className="rounded-3xl bg-white p-4 text-center shadow-sm">
-                  <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
+              <div className="mt-8 grid gap-4 sm:grid-cols-3 print:grid-cols-3">
+                <div className="rounded-3xl bg-white p-4 text-center shadow-sm print:shadow-none print:border print:border-slate-200 print:rounded-lg">
+                  <p className="text-xs uppercase tracking-[0.18em] text-slate-400 print:text-slate-500">
                     Tekanan Darah
                   </p>
                   <p className="mt-3 text-sm font-semibold text-slate-950">
                     {ans.systolic_bp || 0}/{ans.diastolic_bp || 0}
                   </p>
                 </div>
-                <div className="rounded-3xl bg-white p-4 text-center shadow-sm">
-                  <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
+                <div className="rounded-3xl bg-white p-4 text-center shadow-sm print:shadow-none print:border print:border-slate-200 print:rounded-lg">
+                  <p className="text-xs uppercase tracking-[0.18em] text-slate-400 print:text-slate-500">
                     Denyut Jantung
                   </p>
                   <p className="mt-3 text-sm font-semibold text-slate-950">
                     {ans.resting_heart_rate || 0} BPM
                   </p>
                 </div>
-                <div className="rounded-3xl bg-white p-4 text-center shadow-sm">
-                  <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
+                <div className="rounded-3xl bg-white p-4 text-center shadow-sm print:shadow-none print:border print:border-slate-200 print:rounded-lg">
+                  <p className="text-xs uppercase tracking-[0.18em] text-slate-400 print:text-slate-500">
                     Kolesterol
                   </p>
                   <p className="mt-3 text-sm font-semibold text-slate-950">
@@ -168,15 +198,15 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
               </div>
             </div>
 
-            <div className="rounded-[28px] bg-white p-8 shadow-[0_18px_60px_-28px_rgba(15,23,42,0.2)]">
+            <div className="rounded-[28px] bg-white p-8 shadow-[0_18px_60px_-28px_rgba(15,23,42,0.2)] print:p-0 print:shadow-none print:mt-6">
               <h3 className="text-xl font-semibold text-slate-950">
                 Data Skrining Anda
               </h3>
-              <div className="mt-6 space-y-3 max-h-[420px] overflow-y-auto pr-2">
+              <div className="mt-6 space-y-3 max-h-[420px] overflow-y-auto pr-2 print:max-h-none print:overflow-visible print:pr-0 print:grid print:grid-cols-2 print:gap-4 print:space-y-0">
                 {detailItems.map((item, index) => (
                   <div
                     key={index}
-                    className="rounded-3xl bg-slate-50 px-5 py-4 text-sm text-slate-800 shadow-sm"
+                    className="rounded-3xl bg-slate-50 px-5 py-4 text-sm text-slate-800 shadow-sm print:shadow-none print:border print:border-slate-200 print:bg-white print:rounded-lg print:py-2 print:px-3"
                   >
                     {item}
                   </div>
@@ -185,24 +215,30 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
             </div>
           </div>
 
-          <div className="mt-10 rounded-[28px] bg-white p-8 shadow-[0_18px_60px_-28px_rgba(15,23,42,0.2)]">
+          <div className="mt-10 rounded-[28px] bg-white p-8 shadow-[0_18px_60px_-28px_rgba(15,23,42,0.2)] print:shadow-none print:border-t print:border-slate-200 print:rounded-none print:p-0 print:pt-8 print:mt-8">
             <h3 className="text-xl font-semibold text-slate-950">
               Rekomendasi
             </h3>
             <p className="mt-3 text-sm leading-7 text-slate-600">
               {assessment.aiInsights || "Berdasarkan analisis risiko Anda, kami menyarankan Anda untuk memperhatikan gaya hidup dan pola makan."}
             </p>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 print:grid-cols-1 print:gap-3">
               {recommendations.map((rec, i) => (
-                <div key={i} className="rounded-3xl bg-[#1b4062] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#163551] flex items-center">
-                  {rec}
+                <div key={i} className="rounded-3xl bg-[#1b4062] px-6 py-4 text-sm font-semibold text-white transition flex items-center print:bg-white print:text-slate-900 print:border print:border-slate-300 print:rounded-lg print:py-3">
+                  <span className="print:hidden">{rec}</span>
+                  <span className="hidden print:inline-flex gap-3">
+                    <span className="font-bold text-slate-400">{i + 1}.</span> {rec}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
         </div>
       </main>
-      <Chatbot />
+      
+      <div className="print:hidden">
+        <Chatbot />
+      </div>
     </div>
   );
 }
