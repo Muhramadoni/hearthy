@@ -1,26 +1,82 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar.jsx";
 import Chatbot from "../components/Chatbot.jsx";
-
-const detailItems = [
-  "23 Tahun",
-  "22.1",
-  "100mmHg",
-  "130 mg/dL",
-  "100 BPM",
-  "Ya",
-  "Sedang",
-  "2x",
-  "5.000 langkah",
-  "Normal 0 - 14",
-  "1 jam 15 menit",
-  "8 jam 10 menit",
-];
+import { getAssessmentById } from "../services/assessmentService.js";
 
 export default function HistoryDetailPage({ currentPage, onNavigate }) {
+  const [assessment, setAssessment] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     document.title = "Detail History - Hearthy";
+    loadDetail();
   }, []);
+
+  const loadDetail = async () => {
+    try {
+      const id = localStorage.getItem("selected_history_id");
+      if (!id) {
+        onNavigate?.("history");
+        return;
+      }
+      const res = await getAssessmentById(id);
+      setAssessment(res.assessment);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#f0f0f0] flex items-center justify-center text-slate-500">
+        <Navbar
+          currentPage={currentPage ?? "history"}
+          onNavigate={onNavigate ?? (() => {})}
+        />
+        Loading data...
+      </div>
+    );
+  }
+  
+  if (!assessment) {
+    return (
+      <div className="min-h-screen bg-[#f0f0f0] flex flex-col items-center justify-center text-slate-500">
+        <Navbar
+          currentPage={currentPage ?? "history"}
+          onNavigate={onNavigate ?? (() => {})}
+        />
+        <div className="mt-20">Data tidak ditemukan.</div>
+        <button
+          onClick={() => onNavigate?.("history")}
+          className="mt-4 inline-flex items-center justify-center rounded-2xl bg-[#1b4062] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#163551]"
+        >
+          Kembali ke History
+        </button>
+      </div>
+    );
+  }
+
+  const ans = assessment.answers || {};
+  const detailItems = [
+    `Usia: ${ans.age || "-"} Tahun`,
+    `BMI: ${ans.bmi || "-"}`,
+    `Tekanan Darah: ${ans.systolic_bp || "-"}/${ans.diastolic_bp || "-"} mmHg`,
+    `Kolesterol: ${ans.cholesterol_mg_dl || "-"} mg/dL`,
+    `Denyut Jantung: ${ans.resting_heart_rate || "-"} BPM`,
+    `Langkah: ${ans.daily_steps || "-"} langkah`,
+    `Tidur: ${ans.sleep_hours || "-"} jam`,
+    `Riwayat Keluarga: ${ans.family_history_heart_disease ? "Ya" : "Tidak"}`,
+    `Kualitas Diet (0-7): ${ans.diet_quality_score || "-"}`,
+    `Aktivitas Fisik: ${ans.physical_activity_hours_per_week || "-"} jam/minggu`,
+    `Tingkat Stres (0-10): ${ans.stress_level || "-"}`,
+    `Alkohol: ${ans.alcohol_units_per_week || "-"} unit/minggu`,
+  ];
+  
+  const recommendations = Array.isArray(assessment.recommendations) 
+    ? assessment.recommendations 
+    : [assessment.recommendations || "Belum ada rekomendasi."];
 
   return (
     <div className="min-h-screen bg-[#f0f0f0] text-slate-950">
@@ -50,12 +106,6 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
               >
                 Kembali
               </button>
-              <button
-                type="button"
-                className="inline-flex items-center justify-center rounded-2xl bg-[#1b4062] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#163551]"
-              >
-                Download
-              </button>
             </div>
           </div>
 
@@ -67,11 +117,11 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
                     Hasil Prediksi
                   </p>
                   <h2 className="mt-3 text-2xl font-bold text-slate-950">
-                    Skor risiko anda sekitar 90%
+                    Skor risiko anda sekitar {assessment.score || 0}%
                   </h2>
                 </div>
-                <span className="rounded-full bg-[#f7d4c5] px-4 py-2 text-sm font-semibold text-[#b02408]">
-                  Tinggi
+                <span className="rounded-full bg-[#f7d4c5] px-4 py-2 text-sm font-semibold text-[#b02408] capitalize">
+                  {assessment.severity || "Unknown"}
                 </span>
               </div>
 
@@ -82,9 +132,11 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
 
               <div className="mt-8 flex items-center justify-center">
                 <div className="relative h-[300px] w-[300px] rounded-full bg-[#f8fafc] shadow-inner shadow-slate-200/80">
-                  <div className="absolute inset-0 rounded-full border-8 border-transparent border-r-[#ef4444] border-b-[#2563eb] border-l-[#fbbf24] border-t-[#f8fafc]" />
-                  <div className="absolute inset-20 rounded-full bg-white"></div>
-                  <div className="absolute inset-24 rounded-full bg-[#f8fafc]" />
+                  <div className={`absolute inset-0 rounded-full border-8 border-transparent ${assessment.severity === 'high' ? 'border-t-[#ef4444] border-r-[#ef4444] border-b-[#ef4444]' : assessment.severity === 'moderate' ? 'border-t-[#fbbf24] border-r-[#fbbf24]' : 'border-t-[#22c55e]'} border-l-[#f8fafc]`} />
+                  <div className="absolute inset-20 rounded-full bg-white flex items-center justify-center">
+                    <span className="text-4xl font-bold text-slate-800">{assessment.score || 0}%</span>
+                  </div>
+                  <div className="absolute inset-24 rounded-full bg-transparent" />
                 </div>
               </div>
 
@@ -94,7 +146,7 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
                     Tekanan Darah
                   </p>
                   <p className="mt-3 text-sm font-semibold text-slate-950">
-                    Tinggi
+                    {ans.systolic_bp || 0}/{ans.diastolic_bp || 0}
                   </p>
                 </div>
                 <div className="rounded-3xl bg-white p-4 text-center shadow-sm">
@@ -102,15 +154,15 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
                     Denyut Jantung
                   </p>
                   <p className="mt-3 text-sm font-semibold text-slate-950">
-                    100 BPM
+                    {ans.resting_heart_rate || 0} BPM
                   </p>
                 </div>
                 <div className="rounded-3xl bg-white p-4 text-center shadow-sm">
                   <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
-                    Lainnya
+                    Kolesterol
                   </p>
                   <p className="mt-3 text-sm font-semibold text-slate-950">
-                    90%
+                    {ans.cholesterol_mg_dl || 0} mg/dL
                   </p>
                 </div>
               </div>
@@ -138,20 +190,14 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
               Rekomendasi
             </h3>
             <p className="mt-3 text-sm leading-7 text-slate-600">
-              Berdasarkan analisis risiko Anda yang tinggi, kami sangat
-              menyarankan Anda untuk segera menjadwalkan konsultasi dengan
-              dokter spesialis jantung guna pemeriksaan lebih lanjut.
+              {assessment.aiInsights || "Berdasarkan analisis risiko Anda, kami menyarankan Anda untuk memperhatikan gaya hidup dan pola makan."}
             </p>
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              <button className="rounded-3xl bg-[#1b4062] px-4 py-4 text-sm font-semibold text-white transition hover:bg-[#163551]">
-                kurangi asupan garam harian
-              </button>
-              <button className="rounded-3xl bg-[#1b4062] px-4 py-4 text-sm font-semibold text-white transition hover:bg-[#163551]">
-                hindari aktivitas fisik yang terlalu berat
-              </button>
-              <button className="rounded-3xl bg-[#1b4062] px-4 py-4 text-sm font-semibold text-white transition hover:bg-[#163551]">
-                konsumsi makanan tinggi serat
-              </button>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {recommendations.map((rec, i) => (
+                <div key={i} className="rounded-3xl bg-[#1b4062] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#163551] flex items-center">
+                  {rec}
+                </div>
+              ))}
             </div>
           </div>
         </div>

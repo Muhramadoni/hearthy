@@ -2,44 +2,68 @@ import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
 import Chatbot from "../components/Chatbot.jsx";
 import iconLaporan from "../icon/icon-laporan.svg";
-
-const historyGroups = [
-  {
-    label: "April 2026",
-    records: [
-      { date: "24 April 2026", time: "12.00 WIB" },
-      { date: "24 April 2026", time: "12.00 WIB" },
-      { date: "24 April 2026", time: "12.00 WIB" },
-    ],
-  },
-  {
-    label: "Maret 2026",
-    records: [
-      { date: "24 Maret 2026", time: "12.00 WIB" },
-      { date: "24 Maret 2026", time: "12.00 WIB" },
-      { date: "24 Maret 2026", time: "12.00 WIB" },
-    ],
-  },
-  {
-    label: "Februari 2026",
-    records: [
-      { date: "24 Februari 2026", time: "12.00 WIB" },
-      { date: "24 Februari 2026", time: "12.00 WIB" },
-      { date: "24 Februari 2026", time: "12.00 WIB" },
-    ],
-  },
-];
+import { getAssessments } from "../services/assessmentService.js";
 
 export default function HistoryPage({ currentPage, onNavigate }) {
   const [selectedDate, setSelectedDate] = useState("");
+  const [historyGroups, setHistoryGroups] = useState([]);
 
   useEffect(() => {
     document.title = "History - Web Hearty";
+    loadHistory();
   }, []);
+
+  const loadHistory = async () => {
+    try {
+      const res = await getAssessments(100, 0);
+      const assessments = (res.assessments || [])
+        .filter((a) => a.type === "cardiovascular")
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+      // Group by month
+      const groups = {};
+      assessments.forEach((record) => {
+        const d = new Date(record.created_at);
+        const monthYear = d.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
+        if (!groups[monthYear]) {
+          groups[monthYear] = [];
+        }
+        groups[monthYear].push({
+          id: record.id,
+          date: d.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }),
+          time: d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB",
+          rawDate: d,
+        });
+      });
+
+      const formattedGroups = Object.keys(groups).map((label) => ({
+        label,
+        records: groups[label],
+      }));
+
+      setHistoryGroups(formattedGroups);
+    } catch (err) {
+      console.error("Failed to load history", err);
+    }
+  };
 
   const handleDateChange = (event) => {
     setSelectedDate(event.target.value);
   };
+
+  const handleDetailClick = (id) => {
+    localStorage.setItem("selected_history_id", id);
+    onNavigate?.("history-detail");
+  };
+
+  const filteredGroups = historyGroups.map(group => {
+    if (!selectedDate) return group;
+    const filterD = new Date(selectedDate);
+    const records = group.records.filter(r => {
+      return r.rawDate.toDateString() === filterD.toDateString();
+    });
+    return { ...group, records };
+  }).filter(group => group.records.length > 0);
 
   return (
     <div className="min-h-screen bg-[#f0f0f0] text-slate-900">
@@ -70,15 +94,21 @@ export default function HistoryPage({ currentPage, onNavigate }) {
                     className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
                   />
                 </div>
-                <button className="inline-flex min-w-[120px] items-center justify-center rounded-2xl bg-[#1b4062] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#163551]">
-                  Filter
+                <button 
+                  onClick={() => setSelectedDate("")}
+                  className="inline-flex min-w-[120px] items-center justify-center rounded-2xl bg-[#1b4062] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#163551]"
+                >
+                  Clear Filter
                 </button>
               </div>
             </div>
           </div>
 
           <div className="mt-10 space-y-10">
-            {historyGroups.map((group) => (
+            {filteredGroups.length === 0 && (
+              <p className="text-center text-slate-500">Belum ada riwayat asesmen.</p>
+            )}
+            {filteredGroups.map((group) => (
               <section key={group.label} className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-semibold text-slate-950">
@@ -107,7 +137,7 @@ export default function HistoryPage({ currentPage, onNavigate }) {
                         <span>{record.time}</span>
                         <button
                           type="button"
-                          onClick={() => onNavigate?.("history-detail")}
+                          onClick={() => handleDetailClick(record.id)}
                           className="font-medium text-sky-700 transition hover:text-sky-800"
                         >
                           Lihat Selengkapnya

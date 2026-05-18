@@ -67,6 +67,38 @@ const assessmentController = {
       
       const { risk_category, score, severity_mapped } = predictionResult;
 
+      // Generate localized recommendations and insights based on answers
+      const generatedRecommendations = [];
+      if (severity_mapped === 'high') {
+        generatedRecommendations.push("Segera jadwalkan konsultasi dengan dokter atau spesialis jantung.");
+      }
+      if (answers.systolic_bp >= 130 || answers.diastolic_bp >= 80) {
+        generatedRecommendations.push("Kurangi asupan garam harian dan pantau tekanan darah secara berkala.");
+      }
+      if (answers.cholesterol_mg_dl >= 200) {
+        generatedRecommendations.push("Batasi makanan berlemak tinggi dan tingkatkan konsumsi serat, buah, serta sayur.");
+      }
+      if (answers.daily_steps < 5000 || answers.physical_activity_hours_per_week < 2.5) {
+        generatedRecommendations.push("Tingkatkan aktivitas fisik harian Anda, setidaknya 30 menit olahraga ringan.");
+      }
+      if (answers.bmi >= 25) {
+        generatedRecommendations.push("Perhatikan porsi dan pola makan untuk menjaga berat badan tetap ideal.");
+      }
+      if (answers.sleep_hours < 6) {
+        generatedRecommendations.push("Usahakan tidur cukup selama 7-8 jam per malam untuk pemulihan optimal.");
+      }
+      if (answers.stress_level >= 7) {
+        generatedRecommendations.push("Luangkan waktu untuk relaksasi dan mengelola stres dengan baik.");
+      }
+      if (answers.alcohol_units_per_week >= 7) {
+        generatedRecommendations.push("Kurangi konsumsi alkohol demi menjaga tekanan darah dan kesehatan jantung.");
+      }
+      if (generatedRecommendations.length === 0) {
+        generatedRecommendations.push("Pertahankan pola makan seimbang, istirahat cukup, dan aktivitas fisik teratur.");
+      }
+
+      const generatedInsights = `Berdasarkan hasil prediksi AI, tingkat risiko penyakit kardiovaskular Anda berada pada kategori ${severity_mapped === 'high' ? 'Tinggi' : severity_mapped === 'moderate' ? 'Sedang' : 'Rendah'}. ${severity_mapped === 'low' ? 'Terus jaga kebiasaan sehat Anda!' : 'Ada beberapa parameter yang perlu mendapat perhatian khusus untuk mencegah risiko memburuk.'}`;
+
       // Save to database
       const assessment = await assessmentModel.create({
         userId: req.user.id,
@@ -75,8 +107,8 @@ const assessmentController = {
         score: Math.round(score), // This is the probability percentage, must be integer
         maxScore: 100, // Probability max is 100
         severity: severity_mapped,
-        recommendations: [`Your predicted cardiovascular risk category is: ${risk_category}.`],
-        aiInsights: `The AI model analyzed your inputs and predicted a score of ${score}%. Risk category: ${risk_category}.`,
+        recommendations: generatedRecommendations,
+        aiInsights: generatedInsights,
       });
 
       res.status(201).json({
@@ -108,7 +140,7 @@ const assessmentController = {
   // GET /api/assessments/summary
   getSummary: async (req, res, next) => {
     try {
-      const TYPES = ['mental_health', 'physical', 'sleep', 'nutrition', 'stress'];
+      const TYPES = ['mental_health', 'physical', 'sleep', 'nutrition', 'stress', 'cardiovascular'];
       const summary = {};
       for (const t of TYPES) {
         summary[t] = await assessmentModel.findLatestByType(req.user.id, t);
@@ -121,7 +153,7 @@ const assessmentController = {
   // GET /api/assessments/recommendations
   getRecommendations: async (req, res, next) => {
     try {
-      const TYPES = ['mental_health', 'physical', 'sleep', 'nutrition', 'stress'];
+      const TYPES = ['mental_health', 'physical', 'sleep', 'nutrition', 'stress', 'cardiovascular'];
       const allRecs = [];
       for (const t of TYPES) {
         const latest = await assessmentModel.findLatestByType(req.user.id, t);

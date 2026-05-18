@@ -278,13 +278,21 @@ def main():
             "status": "success",
             "prediction": {
                 "risk_category": str(risk_category),
-                "score": round(probability_score, 2), # e.g., 85.45
+                "score": round(probability_score, 2), # Default fallback
                 "severity_mapped": map_risk_to_severity(str(risk_category))
             }
         }
         
         if risk_score_val is not None:
             response["prediction"]["heart_disease_risk_score"] = round(risk_score_val, 2)
+            # Use regression risk * 100 as the actual UI score
+            response["prediction"]["score"] = round(risk_score_val * 100, 2)
+        else:
+            # Fallback: if category is healthy (1), risk is low (e.g. 100 - confidence)
+            if response["prediction"]["severity_mapped"] == "low":
+                response["prediction"]["score"] = round(100 - probability_score, 2)
+            else:
+                response["prediction"]["score"] = round(probability_score, 2)
         
         print(json.dumps(response))
         
@@ -296,14 +304,14 @@ def main():
 
 def map_risk_to_severity(risk_category):
     # This maps the AI risk category to the severity expected by Hearthy (low, moderate, high, very_high)
-    # Adjust according to actual classes output by your model!
-    risk_category_lower = risk_category.lower()
+    risk_category_lower = str(risk_category).lower()
     
-    if "high" in risk_category_lower or "severe" in risk_category_lower or risk_category_lower == "2" or risk_category_lower == "3":
+    # Class 0 usually means heart disease (High Risk), Class 1 means no heart disease (Low Risk)
+    if "high" in risk_category_lower or "severe" in risk_category_lower or risk_category_lower == "0":
         return "high"
-    elif "moderate" in risk_category_lower or "elevated" in risk_category_lower or risk_category_lower == "1":
+    elif "moderate" in risk_category_lower or "elevated" in risk_category_lower or risk_category_lower == "2":
         return "moderate"
-    elif "low" in risk_category_lower or "normal" in risk_category_lower or risk_category_lower == "0":
+    elif "low" in risk_category_lower or "normal" in risk_category_lower or risk_category_lower == "1":
         return "low"
     else:
         return "moderate" # Fallback
