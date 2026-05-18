@@ -7,6 +7,7 @@ import { getAssessments } from "../services/assessmentService.js";
 export default function HistoryPage({ currentPage, onNavigate }) {
   const [selectedDate, setSelectedDate] = useState("");
   const [historyGroups, setHistoryGroups] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(9);
 
   useEffect(() => {
     document.title = "History - Web Hearty";
@@ -56,14 +57,37 @@ export default function HistoryPage({ currentPage, onNavigate }) {
     onNavigate?.("history-detail");
   };
 
-  const filteredGroups = historyGroups.map(group => {
-    if (!selectedDate) return group;
-    const filterD = new Date(selectedDate);
-    const records = group.records.filter(r => {
-      return r.rawDate.toDateString() === filterD.toDateString();
+  // Flatten, filter, and limit records for pagination
+  const allFilteredRecords = [];
+  historyGroups.forEach((group) => {
+    if (!selectedDate) {
+      allFilteredRecords.push(...group.records);
+    } else {
+      const filterD = new Date(selectedDate);
+      const matched = group.records.filter(
+        (r) => r.rawDate.toDateString() === filterD.toDateString()
+      );
+      allFilteredRecords.push(...matched);
+    }
+  });
+
+  const visibleRecords = allFilteredRecords.slice(0, visibleCount);
+
+  // Regroup visible records by month
+  const displayGroupsMap = {};
+  visibleRecords.forEach((record) => {
+    const monthYear = record.rawDate.toLocaleDateString("id-ID", {
+      month: "long",
+      year: "numeric",
     });
-    return { ...group, records };
-  }).filter(group => group.records.length > 0);
+    if (!displayGroupsMap[monthYear]) displayGroupsMap[monthYear] = [];
+    displayGroupsMap[monthYear].push(record);
+  });
+
+  const finalDisplayGroups = Object.keys(displayGroupsMap).map((label) => ({
+    label,
+    records: displayGroupsMap[label],
+  }));
 
   return (
     <div className="min-h-screen bg-[#f0f0f0] text-slate-900">
@@ -105,10 +129,10 @@ export default function HistoryPage({ currentPage, onNavigate }) {
           </div>
 
           <div className="mt-10 space-y-10">
-            {filteredGroups.length === 0 && (
+            {finalDisplayGroups.length === 0 && (
               <p className="text-center text-slate-500">Belum ada riwayat asesmen.</p>
             )}
-            {filteredGroups.map((group) => (
+            {finalDisplayGroups.map((group) => (
               <section key={group.label} className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-semibold text-slate-950">
@@ -148,6 +172,52 @@ export default function HistoryPage({ currentPage, onNavigate }) {
                 </div>
               </section>
             ))}
+
+            {allFilteredRecords.length > 9 && (
+              <div className="mt-12 flex justify-center pb-8">
+                {visibleCount < allFilteredRecords.length ? (
+                  <button
+                    onClick={() => setVisibleCount((prev) => prev + 9)}
+                    className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50 hover:text-slate-900"
+                  >
+                    Tampilkan lebih banyak
+                    <svg
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setVisibleCount(9)}
+                    className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50 hover:text-slate-900"
+                  >
+                    Tampilkan lebih sedikit
+                    <svg
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M5 15l7-7 7 7"
+                      />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </section>
       </main>

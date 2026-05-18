@@ -465,9 +465,6 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
         </section>
 
         <div className="mt-8 flex flex-col gap-3 justify-end text-right sm:flex-row sm:items-center sm:justify-end">
-          <button className="inline-flex items-center justify-center rounded-full bg-[#dddddd] px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-300">
-            Lihat ringkasan
-          </button>
           <button onClick={handleSubmit} className="inline-flex items-center justify-center rounded-full bg-[#1e3a5a] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#173652]">
             Simpan dan lihat hasil
           </button>

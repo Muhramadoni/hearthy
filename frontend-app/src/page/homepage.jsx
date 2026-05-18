@@ -266,12 +266,12 @@ function App({ currentPage, onNavigate }) {
               penyakit jantung secara instan.
             </p>
             <div className="mt-16 flex justify-center">
-              <a
-                href="#assessment"
+              <button
+                onClick={() => onNavigate("assessment")}
                 className="inline-flex items-center justify-center rounded-full bg-[#1b4062] px-8 py-5 text-lg font-semibold capitalized text-white shadow-lg shadow-[#1b4062]/15 transition hover:bg-[#173652]"
               >
                 Mulai Sekarang
-              </a>
+              </button>
             </div>
           </div>
         </section>

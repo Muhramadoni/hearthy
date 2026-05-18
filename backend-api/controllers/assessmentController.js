@@ -125,6 +125,13 @@ const assessmentController = {
   // GET /api/assessments
   getAssessments: async (req, res, next) => {
     try {
+      // Lazy cleanup: delete records older than 1 year whenever history is fetched
+      try {
+        await assessmentModel.deleteOldRecords();
+      } catch (cleanupErr) {
+        console.error('Error during automatic history cleanup:', cleanupErr);
+      }
+
       const limit  = Math.min(parseInt(req.query.limit)  || 20, 100);
       const offset = parseInt(req.query.offset) || 0;
       const list   = await assessmentModel.findAllByUser(req.user.id, limit, offset);

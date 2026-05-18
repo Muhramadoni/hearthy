@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import HomePage from "./page/homepage.jsx";
 import DashboardPage from "./page/dashboard.jsx";
 import AssessmentPage from "./page/assessment.jsx";
@@ -14,7 +14,27 @@ import { isAuthenticated } from "./services/authService";
 const PROTECTED_PAGES = ["dashboard", "assessment", "history", "history-detail", "profile"];
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState("home");
+  const getInitialPage = () => {
+    const sessionPage = sessionStorage.getItem("currentPage");
+    if (sessionPage) {
+      if (PROTECTED_PAGES.includes(sessionPage) && !isAuthenticated()) {
+        return "login";
+      }
+      return sessionPage;
+    }
+
+    if (isAuthenticated()) {
+      return "dashboard";
+    }
+    
+    return "home";
+  };
+
+  const [currentPage, setCurrentPage] = useState(getInitialPage);
+
+  useEffect(() => {
+    sessionStorage.setItem("currentPage", currentPage);
+  }, [currentPage]);
 
   const handleNavigate = (page) => {
     // Jika halaman protected tapi belum login → redirect ke login

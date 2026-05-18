@@ -62,6 +62,13 @@ const assessmentModel = {
     );
     return rowCount > 0;
   },
+
+  deleteOldRecords: async () => {
+    const { rowCount } = await pool.query(
+      "DELETE FROM assessments WHERE created_at < NOW() - INTERVAL '1 year'"
+    );
+    return rowCount;
+  },
 };
 
 module.exports = assessmentModel;
