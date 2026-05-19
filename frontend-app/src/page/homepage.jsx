@@ -252,11 +252,11 @@ function App({ currentPage, onNavigate }) {
           className="mx-auto max-w-screen-2xl px-6 pt-16 pb-16"
         >
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl md:text-6xl">
-              <span className="block text-[#1b4062] text-5xl">
+            <h1 className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl md:text-5xl lg:text-6xl">
+              <span className="block text-[#1b4062] text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
                 Sistem Prediksi Risiko
               </span>
-              <span className="block text-[#1b4062] text-5xl">
+              <span className="block text-[#1b4062] text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
                 Kardiovaskular Berbasis AI
               </span>
             </h1>
@@ -277,7 +277,7 @@ function App({ currentPage, onNavigate }) {
         </section>
 
         <section className="bg-[#dde2e7] py-16">
-          <div className="mx-auto grid max-w-screen-2xl gap-6 px-6 md:grid-cols-3">
+          <div className="mx-auto grid max-w-screen-2xl gap-6 px-6 sm:grid-cols-2 lg:grid-cols-3">
             <div className="rounded-3xl p-8">
               <p className="text-4xl font-semibold text-[#1b4062]">#1</p>
               <h2 className="mt-4 text-lg font-semibold text-[#1b4062]">
@@ -322,7 +322,7 @@ function App({ currentPage, onNavigate }) {
               sederhana
             </p>
           </div>
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
+          <div className="mt-10 grid gap-6 px-6 sm:grid-cols-2 lg:grid-cols-3">
             {steps.map((step) => (
               <div
                 key={step.title}
@@ -355,7 +355,7 @@ function App({ currentPage, onNavigate }) {
                 proaktif.
               </p>
             </div>
-            <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {features.map((feature) => (
                 <div
                   key={feature.title}
@@ -438,7 +438,7 @@ function App({ currentPage, onNavigate }) {
       </main>
 
       <footer className="bg-[#ffffff] py-10">
-        <div className="mx-auto grid max-w-screen-2xl gap-100 px-6 md:grid-cols-[1.5fr_1fr_1fr] items-center">
+        <div className="mx-auto grid max-w-screen-2xl gap-8 px-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-[1.5fr_1fr_1fr] items-start md:items-center">
           <div className="space-y-3">
             <div className="flex items-center">
               <img src={logoSrc} alt="Hearthy logo" className="h-9 w-auto" />

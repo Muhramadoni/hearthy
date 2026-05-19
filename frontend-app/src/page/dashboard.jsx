@@ -145,7 +145,7 @@ export default function DashboardPage({ currentPage, onNavigate }) {
           </p>
         </section>
 
-        <section className="grid gap-4 lg:grid-cols-3">
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <article className="rounded-[32px] bg-white p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
             <p className="text-sm font-semibold capitalized text-slate-500">
               Status risiko
@@ -224,7 +224,8 @@ export default function DashboardPage({ currentPage, onNavigate }) {
 
             <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-slate-50 p-4">
               {chartData.points.length > 0 ? (
-                <svg viewBox="0 0 720 280" className="h-[320px] w-full">
+                <div className="w-full">
+                  <svg viewBox="0 0 720 280" className="h-auto w-full max-h-[320px]">
                   <defs>
                     <linearGradient id="fillGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#dc2626" stopOpacity="0.16" />
@@ -268,6 +269,7 @@ export default function DashboardPage({ currentPage, onNavigate }) {
                     </g>
                   ))}
                 </svg>
+                </div>
               ) : (
                 <div className="flex h-[320px] items-center justify-center text-slate-500">
                   Belum ada data grafik (Lakukan asesmen)

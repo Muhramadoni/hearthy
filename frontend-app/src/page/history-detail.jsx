@@ -136,7 +136,7 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
 
           <div className="mt-10 grid gap-6 lg:grid-cols-[1.2fr_0.8fr] print:flex print:flex-col">
             <div className="rounded-[28px] bg-slate-50 p-8 shadow-[0_18px_60px_-28px_rgba(15,23,42,0.2)] print:bg-white print:shadow-none print:border-b print:border-slate-200 print:rounded-none print:p-0 print:pb-8">
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
                     Hasil Prediksi
@@ -145,7 +145,7 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
                     Skor risiko anda sekitar {assessment.score || 0}%
                   </h2>
                 </div>
-                <span className={`rounded-full px-4 py-2 text-sm font-semibold capitalize ${
+                <span className={`self-start sm:self-auto rounded-full px-4 py-2 text-sm font-semibold capitalize ${
                   assessment.severity === 'high' ? 'bg-red-100 text-red-700' :
                   assessment.severity === 'moderate' ? 'bg-yellow-100 text-yellow-700' :
                   assessment.severity === 'low' ? 'bg-green-100 text-green-700' :
@@ -161,12 +161,12 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
               </p>
 
               <div className="mt-8 flex items-center justify-center">
-                <div className="relative h-[300px] w-[300px] rounded-full bg-[#f8fafc] shadow-inner shadow-slate-200/80">
+                <div className="relative h-[240px] w-[240px] sm:h-[300px] sm:w-[300px] rounded-full bg-[#f8fafc] shadow-inner shadow-slate-200/80">
                   <div className={`absolute inset-0 rounded-full border-8 border-transparent ${assessment.severity === 'high' ? 'border-t-[#ef4444] border-r-[#ef4444] border-b-[#ef4444]' : assessment.severity === 'moderate' ? 'border-t-[#fbbf24] border-r-[#fbbf24]' : 'border-t-[#22c55e]'} border-l-[#f8fafc]`} />
-                  <div className="absolute inset-20 rounded-full bg-white flex items-center justify-center">
-                    <span className="text-4xl font-bold text-slate-800">{assessment.score || 0}%</span>
+                  <div className="absolute inset-16 sm:inset-20 rounded-full bg-white flex items-center justify-center">
+                    <span className="text-3xl sm:text-4xl font-bold text-slate-800">{assessment.score || 0}%</span>
                   </div>
-                  <div className="absolute inset-24 rounded-full bg-transparent" />
+                  <div className="absolute inset-20 sm:inset-24 rounded-full bg-transparent" />
                 </div>
               </div>
 

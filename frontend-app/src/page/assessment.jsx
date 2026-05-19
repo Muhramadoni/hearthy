@@ -385,11 +385,11 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                 <span className="text-sm font-semibold text-slate-900">
                   Level stress
                 </span>
-                <div className="mt-3 flex gap-3">
+                <div className="mt-3 flex flex-col sm:flex-row gap-3">
                   <button
                     type="button"
                     onClick={() => setIsStressTestOpen(true)}
-                    className="rounded-2xl bg-[#1e3a5a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#173652]"
+                    className="w-full sm:w-auto rounded-2xl bg-[#1e3a5a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#173652]"
                   >
                     Test level stress
                   </button>
@@ -407,7 +407,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                 <span className="text-sm font-semibold text-slate-900">
                   Aktivitas Fisik (jam/minggu)
                 </span>
-                <div className="mt-3 flex items-center gap-4">
+                <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-4">
                   <input
                     type="range"
                     min="0"
@@ -436,7 +436,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                 <span className="text-sm font-semibold text-slate-900">
                   Durasi Tidur (jam/malam)
                 </span>
-                <div className="mt-3 flex items-center gap-4">
+                <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-4">
                   <input
                     type="range"
                     min="0"
@@ -484,7 +484,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                   <p className="mb-3 text-sm font-semibold text-slate-900">
                     {q.question}
                   </p>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
                     {q.options.map((option) => (
                       <button
                         key={option}

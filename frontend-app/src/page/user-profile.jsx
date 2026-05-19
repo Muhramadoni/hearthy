@@ -116,15 +116,15 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
               </div>
             ) : (
               <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-                <div className="flex items-center gap-6">
-                  <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-slate-950 bg-[#f8fafc]">
-                    <img src={iconUser} alt="Avatar" className="h-16 w-16" />
+                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-left">
+                  <div className="flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-full border-4 border-slate-950 bg-[#f8fafc] shrink-0">
+                    <img src={iconUser} alt="Avatar" className="h-12 w-12 sm:h-16 sm:w-16" />
                   </div>
-                  <div>
-                    <h2 className="text-2xl font-semibold text-[#1e3a5a]">
+                  <div className="w-full overflow-hidden">
+                    <h2 className="text-xl sm:text-2xl font-semibold text-[#1e3a5a] truncate">
                       {userData.name}
                     </h2>
-                    <p className="mt-2 text-base font-medium text-slate-600">
+                    <p className="mt-1 sm:mt-2 text-sm sm:text-base font-medium text-slate-600 truncate">
                       {userData.email}
                     </p>
                   </div>
@@ -133,7 +133,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                 <button
                   type="button"
                   onClick={openEdit}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-[#1e3a5a] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#173652] cursor-pointer"
+                  className="w-full lg:w-auto inline-flex justify-center items-center gap-2 rounded-2xl bg-[#1e3a5a] px-4 py-3 sm:py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#173652] cursor-pointer"
                 >
                   <img src={iconEdit} alt="Edit profil" className="h-4 w-4" />
                   Edit
@@ -203,8 +203,8 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-black/80 z-40" onClick={() => !saving && setIsEditModalOpen(false)} />
-          <div className="relative z-50 w-full max-w-2xl rounded-[28px] bg-white p-8 shadow-[0_20px_60px_-20px_rgba(15,23,42,0.12),_inset_0_1px_0_0_rgba(255,255,255,0.5)] ring-1 ring-slate-200 my-8">
-            <h2 className="text-2xl font-semibold text-[#1e3a5a] mb-6">
+          <div className="relative z-50 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[28px] bg-white p-5 sm:p-6 shadow-[0_20px_60px_-20px_rgba(15,23,42,0.12),_inset_0_1px_0_0_rgba(255,255,255,0.5)] ring-1 ring-slate-200">
+            <h2 className="text-xl sm:text-2xl font-semibold text-[#1e3a5a] mb-4">
               Edit Data Pribadi
             </h2>
 
@@ -216,28 +216,28 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
             )}
 
             {/* Username & Email — read-only dalam modal */}
-            <div className="grid gap-6 sm:grid-cols-2">
-              <div className="sm:col-span-2">
-                <label className="mb-2 block text-sm font-medium text-slate-500">
+            <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
+              <div className="sm:col-span-1">
+                <label className="mb-1 block text-sm font-medium text-slate-500">
                   Username <span className="text-xs text-slate-400">(tidak dapat diubah)</span>
                 </label>
-                <div className="w-full rounded-2xl bg-[#f3f4f6] px-4 py-3 text-sm text-slate-500">
+                <div className="w-full rounded-2xl bg-[#f3f4f6] px-4 py-2.5 text-sm text-slate-500 truncate">
                   {userData.name}
                 </div>
               </div>
 
-              <div className="sm:col-span-2">
-                <label className="mb-2 block text-sm font-medium text-slate-500">
+              <div className="sm:col-span-1">
+                <label className="mb-1 block text-sm font-medium text-slate-500">
                   Email <span className="text-xs text-slate-400">(tidak dapat diubah)</span>
                 </label>
-                <div className="w-full rounded-2xl bg-[#f3f4f6] px-4 py-3 text-sm text-slate-500">
+                <div className="w-full rounded-2xl bg-[#f3f4f6] px-4 py-2.5 text-sm text-slate-500 truncate">
                   {userData.email}
                 </div>
               </div>
 
               {/* Telepon — editable */}
               <div className="sm:col-span-2">
-                <label className="mb-2 block text-sm font-medium text-slate-500">
+                <label className="mb-1 block text-sm font-medium text-slate-500">
                   Telepon
                 </label>
                 <input
@@ -247,33 +247,33 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                   value={editData.phone}
                   onChange={handleInputChange}
                   placeholder="Contoh: +6281234567890"
-                  className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
+                  className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20"
                 />
               </div>
 
               {/* Alamat — editable */}
               <div className="sm:col-span-2">
-                <label className="mb-2 block text-sm font-medium text-slate-500">
+                <label className="mb-1 block text-sm font-medium text-slate-500">
                   Alamat
                 </label>
                 <textarea
                   id="edit-address"
                   name="address"
-                  rows={4}
+                  rows={3}
                   value={editData.address}
                   onChange={handleInputChange}
                   placeholder="Masukkan alamat lengkap Anda"
-                  className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20 resize-none"
+                  className="w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#1e3a5a] focus:outline-none focus:ring-2 focus:ring-[#1e3a5a] focus:ring-opacity-20 resize-none"
                 />
               </div>
             </div>
 
-            <div className="mt-8 flex gap-3 justify-end">
+            <div className="mt-6 flex flex-row gap-3 justify-end">
               <button
                 type="button"
                 onClick={() => setIsEditModalOpen(false)}
                 disabled={saving}
-                className="rounded-2xl border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50 disabled:opacity-50"
+                className="rounded-2xl border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-50 disabled:opacity-50"
               >
                 Batal
               </button>
@@ -281,7 +281,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                 type="button"
                 onClick={handleSave}
                 disabled={saving}
-                className="rounded-2xl bg-[#1e3a5a] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#173652] disabled:opacity-60 flex items-center gap-2"
+                className="justify-center rounded-2xl bg-[#1e3a5a] px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#173652] disabled:opacity-60 flex items-center gap-2"
               >
                 {saving && (
                   <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
