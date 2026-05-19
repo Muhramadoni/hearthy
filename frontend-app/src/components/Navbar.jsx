@@ -61,10 +61,10 @@ export default function Navbar({ currentPage = "home", onNavigate, showLoginButt
 
       <header className="fixed top-0 left-0 right-0 z-40 pointer-events-none">
         {/* Efek blur gradual untuk area di luar navbar (sebelum konten menyentuh tepi atas layar) */}
-        <div className="absolute inset-0 bg-[#f0f0f0]/60 backdrop-blur-md [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)]"></div>
+        <div className="absolute inset-0 backdrop-blur-md [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)]"></div>
         
         <div className="relative px-4 py-4 md:px-6 md:py-6">
-          <div className="pointer-events-auto mx-auto flex max-w-screen-2xl items-center justify-between gap-4 md:gap-6 rounded-3xl md:rounded-[32px] bg-white/80 backdrop-blur-lg px-4 md:px-6 py-3 md:py-4 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.16)] shadow-lg ring-1 ring-slate-200/70">
+          <div className="pointer-events-auto mx-auto flex max-w-screen-2xl items-center justify-between gap-4 md:gap-6 rounded-3xl md:rounded-[32px] bg-white px-4 md:px-6 py-3 md:py-4 shadow-[0_24px_80px_-28px_rgba(15,23,42,0.16)] shadow-lg ring-1 ring-slate-200/70">
           
           <div className="flex items-center">
             <img

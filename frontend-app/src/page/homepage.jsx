@@ -392,45 +392,18 @@ function App({ currentPage, onNavigate }) {
                 </p>
               </div>
 
-              <div className="mt-10 grid gap-6">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <label className="text-sm font-medium text-slate-800">
-                    <span className="block">Nama Lengkap</span>
-                    <input
-                      type="text"
-                      placeholder="Contoh : Ramadhoni"
-                      className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-[#1b4062] focus:outline-none focus:ring-2 focus:ring-[#1b4062]/15"
-                    />
-                  </label>
-                  <label className="text-sm font-medium text-slate-800">
-                    <span className="block">Rating</span>
-                    <div className="mt-3 flex items-center gap-2 text-slate-500">
-                      <IconRating className="h-10 w-10 text-slate-500" />
-                      <IconRating className="h-10 w-10 text-slate-500" />
-                      <IconRating className="h-10 w-10 text-slate-500" />
-                      <IconRating className="h-10 w-10 text-slate-500" />
-                      <IconRating className="h-10 w-10 text-slate-500" />
-                    </div>
-                  </label>
-                </div>
-
-                <label className="text-sm font-medium">
-                  <span className="block">Pesan / Komentar</span>
-                  <textarea
-                    rows={5}
-                    placeholder="Tuliskan pengalaman Anda dalam menggunakan aplikasi ini"
-                    className="mt-3 w-full rounded-2xl border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-[#1b4062] focus:outline-none focus:ring-2 focus:ring-[#1b4062]/15"
-                  />
-                </label>
-
-                <div className="flex justify-center">
-                  <button className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1b4062] px-8 py-5 text-white shadow-lg shadow-[#1b4062]/15 transition hover:bg-[#173652]">
-                    <IconSendFeedback className="h-5 w-5 text-white" />
-                    <span className="capitalize text-lg font-semibold">
-                      Kirim Feedback
-                    </span>
-                  </button>
-                </div>
+              <div className="mt-10 flex justify-center">
+                <a 
+                  href="https://forms.gle/hjQrssj9eJwXmn1F7" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1b4062] px-8 py-5 text-white shadow-lg shadow-[#1b4062]/15 transition hover:bg-[#173652]"
+                >
+                  <span className="capitalize text-lg font-semibold">
+                    Isi Feedback
+                  </span>
+                  <IconSendFeedback className="h-5 w-5 text-white" />
+                </a>
               </div>
             </div>
           </div>
