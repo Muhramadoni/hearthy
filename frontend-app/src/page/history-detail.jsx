@@ -93,7 +93,7 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
-          @page { margin: 1cm; }
+          @page { margin: 0; }
         }
       `}</style>
       <div className="print:hidden">
@@ -104,16 +104,14 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
       </div>
 
       <main className="mx-auto max-w-screen-2xl px-6 py-10 print:p-0 print:m-0">
-        <div id="pdf-content" className="rounded-[32px] bg-white px-6 py-8 shadow-[0_24px_80px_-38px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70 print:shadow-none print:ring-0 print:rounded-none print:p-0">
+        <div id="pdf-content" className="flex flex-col gap-6 print:p-8 print:py-12">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-2xl print:hidden">
-              <h1 className="text-3xl font-bold text-slate-950 sm:text-4xl">
-                Detail Hasil Prediksi
+            <div className="max-w-2xl print:block print:mb-4">
+              <h1 className="text-3xl font-bold text-slate-950 sm:text-4xl print:text-2xl">
+                Laporan Hasil Prediksi Hearthy
               </h1>
-              <p className="mt-3 max-w-xl text-sm leading-7 text-slate-600">
-                Pahami profil risiko jantung Anda secara mendalam untuk
-                menentukan langkah pencegahan yang paling tepat bagi kesehatan
-                Anda.
+              <p className="mt-3 max-w-xl text-sm leading-7 text-slate-600 print:text-xs print:mt-1 print:leading-5">
+                Profil risiko jantung Anda secara mendalam berdasarkan parameter klinis dan gaya hidup yang diberikan.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center print:hidden">
@@ -134,8 +132,8 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
             </div>
           </div>
 
-          <div className="mt-10 grid gap-6 lg:grid-cols-[1.2fr_0.8fr] print:flex print:flex-col">
-            <div className="rounded-[28px] bg-slate-50 p-8 shadow-[0_18px_60px_-28px_rgba(15,23,42,0.2)] print:bg-white print:shadow-none print:border-b print:border-slate-200 print:rounded-none print:p-0 print:pb-8">
+          <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] print:flex print:flex-col">
+            <div className="rounded-[32px] bg-white p-8 shadow-[0_24px_80px_-38px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70 print:bg-white print:shadow-none print:border-b print:border-slate-200 print:rounded-none print:p-0 print:pb-8">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -161,12 +159,12 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
               </p>
 
               <div className="mt-8 flex items-center justify-center">
-                <div className="relative h-[240px] w-[240px] sm:h-[300px] sm:w-[300px] rounded-full bg-[#f8fafc] shadow-inner shadow-slate-200/80">
+                <div className="relative h-[240px] w-[240px] sm:h-[300px] sm:w-[300px] print:h-[180px] print:w-[180px] rounded-full bg-[#f8fafc] shadow-inner shadow-slate-200/80">
                   <div className={`absolute inset-0 rounded-full border-8 border-transparent ${assessment.severity === 'high' ? 'border-t-[#ef4444] border-r-[#ef4444] border-b-[#ef4444]' : assessment.severity === 'moderate' ? 'border-t-[#fbbf24] border-r-[#fbbf24]' : 'border-t-[#22c55e]'} border-l-[#f8fafc]`} />
-                  <div className="absolute inset-16 sm:inset-20 rounded-full bg-white flex items-center justify-center">
-                    <span className="text-3xl sm:text-4xl font-bold text-slate-800">{assessment.score || 0}%</span>
+                  <div className="absolute inset-16 sm:inset-20 print:inset-8 rounded-full bg-white flex items-center justify-center">
+                    <span className="text-3xl sm:text-4xl print:text-2xl font-bold text-slate-800">{assessment.score || 0}%</span>
                   </div>
-                  <div className="absolute inset-20 sm:inset-24 rounded-full bg-transparent" />
+                  <div className="absolute inset-20 sm:inset-24 print:inset-12 rounded-full bg-transparent" />
                 </div>
               </div>
 
@@ -198,15 +196,15 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
               </div>
             </div>
 
-            <div className="rounded-[28px] bg-white p-8 shadow-[0_18px_60px_-28px_rgba(15,23,42,0.2)] print:p-0 print:shadow-none print:mt-6">
+            <div className="rounded-[32px] bg-white p-8 shadow-[0_24px_80px_-38px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70 print:p-0 print:shadow-none print:mt-6">
               <h3 className="text-xl font-semibold text-slate-950">
                 Data Skrining Anda
               </h3>
-              <div className="mt-6 space-y-3 max-h-[420px] overflow-y-auto pr-2 print:max-h-none print:overflow-visible print:pr-0 print:grid print:grid-cols-2 print:gap-4 print:space-y-0">
+              <div className="mt-6 space-y-3 max-h-[420px] overflow-y-auto pr-2 print:max-h-none print:overflow-visible print:pr-0 print:grid print:grid-cols-2 print:gap-2 print:space-y-0">
                 {detailItems.map((item, index) => (
                   <div
                     key={index}
-                    className="rounded-3xl bg-slate-50 px-5 py-4 text-sm text-slate-800 shadow-sm print:shadow-none print:border print:border-slate-200 print:bg-white print:rounded-lg print:py-2 print:px-3"
+                    className="rounded-3xl bg-slate-50 px-5 py-4 text-sm text-slate-800 shadow-sm print:shadow-none print:border print:border-slate-200 print:bg-white print:rounded-md print:py-1.5 print:px-3 print:text-xs"
                   >
                     {item}
                   </div>
@@ -215,19 +213,19 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
             </div>
           </div>
 
-          <div className="mt-10 rounded-[28px] bg-white p-8 shadow-[0_18px_60px_-28px_rgba(15,23,42,0.2)] print:shadow-none print:border-t print:border-slate-200 print:rounded-none print:p-0 print:pt-8 print:mt-8">
+          <div className="rounded-[32px] bg-white p-8 shadow-[0_24px_80px_-38px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70 print:shadow-none print:border-t print:border-slate-200 print:rounded-none print:p-0 print:pt-8 print:mt-8">
             <h3 className="text-xl font-semibold text-slate-950">
               Rekomendasi
             </h3>
             <p className="mt-3 text-sm leading-7 text-slate-600">
               {assessment.aiInsights || "Berdasarkan analisis risiko Anda, kami menyarankan Anda untuk memperhatikan gaya hidup dan pola makan."}
             </p>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 print:grid-cols-1 print:gap-3">
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 print:grid-cols-1 print:gap-2">
               {recommendations.map((rec, i) => (
-                <div key={i} className="rounded-3xl bg-[#1b4062] px-6 py-4 text-sm font-semibold text-white transition flex items-center print:bg-white print:text-slate-900 print:border print:border-slate-300 print:rounded-lg print:py-3">
+                <div key={i} className="rounded-3xl bg-[#1b4062] px-6 py-4 text-sm font-semibold text-white transition flex items-center print:bg-white print:text-slate-900 print:border print:border-slate-300 print:rounded-md print:py-2 print:px-3 print:break-inside-avoid print:text-xs">
                   <span className="print:hidden">{rec}</span>
-                  <span className="hidden print:inline-flex gap-3">
-                    <span className="font-bold text-slate-400">{i + 1}.</span> {rec}
+                  <span className="hidden print:inline-flex gap-2">
+                    <span className="font-bold text-slate-500">{i + 1}.</span> {rec}
                   </span>
                 </div>
               ))}

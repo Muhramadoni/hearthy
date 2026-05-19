@@ -11,6 +11,41 @@ const defaultMetricItems = [
   { title: "Kolesterol", value: "0", unit: "mg/dL" },
 ];
 
+function AnimatedNumber({ value, duration = 1500 }) {
+  const [count, setCount] = useState(0);
+  
+  useEffect(() => {
+    let startTimestamp = null;
+    let rafId = null;
+    const target = parseFloat(value) || 0;
+    
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      const easeProgress = progress * (2 - progress); // ease out quad
+      setCount(easeProgress * target);
+      if (progress < 1) {
+        rafId = window.requestAnimationFrame(step);
+      } else {
+        setCount(target);
+      }
+    };
+    
+    if (target === 0) {
+      rafId = window.requestAnimationFrame(() => setCount(0));
+    } else {
+      rafId = window.requestAnimationFrame(step);
+    }
+
+    return () => {
+      if (rafId) window.cancelAnimationFrame(rafId);
+    };
+  }, [value, duration]);
+  
+  const isFloat = value.toString().includes(".");
+  return <>{isFloat ? count.toFixed(1) : Math.floor(count)}</>;
+}
+
 export default function DashboardPage({ currentPage, onNavigate }) {
   const [metricItems, setMetricItems] = useState(defaultMetricItems);
   const [riskStatus, setRiskStatus] = useState("Belum ada data");
@@ -162,7 +197,9 @@ export default function DashboardPage({ currentPage, onNavigate }) {
             <p className="text-sm font-semibold capitalized text-slate-500">
               Skor risiko
             </p>
-            <p className={`mt-4 text-5xl font-bold ${getStatusTextColor(riskStatus)}`}>{riskScore}%</p>
+            <p className={`mt-4 text-5xl font-bold ${getStatusTextColor(riskStatus)}`}>
+              <AnimatedNumber value={riskScore} />%
+            </p>
             <p className="mt-3 text-sm text-slate-600">Skor risiko terbaru</p>
           </article>
 
@@ -189,12 +226,12 @@ export default function DashboardPage({ currentPage, onNavigate }) {
                 </h2>
                 <p className={`mt-6 font-bold ${getStatusTextColor(riskStatus)}`}>
                   <span className="text-4xl">
-                    {metric.value.split(" /")[0]}
+                    <AnimatedNumber value={metric.value.split(" /")[0]} />
                   </span>
                   {metric.value.includes(" /") && (
                     <span className="text-2xl text-[#000000]">
                       {" "}
-                      /{metric.value.split(" /")[1]}
+                      /<AnimatedNumber value={metric.value.split(" /")[1]} />
                     </span>
                   )}
                 </p>
