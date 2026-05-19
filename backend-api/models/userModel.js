@@ -1,6 +1,19 @@
+/**
+ * @fileoverview Model Pengguna (User Model).
+ * Mengatur interaksi database untuk tabel `users`.
+ * Bertanggung jawab atas pencarian kredensial (email/password) dan pembaruan data pengguna secara umum.
+ */
 const { pool } = require('../database/pool');
 
+/**
+ * Objek Model Database untuk Pengguna Utama.
+ */
 const userModel = {
+  /**
+   * Mencari pengguna berdasarkan alamat email. Sering digunakan untuk keperluan login.
+   * @param {string} email - Email yang ingin dicari.
+   * @returns {Promise<Object|null>} Data pengguna jika ada, `null` jika tidak ditemukan.
+   */
   findByEmail: async (email) => {
     const { rows } = await pool.query(
       'SELECT * FROM users WHERE email = $1 LIMIT 1', [email]

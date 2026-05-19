@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Layanan AI (AI Service).
+ * Menjembatani backend Node.js dengan skrip Python untuk menjalankan prediksi
+ * model *Machine Learning* (contoh: prediksi risiko kardiovaskular).
+ */
 const { spawn } = require('child_process');
 const path = require('path');
 

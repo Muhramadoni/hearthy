@@ -1,9 +1,16 @@
+/**
+ * @fileoverview Modul Layanan Autentikasi (Auth Service).
+ * Menyediakan fungsi-fungsi untuk berinteraksi dengan API autentikasi backend,
+ * termasuk login, registrasi, manajemen token, dan reset password.
+ */
+
 const BASE_URL = '/api/auth';
 
 /**
- * Cek apakah email terdaftar
- * @param {string} email
- * @returns {Promise<void>} — throws jika email tidak terdaftar
+ * Memeriksa ketersediaan atau validitas email pengguna di sistem.
+ * @param {string} email - Alamat email yang akan diperiksa.
+ * @returns {Promise<Object>} Respons dari server yang berisi status pengecekan.
+ * @throws {Error} Jika email tidak terdaftar atau terjadi kesalahan server.
  */
 export async function checkEmail(email) {
   const res = await fetch(`${BASE_URL}/check-email`, {
@@ -22,10 +29,11 @@ export async function checkEmail(email) {
 }
 
 /**
- * Reset password menggunakan email yang sudah diverifikasi
- * @param {string} email
- * @param {string} newPassword
- * @returns {Promise<void>}
+ * Melakukan proses reset kata sandi menggunakan email yang telah diverifikasi.
+ * @param {string} email - Alamat email pengguna.
+ * @param {string} newPassword - Kata sandi baru yang akan disimpan.
+ * @returns {Promise<Object>} Respons dari server mengenai status reset.
+ * @throws {Error} Jika proses reset kata sandi gagal.
  */
 export async function resetPassword(email, newPassword) {
   const res = await fetch(`${BASE_URL}/reset-password`, {
@@ -44,10 +52,12 @@ export async function resetPassword(email, newPassword) {
 }
 
 /**
- * Login user with email & password
- * @param {string} email
- * @param {string} password
- * @returns {Promise<{token: string, user: object}>}
+ * Melakukan proses autentikasi (login) pengguna.
+ * Menyimpan token dan data pengguna ke dalam `localStorage` jika berhasil.
+ * @param {string} email - Alamat email pengguna.
+ * @param {string} password - Kata sandi pengguna.
+ * @returns {Promise<{token: string, user: Object}>} Data token otorisasi dan profil pengguna.
+ * @throws {Error} Jika kredensial tidak valid atau proses login gagal.
  */
 export async function login(email, password) {
   const res = await fetch(`${BASE_URL}/login`, {
@@ -70,11 +80,13 @@ export async function login(email, password) {
 }
 
 /**
- * Register new user
- * @param {string} name
- * @param {string} email
- * @param {string} password
- * @returns {Promise<{token: string, user: object}>}
+ * Mendaftarkan pengguna baru ke dalam sistem.
+ * Catatan: Fungsi ini tidak otomatis melakukan login setelah registrasi berhasil.
+ * @param {string} name - Nama lengkap pengguna.
+ * @param {string} email - Alamat email pengguna.
+ * @param {string} password - Kata sandi yang diinginkan.
+ * @returns {Promise<{token: string, user: Object}>} Data pengguna yang baru terdaftar.
+ * @throws {Error} Jika email sudah digunakan atau proses registrasi gagal.
  */
 export async function register(name, email, password) {
   const res = await fetch(`${BASE_URL}/register`, {
@@ -94,7 +106,9 @@ export async function register(name, email, password) {
 }
 
 /**
- * Logout user - hapus token dari localStorage
+ * Mengakhiri sesi pengguna (logout).
+ * Menghapus token dan data profil dari `localStorage` serta memberitahu server.
+ * @returns {Promise<void>}
  */
 export async function logout() {
   const token = localStorage.getItem('hearthy_token');
@@ -118,8 +132,8 @@ export async function logout() {
 }
 
 /**
- * Ambil user yang sedang login dari localStorage
- * @returns {object|null}
+ * Mengambil data profil pengguna yang saat ini sedang login dari `localStorage`.
+ * @returns {Object|null} Objek data pengguna, atau `null` jika belum login atau terjadi kesalahan *parsing*.
  */
 export function getCurrentUser() {
   try {
@@ -131,16 +145,16 @@ export function getCurrentUser() {
 }
 
 /**
- * Cek apakah user sudah login
- * @returns {boolean}
+ * Memeriksa status autentikasi pengguna saat ini.
+ * @returns {boolean} `true` jika pengguna memiliki token aktif, `false` jika tidak.
  */
 export function isAuthenticated() {
   return !!localStorage.getItem('hearthy_token');
 }
 
 /**
- * Ambil token aktif
- * @returns {string|null}
+ * Mengambil token akses (JWT) dari `localStorage`.
+ * @returns {string|null} String token akses, atau `null` jika tidak ditemukan.
  */
 export function getToken() {
   return localStorage.getItem('hearthy_token');

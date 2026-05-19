@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Rute Pengguna (User Routes).
+ * Mendefinisikan _endpoints_ khusus untuk manajemen profil akun masing-masing pengguna.
+ * Semua rute ini memerlukan otentikasi.
+ */
 const express        = require('express');
 const router         = express.Router();
 const userController = require('../controllers/userController');

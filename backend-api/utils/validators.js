@@ -1,6 +1,7 @@
 /**
- * validators.js — Input validation helpers for Hearthy API.
- * Uses plain JS (no external library) for lightweight validation.
+ * @fileoverview Kumpulan Validator (Validation Helpers).
+ * Fungsi-fungsi ringan menggunakan *plain JavaScript* untuk memvalidasi input
+ * dari pengguna sebelum diproses lebih lanjut oleh *controller*.
  */
 
 const createError = (message) => ({ error: { message } });

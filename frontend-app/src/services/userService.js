@@ -1,10 +1,16 @@
+/**
+ * @fileoverview Modul Layanan Pengguna (User Service).
+ * Menyediakan fungsi-fungsi interaksi dengan API terkait manajemen profil pengguna.
+ */
+
 import { getToken } from './authService';
 
 const BASE_URL = '/api/users';
 
 /**
- * Ambil profil user yang sedang login
- * @returns {Promise<{user: object, profile: object|null}>}
+ * Mengambil informasi profil lengkap dari pengguna yang sedang login.
+ * @returns {Promise<{user: Object, profile: Object|null}>} Objek gabungan kredensial akun dan data biodata profil.
+ * @throws {Error} Jika gagal memuat data profil.
  */
 export async function fetchProfile() {
   const res = await fetch(`${BASE_URL}/profile`, {
@@ -20,9 +26,12 @@ export async function fetchProfile() {
 }
 
 /**
- * Update profil user (phone & address)
- * @param {{ phone?: string, address?: string }} payload
- * @returns {Promise<object>} profile yang diperbarui
+ * Memperbarui data biodata profil pengguna, seperti nomor telepon dan alamat.
+ * @param {Object} payload - Objek berisi data yang ingin diperbarui.
+ * @param {string} [payload.phone] - Nomor telepon baru pengguna.
+ * @param {string} [payload.address] - Alamat tempat tinggal baru pengguna.
+ * @returns {Promise<Object>} Data profil terbaru setelah berhasil disimpan.
+ * @throws {Error} Jika proses pembaruan gagal dilakukan.
  */
 export async function updateProfile(payload) {
   const res = await fetch(`${BASE_URL}/profile`, {

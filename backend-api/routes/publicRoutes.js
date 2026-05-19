@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Rute Publik (Public Routes).
+ * Mendefinisikan _endpoints_ untuk mengambil data publik (artikel, tips) 
+ * yang dapat diakses tanpa proses *login*.
+ */
 const express          = require('express');
 const router           = express.Router();
 const publicController = require('../controllers/publicController');

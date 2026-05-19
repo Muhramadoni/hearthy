@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Titik Masuk Utama (Main Entry Point) Server Backend.
+ * Menginisialisasi aplikasi Express, mengatur *middleware* global (CORS, body parser),
+ * mendaftarkan rute API utama, dan menjalankan *server* pada *port* yang ditentukan.
+ */
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');

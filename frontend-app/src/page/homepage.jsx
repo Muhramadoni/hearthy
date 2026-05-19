@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Komponen Halaman Utama (Homepage) untuk aplikasi Hearthy.
+ * Menampilkan informasi mengenai sistem prediksi risiko kardiovaskular, 
+ * cara kerja, keunggulan fitur, dan tautan formulir umpan balik (feedback).
+ */
+
 import logoSrc from "../image/logo-hearthy.png";
 import iconInputDataKlinis from "../icon/icon-input-data-klinis.svg";
 import iconAI from "../icon/icon-AI.svg";
@@ -7,6 +13,11 @@ import Navbar from "../components/Navbar.jsx";
 import Chatbot from "../components/Chatbot.jsx";
 import { isAuthenticated } from "../services/authService";
 
+/**
+ * Konfigurasi langkah-langkah penggunaan aplikasi (Cara Kerja).
+ * Digunakan untuk merender kartu-kartu instruksi pada bagian "How It Works".
+ * @type {Array<{title: string, description: string, icon: string}>}
+ */
 const steps = [
   {
     title: "1. Input Data Klinis",
@@ -28,6 +39,13 @@ const steps = [
   },
 ];
 
+/**
+ * Komponen Ikon: Prediksi AI Akurat
+ * Menampilkan grafis vektor (SVG) representasi kecerdasan buatan.
+ * @param {Object} props - Properti komponen.
+ * @param {string} [props.className="h-6 w-6"] - Kelas utilitas Tailwind CSS untuk penyesuaian gaya.
+ * @returns {JSX.Element} Elemen SVG ikon.
+ */
 function IconPrediksiAkurat({ className = "h-6 w-6" }) {
   return (
     <svg
@@ -96,6 +114,11 @@ function IconDesainInklusif({ className = "h-6 w-6" }) {
   );
 }
 
+/**
+ * Konfigurasi keunggulan utama platform Hearthy.
+ * Digunakan untuk merender kartu fitur pada bagian "Keunggulan Utama".
+ * @type {Array<{title: string, description: string, icon: React.FC}>}
+ */
 const features = [
   {
     title: "Prediksi AI Akurat",
@@ -123,6 +146,11 @@ const features = [
   },
 ];
 
+/**
+ * Konfigurasi tautan Footer.
+ * Mengelompokkan tautan berdasarkan kategori "Platform" dan "Dukungan".
+ * @type {Object.<string, string[]>}
+ */
 const footerLinks = {
   platform: ["Kebijakan Privasi", "Ketentuan Layanan"],
   dukungan: ["Sanggahan Medis", "Kontak"],
@@ -233,13 +261,34 @@ function IconRating({ className = "h-5 w-5" }) {
   );
 }
 
+/**
+ * Komponen Utama: Homepage (App)
+ * Berfungsi sebagai titik masuk visual (landing page) bagi pengguna baru maupun yang belum login.
+ * Menampilkan:
+ * 1. Bagian Hero (Sistem Prediksi Risiko Kardiovaskular Berbasis AI)
+ * 2. Statistik Global (Penyebab Global, Dapat Dicegah, Deteksi Dini)
+ * 3. Cara Kerja Sistem
+ * 4. Keunggulan Fitur
+ * 5. Call to Action untuk Umpan Balik (Google Form)
+ * 6. Footer (Tautan Platform & Dukungan)
+ *
+ * @param {Object} props - Properti komponen.
+ * @param {string} props.currentPage - Penanda halaman aktif untuk navigasi Navbar.
+ * @param {function} props.onNavigate - Fungsi *callback* untuk merutekan pengguna antar halaman.
+ * @returns {JSX.Element} Antarmuka pengguna Homepage.
+ */
 function App({ currentPage, onNavigate }) {
   useEffect(() => {
+    // Mengubah judul dokumen HTML pada saat halaman dimuat
     document.title = "Home - Web Hearty";
   }, []);
 
   return (
     <div className="min-h-screen bg-[#f0f0f0] text-slate-950">
+      {/* 
+        Komponen Navigasi Utama.
+        Tombol login hanya ditampilkan jika pengguna belum terautentikasi (belum memiliki sesi).
+      */}
       <Navbar
         currentPage={currentPage}
         onNavigate={onNavigate}
@@ -247,6 +296,12 @@ function App({ currentPage, onNavigate }) {
       />
 
       <main className="pt-8">
+        {/* =======================
+            BAGIAN 1: HERO SECTION
+            ======================= 
+            Menampilkan pesan utama aplikasi dan tombol aksi utama (Call to Action) 
+            untuk mengarahkan pengguna melakukan asesmen.
+        */}
         <section
           id="home"
           className="mx-auto max-w-screen-2xl px-6 pt-16 pb-16"
@@ -276,6 +331,12 @@ function App({ currentPage, onNavigate }) {
           </div>
         </section>
 
+        {/* =======================
+            BAGIAN 2: STATISTIK GLOBAL
+            ======================= 
+            Menampilkan data faktual terkait risiko penyakit kardiovaskular secara global 
+            untuk membangun urgensi bagi pengguna.
+        */}
         <section className="bg-[#dde2e7] py-16">
           <div className="mx-auto grid max-w-screen-2xl gap-6 px-6 sm:grid-cols-2 lg:grid-cols-3">
             <div className="rounded-3xl p-8">
@@ -312,6 +373,12 @@ function App({ currentPage, onNavigate }) {
           </div>
         </section>
 
+        {/* =======================
+            BAGIAN 3: CARA KERJA (HOW IT WORKS)
+            ======================= 
+            Menjelaskan langkah-langkah penggunaan aplikasi dari pengisian formulir data klinis 
+            hingga mendapatkan profil risiko.
+        */}
         <section id="how-it-works" className="mx-auto max-w-screen-2xl py-24">
           <div className="text-center">
             <h2 className="text-5xl font-semibold capitalized text-[#1b4062]">
@@ -346,6 +413,11 @@ function App({ currentPage, onNavigate }) {
           </div>
         </section>
 
+        {/* =======================
+            BAGIAN 4: KEUNGGULAN UTAMA (FEATURES)
+            ======================= 
+            Menyoroti fitur-fitur dan manfaat terbaik dari platform Hearthy.
+        */}
         <section className="bg-[#1b4062] py-24">
           <div className="mx-auto max-w-screen-2xl px-6 text-white">
             <div className="max-w-2xl">
@@ -376,6 +448,11 @@ function App({ currentPage, onNavigate }) {
           </div>
         </section>
 
+        {/* =======================
+            BAGIAN 5: UMPAN BALIK (FEEDBACK)
+            ======================= 
+            Mengarahkan pengguna ke tautan Google Form eksternal untuk memberikan ulasan aplikasi.
+        */}
         <section className="bg-[#dde2e7] py-24">
           <div className="mx-auto max-w-screen-2xl px-6">
             <div className="mx-auto max-w-4xl rounded-[32px] bg-white p-8 shadow-sm shadow-slate-300/40 md:p-12">
@@ -410,6 +487,11 @@ function App({ currentPage, onNavigate }) {
         </section>
       </main>
 
+      {/* =======================
+          BAGIAN 6: FOOTER
+          ======================= 
+          Informasi hak cipta dan navigasi tautan tambahan terkait platform dan dukungan.
+      */}
       <footer className="bg-[#ffffff] py-10">
         <div className="mx-auto grid max-w-screen-2xl gap-8 px-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-[1.5fr_1fr_1fr] items-start md:items-center">
           <div className="space-y-3">

@@ -1,3 +1,17 @@
+/**
+ * @fileoverview Middleware Penanganan Kesalahan (Error Handler).
+ * Menangkap semua kesalahan (Error/Exception) yang terjadi selama pemrosesan request
+ * dan mengembalikan respons JSON yang diformat dengan baik.
+ */
+
+/**
+ * Fungsi middleware untuk menangani *error* secara terpusat.
+ * Menerjemahkan kode kesalahan database (PostgreSQL) menjadi pesan yang ramah pengguna.
+ * @param {Error} err - Objek kesalahan yang ditangkap.
+ * @param {Object} req - Objek permintaan HTTP.
+ * @param {Object} res - Objek respons HTTP.
+ * @param {Function} next - Fungsi next (tidak digunakan di sini tapi diperlukan oleh Express untuk mendeteksi *error handler*).
+ */
 const errorHandler = (err, req, res, next) => { // eslint-disable-line no-unused-vars
   console.error(`[ERROR] ${req.method} ${req.originalUrl} — ${err.message}`);
   if (process.env.NODE_ENV === 'development') console.error(err.stack);

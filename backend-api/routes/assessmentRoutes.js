@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Rute Asesmen (Assessment Routes).
+ * Mendefinisikan _endpoints_ terkait pengiriman dan pengambilan riwayat asesmen.
+ * Semua rute dalam file ini dilindungi oleh middleware `authenticate`.
+ */
 const express              = require('express');
 const router               = express.Router();
 const assessmentController = require('../controllers/assessmentController');

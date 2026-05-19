@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Halaman Profil Pengguna (User Profile Page).
+ * Menampilkan informasi identitas (username, email) serta data kontak (telepon, alamat).
+ * Menyediakan antarmuka bagi pengguna untuk memperbarui data kontak mereka.
+ */
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar.jsx";
 import Chatbot from "../components/Chatbot.jsx";
@@ -5,6 +10,16 @@ import iconUser from "../icon/icon-user.svg";
 import iconEdit from "../icon/icon-edit.svg";
 import { fetchProfile, updateProfile } from "../services/userService";
 
+/**
+ * Komponen Utama: UserProfilePage
+ * Berfungsi memuat data profil melalui pemanggilan API, menampilkannya,
+ * dan mengelola modal pop-up yang memungkinkan pengguna memperbarui informasi profil mereka.
+ *
+ * @param {Object} props - Properti komponen.
+ * @param {string} props.currentPage - Penanda halaman aktif untuk navigasi Navbar.
+ * @param {function} props.onNavigate - Fungsi *callback* untuk berpindah halaman.
+ * @returns {JSX.Element} Antarmuka pengguna Halaman Profil.
+ */
 export default function UserProfilePage({ currentPage, onNavigate }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [loading, setLoading]                 = useState(true);

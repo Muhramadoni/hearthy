@@ -1,9 +1,24 @@
+/**
+ * @fileoverview Halaman Riwayat (History Page).
+ * Menampilkan daftar lengkap hasil prediksi risiko kardiovaskular pengguna sebelumnya,
+ * dikelompokkan berdasarkan bulan dan dapat disaring (filter) berdasarkan tanggal spesifik.
+ */
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
 import Chatbot from "../components/Chatbot.jsx";
 import iconLaporan from "../icon/icon-laporan.svg";
 import { getAssessments } from "../services/assessmentService.js";
 
+/**
+ * Komponen Utama: HistoryPage
+ * Mengambil daftar seluruh asesmen kardiovaskular yang pernah dilakukan oleh pengguna.
+ * Dilengkapi dengan fitur pemfilteran tanggal dan paginasi (load more).
+ *
+ * @param {Object} props - Properti komponen.
+ * @param {string} props.currentPage - Penanda halaman aktif untuk navigasi Navbar.
+ * @param {function} props.onNavigate - Fungsi navigasi ke halaman lain.
+ * @returns {JSX.Element} Antarmuka pengguna Halaman Riwayat.
+ */
 export default function HistoryPage({ currentPage, onNavigate }) {
   const [selectedDate, setSelectedDate] = useState("");
   const [historyGroups, setHistoryGroups] = useState([]);

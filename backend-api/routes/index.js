@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Rute Induk API (Main API Routes).
+ * Menggabungkan seluruh rute yang ada menjadi satu kesatuan di bawah path `/api`.
+ */
 const express = require('express');
 const router  = express.Router();
 

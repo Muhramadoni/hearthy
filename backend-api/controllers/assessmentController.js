@@ -1,10 +1,25 @@
+/**
+ * @fileoverview Pengontrol Asesmen (Assessment Controller).
+ * Menangani logika bisnis untuk permintaan HTTP yang berkaitan dengan pembuatan,
+ * prediksi AI, pengambilan riwayat, dan penghapusan data asesmen risiko kesehatan.
+ */
 const assessmentModel = require('../models/assessmentModel');
 const { calculateScore } = require('../utils/mockAI');
 const { getRecommendationsByScore } = require('../utils/mockAI');
 const { predictCardiovascularRisk } = require('../utils/aiService');
 
+/**
+ * Objek Pengontrol (Controller) Asesmen Kesehatan.
+ * Memuat berbagai *handler* untuk _endpoint_ `/api/assessments`.
+ */
 const assessmentController = {
   // POST /api/assessments
+  /**
+   * Menyimpan data asesmen kesehatan secara umum ke dalam database.
+   * @param {Object} req - Objek permintaan HTTP (Request).
+   * @param {Object} res - Objek respons HTTP (Response).
+   * @param {Function} next - Fungsi *middleware* untuk meneruskan *error*.
+   */
   createAssessment: async (req, res, next) => {
     try {
       const { type, answers } = req.body;

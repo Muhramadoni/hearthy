@@ -1,9 +1,10 @@
 /**
- * runMigrations.js
- * Usage:
- *   node database/runMigrations.js up    ← run all pending migrations
- *   node database/runMigrations.js down  ← rollback last batch
- *   node database/runMigrations.js down all  ← rollback ALL migrations
+ * @fileoverview Skrip Migrasi Database (Migration Runner).
+ * Mengotomatiskan penerapan (UP) dan pembatalan (DOWN) struktur skema tabel ke database PostgreSQL.
+ * Penggunaan:
+ *   node database/runMigrations.js up    ← Menjalankan semua migrasi yang belum dieksekusi
+ *   node database/runMigrations.js down  ← Membatalkan *batch* migrasi terakhir
+ *   node database/runMigrations.js down all  ← Membatalkan SELURUH migrasi
  */
 
 const fs   = require('fs');
@@ -25,12 +26,21 @@ const ensureTrackingTable = async () => {
 };
 
 // ── Get all .js migration files sorted ───────────────────────
+/**
+ * Membaca direktori `migrations` dan mengembalikan daftar file `.js` secara terurut.
+ * @returns {string[]} Array berisi nama-nama file migrasi.
+ */
 const getMigrationFiles = () =>
   fs.readdirSync(MIGRATIONS_DIR)
     .filter(f => f.endsWith('.js'))
     .sort();
 
 // ── UP: Run all pending migrations ───────────────────────────
+/**
+ * Menjalankan proses migrasi maju (UP).
+ * Hanya file migrasi yang belum ada di tabel `schema_migrations` yang akan dijalankan.
+ * @returns {Promise<void>}
+ */
 const migrateUp = async () => {
   await ensureTrackingTable();
 
@@ -71,6 +81,11 @@ const migrateUp = async () => {
 };
 
 // ── DOWN: Rollback last batch (or all) ───────────────────────
+/**
+ * Menjalankan proses migrasi mundur (DOWN).
+ * @param {string} [mode='batch'] - Mode pembatalan: 'batch' (hanya sesi terakhir) atau 'all' (semua).
+ * @returns {Promise<void>}
+ */
 const migrateDown = async (mode = 'batch') => {
   await ensureTrackingTable();
 

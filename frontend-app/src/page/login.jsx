@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Halaman Autentikasi Masuk (Login Page).
+ * Menyediakan antarmuka bagi pengguna untuk masuk ke dalam akun mereka
+ * dengan menggunakan kombinasi alamat email dan kata sandi.
+ */
 import logoHearthy from "../image/logo-hearthy.png";
 import doctorImage from "../image/doctor-image.png";
 import iconShow from "../icon/icon-show.svg";
@@ -5,6 +10,15 @@ import iconHide from "../icon/icon-hide.svg";
 import { useEffect, useState } from "react";
 import { login } from "../services/authService";
 
+/**
+ * Komponen Utama: Login
+ * Mengatur status formulir (email, password), proses pemanggilan API autentikasi,
+ * penanganan kesalahan, dan memfasilitasi navigasi pasca-login.
+ *
+ * @param {Object} props - Properti komponen.
+ * @param {function} props.onNavigate - Fungsi *callback* untuk berpindah halaman.
+ * @returns {JSX.Element} Antarmuka pengguna Halaman Login.
+ */
 export default function Login({ onNavigate }) {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");

@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Halaman Asesmen (Assessment Page).
+ * Mengizinkan pengguna untuk memasukkan data parameter klinis dan gaya hidup,
+ * kemudian mengirimkannya ke AI (backend) untuk mendapatkan prediksi risiko kardiovaskular.
+ */
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
 import Chatbot from "../components/Chatbot.jsx";
@@ -5,6 +10,11 @@ import iconProfilAsasment from "../icon/icon-profil-asasment.svg";
 import iconDetakJantung from "../icon/icon-detak jantung.svg";
 import Swal from "sweetalert2";
 
+/**
+ * Fungsi utilitas untuk mendapatkan deskripsi kategori kualitas diet.
+ * @param {number|string} level - Skor kualitas diet (1-7).
+ * @returns {string} Deskripsi teks kategori diet.
+ */
 const getDietCategory = (level) => {
   const categories = {
     1: "Sangat Buruk",
@@ -18,6 +28,16 @@ const getDietCategory = (level) => {
   return categories[level] || "";
 };
 
+/**
+ * Komponen Utama: AssessmentPage
+ * Menampilkan formulir input untuk data fisik, kebiasaan, riwayat, dan kalkulasi level stres.
+ * Terintegrasi dengan API prediksi dan layanan notifikasi (SweetAlert2).
+ *
+ * @param {Object} props - Properti komponen.
+ * @param {string} props.currentPage - Penanda halaman aktif untuk navigasi Navbar.
+ * @param {function} props.onNavigate - Fungsi navigasi ke halaman lain.
+ * @returns {JSX.Element} Antarmuka pengguna Halaman Asesmen.
+ */
 export default function AssessmentPage({ currentPage, onNavigate }) {
   const [familyHistory, setFamilyHistory] = useState("Ya");
   const [stressLevel, setStressLevel] = useState("");

@@ -1,7 +1,19 @@
+/**
+ * @fileoverview Model Profil Pengguna (Profile Model).
+ * Mengatur interaksi database untuk tabel `profiles` yang berisi data pribadi tambahan
+ * seperti nomor telepon dan alamat tempat tinggal.
+ */
 const { pool } = require('../database/pool');
 
+/**
+ * Objek Model Database untuk Profil Pengguna.
+ */
 const profileModel = {
-  // Buat row profil kosong saat user baru register
+  /**
+   * Membuat entri profil kosong (null) untuk pengguna baru saat registrasi awal.
+   * @param {number|string} userId - ID pengguna.
+   * @returns {Promise<Object>} Baris profil yang dikembalikan.
+   */
   create: async (userId) => {
     const { rows } = await pool.query(
       `INSERT INTO profiles (user_id)

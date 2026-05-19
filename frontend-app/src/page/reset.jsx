@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Halaman Lupa Kata Sandi (Reset Password Page).
+ * Menyediakan antarmuka multi-langkah (multi-step) untuk memverifikasi alamat email
+ * dan mengatur ulang kata sandi pengguna yang lupa akunnya.
+ */
 import logoHearthy from "../image/logo-hearthy.png";
 import doctorImage from "../image/doctor-image.png";
 import iconShow from "../icon/icon-show.svg";
@@ -5,6 +10,16 @@ import iconHide from "../icon/icon-hide.svg";
 import { useEffect, useState } from "react";
 import { checkEmail, resetPassword } from "../services/authService";
 
+/**
+ * Komponen Utama: ResetPassword
+ * Mengelola dua langkah proses reset:
+ * 1. Meminta dan memverifikasi keberadaan alamat email.
+ * 2. Mengambil kata sandi baru dan mengonfirmasinya.
+ *
+ * @param {Object} props - Properti komponen.
+ * @param {function} props.onNavigate - Fungsi *callback* untuk berpindah halaman.
+ * @returns {JSX.Element} Antarmuka pengguna Halaman Reset Kata Sandi.
+ */
 export default function ResetPassword({ onNavigate }) {
   // Step 1 = verifikasi email, Step 2 = isi password baru
   const [step, setStep] = useState(1);

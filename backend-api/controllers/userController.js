@@ -1,11 +1,26 @@
+/**
+ * @fileoverview Pengontrol Pengguna (User Controller).
+ * Mengelola fungsionalitas manajemen akun pengguna setelah login,
+ * termasuk pengambilan/pembaruan profil, penggantian kata sandi, dan statistik.
+ */
 const bcrypt          = require('bcryptjs');
 const userModel       = require('../models/userModel');
 const profileModel    = require('../models/profileModel');
 const assessmentModel = require('../models/assessmentModel');
 const { validateProfileUpdate, validatePasswordChange } = require('../utils/validators');
 
+/**
+ * Objek Pengontrol (Controller) Manajemen Pengguna.
+ * Memuat berbagai *handler* untuk _endpoint_ `/api/users`.
+ */
 const userController = {
   // GET /api/users/profile
+  /**
+   * Mengambil data akun dan profil terperinci milik pengguna yang sedang login.
+   * @param {Object} req - Objek permintaan HTTP.
+   * @param {Object} res - Objek respons HTTP.
+   * @param {Function} next - Fungsi *middleware* *error*.
+   */
   getProfile: async (req, res, next) => {
     try {
       const user    = await userModel.findById(req.user.id);

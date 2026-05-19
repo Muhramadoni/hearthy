@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Pengontrol Autentikasi (Auth Controller).
+ * Bertanggung jawab menangani proses pendaftaran pengguna, otentikasi kredensial (login),
+ * manajemen sesi berbasis JWT, serta verifikasi dan reset kata sandi.
+ */
 const bcrypt       = require('bcryptjs');
 const jwt          = require('jsonwebtoken');
 const userModel    = require('../models/userModel');
@@ -14,8 +19,19 @@ const safeUser = (u) => ({
   role: u.role, createdAt: u.created_at,
 });
 
+/**
+ * Objek Pengontrol (Controller) Autentikasi Pengguna.
+ * Memuat berbagai *handler* untuk _endpoint_ `/api/auth`.
+ */
 const authController = {
   // POST /api/auth/register
+  /**
+   * Menangani proses registrasi akun pengguna baru.
+   * Melakukan validasi input, _hashing_ kata sandi, dan pembuatan _record_ pengguna & profil.
+   * @param {Object} req - Objek permintaan HTTP.
+   * @param {Object} res - Objek respons HTTP.
+   * @param {Function} next - Fungsi *middleware* *error*.
+   */
   register: async (req, res, next) => {
     try {
       const { error } = validateRegister(req.body);

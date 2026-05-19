@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Konfigurasi Koneksi Database (Database Pool).
+ * Menginisialisasi *connection pool* PostgreSQL menggunakan pustaka `pg`.
+ */
 const { Pool } = require('pg');
 require('dotenv').config();
 
@@ -17,6 +21,11 @@ pool.on('error', (err) => {
   process.exit(-1);
 });
 
+/**
+ * Fungsi pembantu untuk menguji koneksi ke database saat server baru berjalan.
+ * Mencetak waktu saat ini (dari server database) jika berhasil.
+ * @returns {Promise<void>}
+ */
 const testConnection = async () => {
   const client = await pool.connect();
   try {

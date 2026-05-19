@@ -1,6 +1,9 @@
 /**
- * mockAI.js — Simulates AI scoring & recommendation engine for Hearthy.
- * Replace with a real AI/ML API call in production.
+ * @fileoverview Mock AI & Recommendation Engine.
+ * Menyediakan logika simulasi *scoring* dan *recommendation* untuk asesmen kesehatan (selain kardiovaskular).
+ * Menggunakan pendekatan berbasis aturan (*rule-based*) sederhana sebagai purwarupa.
+ *
+ * Catatan: Dapat digantikan oleh model ML/API asli di produksi.
  */
 
 // ── Score Calculators ─────────────────────────────────────────────────────────

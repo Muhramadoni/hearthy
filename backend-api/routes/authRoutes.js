@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Rute Autentikasi (Auth Routes).
+ * Mendefinisikan _endpoints_ untuk registrasi, login, manajemen token (refresh), 
+ * dan lupa kata sandi.
+ */
 const express        = require('express');
 const router         = express.Router();
 const authController = require('../controllers/authController');

@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Halaman Pendaftaran (Register Page).
+ * Menyediakan antarmuka bagi pengguna baru untuk membuat akun Hearthy
+ * dengan mengisi nama (username), alamat email, dan kata sandi.
+ */
 import logoHearthy from "../image/logo-hearthy.png";
 import doctorImage from "../image/doctor-image.png";
 import iconShow from "../icon/icon-show.svg";
@@ -5,6 +10,15 @@ import iconHide from "../icon/icon-hide.svg";
 import { useEffect, useState } from "react";
 import { register } from "../services/authService";
 
+/**
+ * Komponen Utama: Register
+ * Mengelola status formulir pendaftaran, memvalidasi input (kecocokan kata sandi, panjang minimum),
+ * dan menangani pemanggilan API pendaftaran (layanan autentikasi).
+ *
+ * @param {Object} props - Properti komponen.
+ * @param {function} props.onNavigate - Fungsi *callback* untuk berpindah halaman.
+ * @returns {JSX.Element} Antarmuka pengguna Halaman Pendaftaran.
+ */
 export default function Register({ onNavigate }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);

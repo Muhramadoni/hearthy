@@ -1,9 +1,24 @@
+/**
+ * @fileoverview Halaman Detail Riwayat (History Detail Page).
+ * Menampilkan ringkasan hasil secara mendalam dari sebuah sesi asesmen tertentu,
+ * termasuk skor akhir, status tingkat keparahan, ringkasan input pengguna, dan rekomendasi langkah pencegahan.
+ */
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar.jsx";
 import Chatbot from "../components/Chatbot.jsx";
 import { getAssessmentById } from "../services/assessmentService.js";
 import Swal from "sweetalert2";
 
+/**
+ * Komponen Utama: HistoryDetailPage
+ * Mengambil data detail suatu asesmen berdasarkan ID (dari `localStorage`) 
+ * dan menyediakan antarmuka visual termasuk grafis melingkar (gauge) serta fungsionalitas cetak PDF.
+ *
+ * @param {Object} props - Properti komponen.
+ * @param {string} props.currentPage - Penanda halaman aktif untuk navigasi Navbar.
+ * @param {function} props.onNavigate - Fungsi navigasi ke halaman lain.
+ * @returns {JSX.Element} Antarmuka pengguna Halaman Detail Riwayat.
+ */
 export default function HistoryDetailPage({ currentPage, onNavigate }) {
   const [assessment, setAssessment] = useState(null);
   const [loading, setLoading] = useState(true);

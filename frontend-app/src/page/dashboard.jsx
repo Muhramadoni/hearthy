@@ -1,9 +1,18 @@
+/**
+ * @fileoverview Halaman Dasbor (Dashboard Page).
+ * Menampilkan ringkasan status risiko kesehatan jantung pengguna,
+ * skor terbaru, metrik fisik (tekanan darah, BMI, dll.), dan grafik tren riwayat asesmen.
+ */
 import Navbar from "../components/Navbar.jsx";
 import Chatbot from "../components/Chatbot.jsx";
 import iconGrafik from "../icon/icon-grafik.svg";
 import { useEffect, useState } from "react";
 import { getAssessmentSummary, getAssessments } from "../services/assessmentService.js";
 
+/**
+ * Konfigurasi metrik default jika pengguna belum memiliki data riwayat.
+ * @type {Array<{title: string, value: string, unit: string}>}
+ */
 const defaultMetricItems = [
   { title: "Tekanan darah", value: "0 /0", unit: "mmHg" },
   { title: "Detak jantung", value: "0", unit: "BPM" },
@@ -11,6 +20,14 @@ const defaultMetricItems = [
   { title: "Kolesterol", value: "0", unit: "mg/dL" },
 ];
 
+/**
+ * Komponen pembantu untuk menganimasikan transisi angka dari 0 menuju nilai target.
+ *
+ * @param {Object} props - Properti komponen.
+ * @param {number|string} props.value - Nilai target akhir (bisa berupa desimal).
+ * @param {number} [props.duration=1500] - Durasi animasi dalam milidetik.
+ * @returns {JSX.Element} Angka yang dianimasikan (dibungkus dalam React Fragment).
+ */
 function AnimatedNumber({ value, duration = 1500 }) {
   const [count, setCount] = useState(0);
   
@@ -46,6 +63,15 @@ function AnimatedNumber({ value, duration = 1500 }) {
   return <>{isFloat ? count.toFixed(1) : Math.floor(count)}</>;
 }
 
+/**
+ * Komponen Utama: DashboardPage
+ * Mengambil ringkasan kesehatan dari API dan menyajikannya dalam format yang mudah dipahami (grafik, skor risiko).
+ *
+ * @param {Object} props - Properti komponen.
+ * @param {string} props.currentPage - Penanda halaman aktif untuk navigasi Navbar.
+ * @param {function} props.onNavigate - Fungsi navigasi ke halaman lain.
+ * @returns {JSX.Element} Antarmuka pengguna Halaman Dasbor.
+ */
 export default function DashboardPage({ currentPage, onNavigate }) {
   const [metricItems, setMetricItems] = useState(defaultMetricItems);
   const [riskStatus, setRiskStatus] = useState("Belum ada data");
