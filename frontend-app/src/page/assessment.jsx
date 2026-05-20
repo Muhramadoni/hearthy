@@ -209,7 +209,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
           <p className="text-sm font-semibold text-slate-600">
             Assessment Pengguna
           </p>
-          <h1 className="mt-2 text-4xl font-bold text-slate-950">
+          <h1 className="mt-2 text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-950">
             Isi Parameter Klinik untuk Prediksi Risiko
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600">

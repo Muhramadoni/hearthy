@@ -46,30 +46,34 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f0f0f0] flex items-center justify-center text-slate-500">
+      <div className="min-h-screen bg-[#f0f0f0] flex flex-col text-slate-500">
         <Navbar
           currentPage={currentPage ?? "history"}
           onNavigate={onNavigate ?? (() => {})}
         />
-        Loading data...
+        <div className="flex-1 flex items-center justify-center">
+          Loading data...
+        </div>
       </div>
     );
   }
   
   if (!assessment) {
     return (
-      <div className="min-h-screen bg-[#f0f0f0] flex flex-col items-center justify-center text-slate-500">
+      <div className="min-h-screen bg-[#f0f0f0] flex flex-col text-slate-500">
         <Navbar
           currentPage={currentPage ?? "history"}
           onNavigate={onNavigate ?? (() => {})}
         />
-        <div className="mt-20">Data tidak ditemukan.</div>
-        <button
-          onClick={() => onNavigate?.("history")}
-          className="mt-4 inline-flex items-center justify-center rounded-2xl bg-[#1b4062] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#163551]"
-        >
-          Kembali ke History
-        </button>
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <div>Data tidak ditemukan.</div>
+          <button
+            onClick={() => onNavigate?.("history")}
+            className="mt-4 inline-flex items-center justify-center rounded-2xl bg-[#1b4062] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#163551]"
+          >
+            Kembali ke History
+          </button>
+        </div>
       </div>
     );
   }
@@ -122,7 +126,7 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
         <div id="pdf-content" className="flex flex-col gap-6 print:p-8 print:py-12">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl print:block print:mb-4">
-              <h1 className="text-3xl font-bold text-slate-950 sm:text-4xl print:text-2xl">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-950 print:text-2xl">
                 Laporan Hasil Prediksi Hearthy
               </h1>
               <p className="mt-3 max-w-xl text-sm leading-7 text-slate-600 print:text-xs print:mt-1 print:leading-5">
@@ -184,24 +188,24 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
               </div>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-3 print:grid-cols-3">
-                <div className="rounded-3xl bg-white p-4 text-center shadow-sm print:shadow-none print:border print:border-slate-200 print:rounded-lg">
-                  <p className="text-xs uppercase tracking-[0.18em] text-slate-400 print:text-slate-500">
+                <div className="rounded-3xl bg-[#E8EBEE] p-4 text-center shadow-sm print:shadow-none print:border print:border-slate-200 print:rounded-lg">
+                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500 print:text-slate-500">
                     Tekanan Darah
                   </p>
                   <p className="mt-3 text-sm font-semibold text-slate-950">
                     {ans.systolic_bp || 0}/{ans.diastolic_bp || 0}
                   </p>
                 </div>
-                <div className="rounded-3xl bg-white p-4 text-center shadow-sm print:shadow-none print:border print:border-slate-200 print:rounded-lg">
-                  <p className="text-xs uppercase tracking-[0.18em] text-slate-400 print:text-slate-500">
+                <div className="rounded-3xl bg-[#E8EBEE] p-4 text-center shadow-sm print:shadow-none print:border print:border-slate-200 print:rounded-lg">
+                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500 print:text-slate-500">
                     Denyut Jantung
                   </p>
                   <p className="mt-3 text-sm font-semibold text-slate-950">
                     {ans.resting_heart_rate || 0} BPM
                   </p>
                 </div>
-                <div className="rounded-3xl bg-white p-4 text-center shadow-sm print:shadow-none print:border print:border-slate-200 print:rounded-lg">
-                  <p className="text-xs uppercase tracking-[0.18em] text-slate-400 print:text-slate-500">
+                <div className="rounded-3xl bg-[#E8EBEE] p-4 text-center shadow-sm print:shadow-none print:border print:border-slate-200 print:rounded-lg">
+                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500 print:text-slate-500">
                     Kolesterol
                   </p>
                   <p className="mt-3 text-sm font-semibold text-slate-950">
@@ -219,7 +223,7 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
                 {detailItems.map((item, index) => (
                   <div
                     key={index}
-                    className="rounded-3xl bg-slate-50 px-5 py-4 text-sm text-slate-800 shadow-sm print:shadow-none print:border print:border-slate-200 print:bg-white print:rounded-md print:py-1.5 print:px-3 print:text-xs"
+                    className="rounded-3xl bg-[#E8EBEE] px-5 py-4 text-sm text-slate-800 shadow-sm print:shadow-none print:border print:border-slate-200 print:bg-white print:rounded-md print:py-1.5 print:px-3 print:text-xs"
                   >
                     {item}
                   </div>

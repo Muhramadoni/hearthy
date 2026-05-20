@@ -320,10 +320,10 @@ function App({ currentPage, onNavigate }) {
               menggunakan teknologi Deep Learning untuk mendeteksi dini risiko
               penyakit jantung secara instan.
             </p>
-            <div className="mt-16 flex justify-center">
+            <div className="mt-10 sm:mt-12 lg:mt-16 flex justify-center">
               <button
                 onClick={() => onNavigate("assessment")}
-                className="inline-flex items-center justify-center rounded-full bg-[#1b4062] px-8 py-5 text-lg font-semibold capitalized text-white shadow-lg shadow-[#1b4062]/15 transition hover:bg-[#173652]"
+                className="inline-flex items-center justify-center rounded-full bg-[#1b4062] px-6 py-3 text-base sm:px-8 sm:py-4 sm:text-lg lg:px-10 lg:py-5 lg:text-xl font-semibold capitalized text-white shadow-lg shadow-[#1b4062]/15 transition hover:bg-[#173652]"
               >
                 Mulai Sekarang
               </button>
@@ -339,32 +339,32 @@ function App({ currentPage, onNavigate }) {
         */}
         <section className="bg-[#dde2e7] py-16">
           <div className="mx-auto grid max-w-screen-2xl gap-6 px-6 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-3xl p-8">
-              <p className="text-4xl font-semibold text-[#1b4062]">#1</p>
-              <h2 className="mt-4 text-lg font-semibold text-[#1b4062]">
+            <div className="rounded-3xl p-6 sm:p-8">
+              <p className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#1b4062]">#1</p>
+              <h2 className="mt-3 sm:mt-4 text-base sm:text-lg lg:text-xl font-semibold text-[#1b4062]">
                 Penyebab Global
               </h2>
-              <p className="mt-3 text-sm leading-7 text-slate-600">
+              <p className="mt-2 sm:mt-3 text-xs sm:text-sm lg:text-base leading-6 sm:leading-7 text-slate-600">
                 Penyakit kardiovaskular tetap menjadi penyebab utama kematian di
                 seluruh dunia, merenggut jutaan nyawa setiap tahunnya.
               </p>
             </div>
-            <div className="rounded-3xl p-8">
-              <p className="text-4xl font-semibold text-[#1b4062]">80%</p>
-              <h2 className="mt-4 text-lg font-semibold text-[#1b4062]">
+            <div className="rounded-3xl p-6 sm:p-8">
+              <p className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#1b4062]">80%</p>
+              <h2 className="mt-3 sm:mt-4 text-base sm:text-lg lg:text-xl font-semibold text-[#1b4062]">
                 Dapat Dicegah
               </h2>
-              <p className="mt-3 text-sm leading-7 text-slate-600">
+              <p className="mt-2 sm:mt-3 text-xs sm:text-sm lg:text-base leading-6 sm:leading-7 text-slate-600">
                 WHO memperkirakan bahwa hingga 80% penyakit jantung dini dan
                 stroke dapat dicegah dengan deteksi dini.
               </p>
             </div>
-            <div className="rounded-3xl p-8">
-              <p className="text-4xl font-semibold text-[#1b4062]">10x</p>
-              <h2 className="mt-4 text-lg font-semibold text-[#1b4062]">
+            <div className="rounded-3xl p-6 sm:p-8">
+              <p className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#1b4062]">10x</p>
+              <h2 className="mt-3 sm:mt-4 text-base sm:text-lg lg:text-xl font-semibold text-[#1b4062]">
                 Deteksi Dini
               </h2>
-              <p className="mt-3 text-sm leading-7 text-slate-600">
+              <p className="mt-2 sm:mt-3 text-xs sm:text-sm lg:text-base leading-6 sm:leading-7 text-slate-600">
                 Skrining AI kami dapat mengidentifikasi pola halus dalam data
                 kesehatan hingga 10x lebih akurat daripada pemeriksaan mandiri
                 tradisional.
@@ -379,12 +379,12 @@ function App({ currentPage, onNavigate }) {
             Menjelaskan langkah-langkah penggunaan aplikasi dari pengisian formulir data klinis 
             hingga mendapatkan profil risiko.
         */}
-        <section id="how-it-works" className="mx-auto max-w-screen-2xl py-24">
-          <div className="text-center">
-            <h2 className="text-5xl font-semibold capitalized text-[#1b4062]">
+        <section id="how-it-works" className="mx-auto max-w-screen-2xl py-16 sm:py-20 lg:py-24">
+          <div className="text-center px-4">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold capitalized text-[#1b4062]">
               Cara Kerja
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-slate-600">
+            <p className="mx-auto mt-3 sm:mt-4 max-w-2xl text-sm sm:text-base lg:text-lg leading-7 sm:leading-8 text-slate-600">
               Dapatkan analisis kesehatan jantung Anda dalam tiga langkah
               sederhana
             </p>
@@ -393,19 +393,19 @@ function App({ currentPage, onNavigate }) {
             {steps.map((step) => (
               <div
                 key={step.title}
-                className="rounded-3xl bg-white p-8 text-center shadow-sm shadow-slate-200/60 transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-105 hover:shadow-xl"
+                className="rounded-3xl bg-white p-6 sm:p-8 text-center shadow-sm shadow-slate-200/60 transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-105 hover:shadow-xl"
               >
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#1b4062] text-white">
+                <div className="mx-auto flex h-12 w-12 sm:h-14 sm:w-14 lg:h-16 lg:w-16 items-center justify-center rounded-full bg-[#1b4062] text-white">
                   <img
                     src={step.icon}
                     alt={step.title}
-                    className="h-7 w-7 brightness-0 invert"
+                    className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 brightness-0 invert"
                   />
                 </div>
-                <h3 className="mt-5 text-lg font-semibold text-[#1b4062]">
+                <h3 className="mt-4 sm:mt-5 text-base sm:text-lg lg:text-xl font-semibold text-[#1b4062]">
                   {step.title}
                 </h3>
-                <p className="mt-3 text-sm leading-7 text-slate-600">
+                <p className="mt-2 sm:mt-3 text-xs sm:text-sm lg:text-base leading-6 sm:leading-7 text-slate-600">
                   {step.description}
                 </p>
               </div>
@@ -418,11 +418,11 @@ function App({ currentPage, onNavigate }) {
             ======================= 
             Menyoroti fitur-fitur dan manfaat terbaik dari platform Hearthy.
         */}
-        <section className="bg-[#1b4062] py-24">
+        <section className="bg-[#1b4062] py-16 sm:py-20 lg:py-24">
           <div className="mx-auto max-w-screen-2xl px-6 text-white">
             <div className="max-w-2xl">
-              <h2 className="text-3xl font-semibold">Keunggulan Utama</h2>
-              <p className="mt-3 text-sm leading-7 text-slate-200">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold">Keunggulan Utama</h2>
+              <p className="mt-2 sm:mt-3 text-xs sm:text-sm lg:text-base leading-6 sm:leading-7 text-slate-200">
                 Mengapa Hearthy menjadi pilihan untuk perawatan kardiovaskular
                 proaktif.
               </p>
@@ -431,15 +431,15 @@ function App({ currentPage, onNavigate }) {
               {features.map((feature) => (
                 <div
                   key={feature.title}
-                  className="rounded-3xl bg-[#2d5a7b] p-8 shadow-sm shadow-slate-900/20 transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-105 hover:shadow-xl"
+                  className="rounded-3xl bg-[#2d5a7b] p-6 sm:p-8 shadow-sm shadow-slate-900/20 transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-105 hover:shadow-xl"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center">
-                    <feature.icon className="h-6 w-6" />
+                  <div className="flex h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 items-center justify-center">
+                    <feature.icon className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7" />
                   </div>
-                  <h3 className="mt-6 text-base font-semibold">
+                  <h3 className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg font-semibold">
                     {feature.title}
                   </h3>
-                  <p className="mt-3 text-sm leading-7 text-slate-200/90">
+                  <p className="mt-2 sm:mt-3 text-xs sm:text-sm lg:text-base leading-6 sm:leading-7 text-slate-200/90">
                     {feature.description}
                   </p>
                 </div>
@@ -453,33 +453,33 @@ function App({ currentPage, onNavigate }) {
             ======================= 
             Mengarahkan pengguna ke tautan Google Form eksternal untuk memberikan ulasan aplikasi.
         */}
-        <section className="bg-[#dde2e7] py-24">
+        <section className="bg-[#dde2e7] py-16 sm:py-20 lg:py-24">
           <div className="mx-auto max-w-screen-2xl px-6">
-            <div className="mx-auto max-w-4xl rounded-[32px] bg-white p-8 shadow-sm shadow-slate-300/40 md:p-12">
-              <div className="mx-auto mb-8 flex h-14 w-14 items-center justify-center text-[#1b4062]">
-                <IconFeedback className="h-9 w-9 text-[#1b4062]" />
+            <div className="mx-auto max-w-4xl rounded-[32px] bg-white p-6 sm:p-8 md:p-12 shadow-sm shadow-slate-300/40">
+              <div className="mx-auto mb-6 sm:mb-8 flex h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 items-center justify-center text-[#1b4062]">
+                <IconFeedback className="h-6 w-6 sm:h-7 sm:w-7 lg:h-9 lg:w-9 text-[#1b4062]" />
               </div>
               <div className="text-center">
-                <h2 className="text-3xl font-semibold text-slate-950">
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-slate-950">
                   Berikan Feedback Anda
                 </h2>
-                <p className="mt-3 text-sm leading-7 text-slate-600">
+                <p className="mt-2 sm:mt-3 text-xs sm:text-sm lg:text-base leading-6 sm:leading-7 text-slate-600">
                   Bantu kami meningkatkan kualitas dengan memberikan respon
                   anda.
                 </p>
               </div>
 
-              <div className="mt-10 flex justify-center">
+              <div className="mt-8 sm:mt-10 flex justify-center">
                 <a 
                   href="https://forms.gle/hjQrssj9eJwXmn1F7" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1b4062] px-8 py-5 text-white shadow-lg shadow-[#1b4062]/15 transition hover:bg-[#173652]"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1b4062] px-6 py-3 sm:px-8 sm:py-4 lg:px-10 lg:py-5 text-white shadow-lg shadow-[#1b4062]/15 transition hover:bg-[#173652]"
                 >
-                  <span className="capitalize text-lg font-semibold">
+                  <span className="capitalize text-base sm:text-lg lg:text-xl font-semibold">
                     Isi Feedback
                   </span>
-                  <IconSendFeedback className="h-5 w-5 text-white" />
+                  <IconSendFeedback className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-white" />
                 </a>
               </div>
             </div>

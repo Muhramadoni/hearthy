@@ -199,7 +199,7 @@ export default function DashboardPage({ currentPage, onNavigate }) {
           <p className="text-sm font-semibold text-slate-600">
             Ringkasan kesehatan anda
           </p>
-          <h1 className="mt-2 text-4xl font-bold text-slate-950">Dashboard</h1>
+          <h1 className="mt-2 text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-950">Dashboard</h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600">
             Lihat performa kesehatan jantung anda, perbandingan risiko, dan
             rekomendasi preventif dalam satu tampilan.
