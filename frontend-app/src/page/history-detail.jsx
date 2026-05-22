@@ -178,7 +178,7 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
               </p>
 
               <div className="mt-8 flex items-center justify-center">
-                <div className="relative h-[240px] w-[240px] sm:h-[300px] sm:w-[300px] print:h-[180px] print:w-[180px] rounded-full bg-[#f8fafc] shadow-inner shadow-slate-200/80">
+                <div className="relative h-[240px] w-[240px] sm:h-[300px] sm:w-[300px] print:h-[180px] print:w-[180px] rounded-full bg-[#E8EBEE] shadow-inner shadow-slate-200/80">
                   <div className={`absolute inset-0 rounded-full border-8 border-transparent ${assessment.severity === 'high' ? 'border-t-[#ef4444] border-r-[#ef4444] border-b-[#ef4444]' : assessment.severity === 'moderate' ? 'border-t-[#fbbf24] border-r-[#fbbf24]' : 'border-t-[#22c55e]'} border-l-[#f8fafc]`} />
                   <div className="absolute inset-16 sm:inset-20 print:inset-8 rounded-full bg-white flex items-center justify-center">
                     <span className="text-3xl sm:text-4xl print:text-2xl font-bold text-slate-800">{assessment.score || 0}%</span>
