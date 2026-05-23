@@ -92,7 +92,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
   return (
     <div className="min-h-screen bg-[#f0f0f0] text-slate-950">
       <div
-        className={`relative z-10 transition-all duration-200 ${isEditModalOpen ? "blur-lg pointer-events-none" : ""}`}
+        className={`transition-all duration-200 ${isEditModalOpen ? "blur-lg pointer-events-none" : ""}`}
       >
         <Navbar
           currentPage={currentPage ?? "profile"}
@@ -174,7 +174,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                   <label className="mb-2 block text-sm font-medium text-slate-500">
                     Username
                   </label>
-                  <div className="rounded-2xl bg-[#f3f4f6] px-4 py-4 text-sm text-slate-900">
+                  <div className="rounded-2xl bg-[#F0F4F8] px-4 py-4 text-sm text-slate-900">
                     {userData.name}
                   </div>
                 </div>
@@ -184,7 +184,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                   <label className="mb-2 block text-sm font-medium text-slate-500">
                     Email
                   </label>
-                  <div className="rounded-2xl bg-[#f3f4f6] px-4 py-4 text-sm text-slate-900">
+                  <div className="rounded-2xl bg-[#F0F4F8] px-4 py-4 text-sm text-slate-900">
                     {userData.email}
                   </div>
                 </div>
@@ -194,7 +194,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                   <label className="mb-2 block text-sm font-medium text-slate-500">
                     Telepon
                   </label>
-                  <div className={`rounded-2xl bg-[#f3f4f6] px-4 py-4 text-sm ${formData.phone ? "text-slate-900" : "text-slate-400 italic"}`}>
+                  <div className={`rounded-2xl bg-[#F0F4F8] px-4 py-4 text-sm ${formData.phone ? "text-slate-900" : "text-slate-400 italic"}`}>
                     {formData.phone || "Belum diisi"}
                   </div>
                 </div>
@@ -204,7 +204,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                   <label className="mb-2 block text-sm font-medium text-slate-500">
                     Alamat
                   </label>
-                  <div className={`min-h-[96px] rounded-2xl bg-[#f3f4f6] px-4 py-4 text-sm whitespace-pre-wrap ${formData.address ? "text-slate-900" : "text-slate-400 italic"}`}>
+                  <div className={`min-h-[96px] rounded-2xl bg-[#F0F4F8] px-4 py-4 text-sm whitespace-pre-wrap ${formData.address ? "text-slate-900" : "text-slate-400 italic"}`}>
                     {formData.address || "Belum diisi"}
                   </div>
                 </div>
