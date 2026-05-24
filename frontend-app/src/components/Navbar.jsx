@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import logoSrc from "../image/logo-hearthy.png";
 import iconUser from "../icon/icon-user.svg";
 import iconSetting from "../icon/icon-setting.svg";
@@ -15,6 +15,20 @@ export default function Navbar({ currentPage = "home", onNavigate, showLoginButt
     const handleStorage = () => setUser(getCurrentUser());
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsProfileMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const isLoggedIn = !!user;
@@ -100,7 +114,7 @@ export default function Navbar({ currentPage = "home", onNavigate, showLoginButt
                   Login
                 </button>
               ) : (
-                <div className="relative">
+                <div className="relative" ref={dropdownRef}>
                   <button
                     type="button"
                     id="navbar-profile-btn"

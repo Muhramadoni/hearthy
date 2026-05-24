@@ -77,7 +77,7 @@ export default function DashboardPage({ currentPage, onNavigate }) {
   const [riskStatus, setRiskStatus] = useState("Belum ada data");
   const [riskScore, setRiskScore] = useState(0);
   const [lastCheck, setLastCheck] = useState("-");
-  const [recommendationText, setRecommendationText] = useState("Lakukan asesmen untuk mendapatkan rekomendasi.");
+  const [recommendations, setRecommendations] = useState(["Lakukan asesmen untuk mendapatkan rekomendasi."]);
   const [dynamicCauses, setDynamicCauses] = useState(["Belum ada data"]);
   
   const [chartData, setChartData] = useState({ points: [], labels: [], path: "" });
@@ -114,9 +114,9 @@ export default function DashboardPage({ currentPage, onNavigate }) {
 
           // Recommendation
           if (cardioSummary.recommendations && cardioSummary.recommendations.length > 0) {
-            setRecommendationText(cardioSummary.recommendations.join(' '));
+            setRecommendations(cardioSummary.recommendations);
           } else if (cardioSummary.aiInsights) {
-            setRecommendationText(cardioSummary.aiInsights);
+            setRecommendations([cardioSummary.aiInsights]);
           }
           
           // Causes
@@ -347,8 +347,16 @@ export default function DashboardPage({ currentPage, onNavigate }) {
             <h2 className="text-xl font-semibold text-slate-950">
               Rekomendasi
             </h2>
-            <div className="mt-5 rounded-[15px] bg-[#E8EBEE] p-6 text-sm leading-7 text-slate-600">
-              {recommendationText}
+            <div className="mt-5 space-y-3 max-h-[350px] overflow-y-auto pr-2">
+              {recommendations.map((rec, idx) => (
+                <div
+                  key={idx}
+                  className="flex gap-3 rounded-3xl bg-[#1e3a5a]/10 p-4"
+                >
+                  <span className="mt-1 h-3.5 w-3.5 rounded-full bg-[#1e3a5a] shrink-0" />
+                  <p className="text-sm leading-7 text-slate-700">{rec}</p>
+                </div>
+              ))}
             </div>
           </article>
 

@@ -25,9 +25,20 @@ export default function Login({ onNavigate }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(() => !!localStorage.getItem("rememberedEmail"));
 
   useEffect(() => {
     document.title = "Login - Web Hearthy";
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    
+    if (savedEmail) {
+      // Menunggu sebentar lalu memunculkan email secara utuh sekaligus
+      const timer = setTimeout(() => {
+        setEmail(savedEmail);
+      }, 600); // jeda 600 milidetik
+
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   const handleSubmit = async (e) => {
@@ -42,6 +53,13 @@ export default function Login({ onNavigate }) {
     setLoading(true);
     try {
       await login(email, password);
+      
+      if (rememberMe) {
+        localStorage.setItem("rememberedEmail", email);
+      } else {
+        localStorage.removeItem("rememberedEmail");
+      }
+      
       // Login berhasil → navigasi ke dashboard
       onNavigate?.("dashboard");
     } catch (err) {
@@ -147,7 +165,12 @@ export default function Login({ onNavigate }) {
             </div>
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center text-gray-600">
-                <input type="checkbox" className="mr-2" /> Ingat saya
+                <input 
+                  type="checkbox" 
+                  className="mr-2" 
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                /> Ingat saya
               </label>
               <button
                 type="button"
