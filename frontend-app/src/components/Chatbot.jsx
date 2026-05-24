@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getCurrentUser } from "../services/authService";
 
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,6 +10,15 @@ export default function Chatbot() {
     },
   ]);
   const [input, setInput] = useState("");
+  const [user, setUser] = useState(getCurrentUser());
+
+  useEffect(() => {
+    const handleStorage = () => setUser(getCurrentUser());
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  if (!user) return null;
 
   const handleSend = () => {
     if (input.trim()) {
