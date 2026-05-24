@@ -59,9 +59,9 @@ def main():
             else: return 5
 
         def get_hypertension_stage(sys_bp, dia_bp):
-            if sys_bp >= 140 or dia_bp >= 90: return 3
-            elif sys_bp >= 130 or dia_bp >= 80: return 2
-            elif sys_bp >= 120 and dia_bp < 80: return 1
+            if sys_bp > 140 or dia_bp > 90: return 3
+            elif sys_bp > 130 or dia_bp > 80: return 2
+            elif sys_bp > 120 and dia_bp <= 80: return 1
             else: return 0
 
         def get_bmi_category(bmi):

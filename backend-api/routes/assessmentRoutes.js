@@ -20,8 +20,6 @@ router.get('/summary',           assessmentController.getSummary);
 // GET  /api/assessments/recommendations
 router.get('/recommendations',   assessmentController.getRecommendations);
 
-// POST /api/assessments
-router.post('/',                 assessmentController.createAssessment);
 
 // POST /api/assessments/predict
 router.post('/predict',          assessmentController.predictCardiovascularRisk);

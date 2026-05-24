@@ -4,54 +4,14 @@
  * prediksi AI, pengambilan riwayat, dan penghapusan data asesmen risiko kesehatan.
  */
 const assessmentModel = require('../models/assessmentModel');
-const { calculateScore } = require('../utils/mockAI');
-const { getRecommendationsByScore } = require('../utils/mockAI');
 const { predictCardiovascularRisk } = require('../utils/aiService');
+const { generateCardioRecommendations, formatRecommendationsForDB } = require('../utils/cardioRecommendations');
 
 /**
  * Objek Pengontrol (Controller) Asesmen Kesehatan.
  * Memuat berbagai *handler* untuk _endpoint_ `/api/assessments`.
  */
 const assessmentController = {
-  // POST /api/assessments
-  /**
-   * Menyimpan data asesmen kesehatan secara umum ke dalam database.
-   * @param {Object} req - Objek permintaan HTTP (Request).
-   * @param {Object} res - Objek respons HTTP (Response).
-   * @param {Function} next - Fungsi *middleware* untuk meneruskan *error*.
-   */
-  createAssessment: async (req, res, next) => {
-    try {
-      const { type, answers } = req.body;
-
-      const VALID_TYPES = ['mental_health', 'physical', 'sleep', 'nutrition', 'stress'];
-      if (!type || !VALID_TYPES.includes(type)) {
-        return res.status(400).json({
-          status: 'error',
-          message: `Invalid assessment type. Must be one of: ${VALID_TYPES.join(', ')}`,
-        });
-      }
-      if (!answers || typeof answers !== 'object') {
-        return res.status(400).json({ status: 'error', message: 'Answers are required.' });
-      }
-
-      const { score, maxScore, severity } = calculateScore(type, answers);
-      const { recommendations, aiInsights } = getRecommendationsByScore(type, score, maxScore, severity);
-
-      const assessment = await assessmentModel.create({
-        userId: req.user.id,
-        type, answers, score, maxScore, severity,
-        recommendations, aiInsights,
-      });
-
-      res.status(201).json({
-        status: 'success',
-        message: 'Assessment submitted successfully! 🌿',
-        data: { assessment },
-      });
-    } catch (err) { next(err); }
-  },
-
   // POST /api/assessments/predict
   predictCardiovascularRisk: async (req, res, next) => {
     try {
@@ -60,7 +20,7 @@ const assessmentController = {
         return res.status(400).json({ status: 'error', message: 'Answers are required for prediction.' });
       }
 
-      // Check for required features
+      // Check for required features and parse to float
       const requiredFeatures = [
         'age', 'bmi', 'systolic_bp', 'diastolic_bp', 'cholesterol_mg_dl', 
         'resting_heart_rate', 'daily_steps', 'stress_level', 
@@ -75,6 +35,8 @@ const assessmentController = {
             message: `Missing required feature for prediction: ${feature}`,
           });
         }
+        // Pastikan nilai menjadi angka desimal (Float) agar Python tidak bingung
+        answers[feature] = parseFloat(answers[feature]);
       }
 
       // Call the AI Service
@@ -83,34 +45,8 @@ const assessmentController = {
       const { risk_category, score, severity_mapped } = predictionResult;
 
       // Generate localized recommendations and insights based on answers
-      const generatedRecommendations = [];
-      if (severity_mapped === 'high') {
-        generatedRecommendations.push("Segera jadwalkan konsultasi dengan dokter atau spesialis jantung.");
-      }
-      if (answers.systolic_bp >= 130 || answers.diastolic_bp >= 80) {
-        generatedRecommendations.push("Kurangi asupan garam harian dan pantau tekanan darah secara berkala.");
-      }
-      if (answers.cholesterol_mg_dl >= 200) {
-        generatedRecommendations.push("Batasi makanan berlemak tinggi dan tingkatkan konsumsi serat, buah, serta sayur.");
-      }
-      if (answers.daily_steps < 5000 || answers.physical_activity_hours_per_week < 2.5) {
-        generatedRecommendations.push("Tingkatkan aktivitas fisik harian Anda, setidaknya 30 menit olahraga ringan.");
-      }
-      if (answers.bmi >= 25) {
-        generatedRecommendations.push("Perhatikan porsi dan pola makan untuk menjaga berat badan tetap ideal.");
-      }
-      if (answers.sleep_hours < 6) {
-        generatedRecommendations.push("Usahakan tidur cukup selama 7-8 jam per malam untuk pemulihan optimal.");
-      }
-      if (answers.stress_level >= 7) {
-        generatedRecommendations.push("Luangkan waktu untuk relaksasi dan mengelola stres dengan baik.");
-      }
-      if (answers.alcohol_units_per_week >= 7) {
-        generatedRecommendations.push("Kurangi konsumsi alkohol demi menjaga tekanan darah dan kesehatan jantung.");
-      }
-      if (generatedRecommendations.length === 0) {
-        generatedRecommendations.push("Pertahankan pola makan seimbang, istirahat cukup, dan aktivitas fisik teratur.");
-      }
+      const rawRecs = generateCardioRecommendations(answers);
+      const generatedRecommendations = formatRecommendationsForDB(rawRecs);
 
       const generatedInsights = `Berdasarkan hasil prediksi AI, tingkat risiko penyakit kardiovaskular Anda berada pada kategori ${severity_mapped === 'high' ? 'Tinggi' : severity_mapped === 'moderate' ? 'Sedang' : 'Rendah'}. ${severity_mapped === 'low' ? 'Terus jaga kebiasaan sehat Anda!' : 'Ada beberapa parameter yang perlu mendapat perhatian khusus untuk mencegah risiko memburuk.'}`;
 
