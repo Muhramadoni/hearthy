@@ -184,13 +184,27 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
         family_history_heart_disease: familyVal,
         diet_quality_score: parseInt(extractNumber(finalAnswers.dietLevel)),
         alcohol_units_per_week: parseFloat(extractNumber(finalAnswers.alcoholUnits)),
-      }
+      },
+      chatHistory: messages.filter(msg => !msg.isLoading).map((msg, idx, arr) => {
+        if (idx === arr.length - 1) return { ...msg, options: undefined };
+        return msg;
+      })
     };
 
     try {
       const token = localStorage.getItem("hearthy_token");
-      const res = await fetch("http://localhost:5000/api/assessments/predict", {
-        method: "POST",
+      const activeId = sessionStorage.getItem("hearthy_active_history_id");
+      
+      let url = "http://localhost:5000/api/assessments/predict";
+      let method = "POST";
+      
+      if (activeId) {
+        url = `http://localhost:5000/api/assessments/predict/${activeId}`;
+        method = "PUT";
+      }
+
+      const res = await fetch(url, {
+        method: method,
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
@@ -206,65 +220,12 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
 
       const newAssessmentId = data.data.assessment.id;
       sessionStorage.setItem("hearthy_active_history_id", newAssessmentId);
-      const severityStr = data.data.assessment.severity === 'high' ? 'Tinggi' : data.data.assessment.severity === 'moderate' ? 'Sedang' : 'Rendah';
-      const score = data.data.assessment.score || 0;
-      const insights = data.data.assessment.aiInsights || "Perhatikan gaya hidup dan pola makan Anda.";
       
-      setMessages((prev) => {
-        // Hapus pesan loading "Tunggu sebentar..."
-        const filteredMessages = prev.filter(msg => typeof msg.text !== 'string' || !msg.text.includes("sedang menganalisis"));
-        
-        const updatedMessages = filteredMessages.map((msg, idx) => {
-          if (idx === filteredMessages.length - 1) return { ...msg, options: undefined };
-          return msg;
-        });
+      const newMessages = data.data.assessment.chat_history || [];
+      if (newMessages.length > 0) {
+        setMessages(newMessages);
+      }
 
-        const summaryElement = (
-          <div className="flex flex-col gap-3 w-full">
-            <div className="flex items-center gap-2 text-[#1e3a5a] font-bold pb-2 border-b border-slate-100">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-green-500">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-              </svg>
-              Analisis Selesai
-            </div>
-            
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2 text-sm">
-              <p className="font-semibold text-slate-700 border-b border-slate-200 pb-1 mb-2">Ringkasan Data Skrining</p>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                <p><span className="text-slate-500">Usia:</span> {finalAnswers.age} thn</p>
-                <p><span className="text-slate-500">BMI:</span> {finalAnswers.bmi}</p>
-                <p><span className="text-slate-500">Tensi:</span> {finalAnswers.systolicBp}/{finalAnswers.diastolicBp} mmHg</p>
-                <p><span className="text-slate-500">Kolesterol:</span> {finalAnswers.cholesterol} mg/dL</p>
-                <p><span className="text-slate-500">Detak Jantung:</span> {finalAnswers.heartRate} bpm</p>
-                <p><span className="text-slate-500">Gula Diet:</span> {finalAnswers.dietLevel}/7</p>
-                <p><span className="text-slate-500">Aktivitas:</span> {finalAnswers.physicalActivity} jam/mgg</p>
-                <p><span className="text-slate-500">Langkah:</span> {finalAnswers.dailySteps}</p>
-                <p className="col-span-2"><span className="text-slate-500">Riwayat Keluarga:</span> {finalAnswers.familyHistory}</p>
-              </div>
-            </div>
-
-            <div className="bg-[#1e3a5a]/5 p-4 rounded-xl border border-[#1e3a5a]/10 mt-1">
-              <p className="text-sm font-semibold text-slate-700 mb-2">Hasil Prediksi Risiko Kardiovaskular</p>
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-4xl font-bold text-[#1e3a5a]">{score}%</span>
-                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                  severityStr === 'Tinggi' ? 'bg-red-100 text-red-700' : 
-                  severityStr === 'Sedang' ? 'bg-yellow-100 text-yellow-700' : 
-                  'bg-green-100 text-green-700'
-                }`}>{severityStr}</span>
-              </div>
-              <p className="text-sm text-slate-700 leading-relaxed text-justify"><strong>Rekomendasi AI:</strong> {insights}</p>
-            </div>
-          </div>
-        );
-
-        return [
-          ...updatedMessages,
-          { text: summaryElement, sender: "bot" },
-          { text: "Ketik 'Mulai Asesmen Baru' atau gunakan icon di pojok kanan atas jika Anda ingin melakukan evaluasi baru.", sender: "bot" }
-        ];
-      });
 
       setCurrentStep(chatSteps.length); // Disable input
 
@@ -281,7 +242,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
     if (!value.trim()) return;
 
     if (value.toLowerCase() === "mulai asesmen baru" || value.toLowerCase() === "baru") {
-      sessionStorage.removeItem("hearthy_active_history_id");
+      // sessionStorage.removeItem("hearthy_active_history_id");
       sessionStorage.removeItem("hearthy_currentStep");
       sessionStorage.removeItem("hearthy_answers");
       setMessages((prev) => [
@@ -331,7 +292,21 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
       setTimeout(() => {
         setMessages((prev) => [
           ...prev,
-          { text: "⏳ Tunggu sebentar, AI kami sedang menganalisis risiko kardiovaskular Anda...", sender: "bot" }
+          { 
+            text: (
+              <div className="flex items-center gap-2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#1e3a5a] animate-spin">
+                  <path d="M5 22h14"></path>
+                  <path d="M5 2h14"></path>
+                  <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path>
+                  <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path>
+                </svg>
+                <span>Tunggu sebentar, AI kami sedang menganalisis risiko kardiovaskular Anda...</span>
+              </div>
+            ), 
+            sender: "bot",
+            isLoading: true
+          }
         ]);
         submitAssessment(newAnswers);
       }, 500);
@@ -365,101 +340,67 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
       const data = res.assessment;
       const dateStr = new Date(data.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
 
-      const ans = data.answers || {};
-      const reconstructedMessages = [
-        { text: `📅 Menampilkan riwayat percakapan asesmen tanggal ${dateStr} WIB.`, sender: "bot" }
-      ];
+      // Check if chat_history exists
+      if (data.chat_history && data.chat_history.length > 0) {
+        setMessages(data.chat_history);
+      } else {
+        // Fallback for old records
+        const ans = data.answers || {};
+        const reconstructedMessages = [
+          { text: `📅 Menampilkan riwayat percakapan asesmen tanggal ${dateStr} WIB.`, sender: "bot" }
+        ];
 
-      const mapKeyToDb = {
-        age: "age",
-        bmi: "bmi",
-        systolicBp: "systolic_bp",
-        diastolicBp: "diastolic_bp",
-        cholesterol: "cholesterol_mg_dl",
-        heartRate: "resting_heart_rate",
-        familyHistory: "family_history_heart_disease",
-        dietLevel: "diet_quality_score",
-        alcoholUnits: "alcohol_units_per_week",
-        dailySteps: "daily_steps",
-        physicalActivity: "physical_activity_hours_per_week",
-        sleepDuration: "sleep_hours"
-      };
+        const mapKeyToDb = {
+          age: "age",
+          bmi: "bmi",
+          systolicBp: "systolic_bp",
+          diastolicBp: "diastolic_bp",
+          cholesterol: "cholesterol_mg_dl",
+          heartRate: "resting_heart_rate",
+          familyHistory: "family_history_heart_disease",
+          dietLevel: "diet_quality_score",
+          alcoholUnits: "alcohol_units_per_week",
+          dailySteps: "daily_steps",
+          physicalActivity: "physical_activity_hours_per_week",
+          sleepDuration: "sleep_hours"
+        };
 
-      // Reconstruct Q&A
-      chatSteps.forEach(step => {
-        if (step.key.startsWith("stress")) return; 
-        const dbKey = mapKeyToDb[step.key];
-        let answerVal = ans[dbKey];
-        
-        if (step.key === "familyHistory" && answerVal !== undefined) {
-          answerVal = answerVal === 1 ? "Ya" : "Tidak";
-        }
-        
-        if (answerVal !== undefined && answerVal !== null) {
-          reconstructedMessages.push({ text: step.question, sender: "bot" });
-          reconstructedMessages.push({ text: answerVal.toString(), sender: "user" });
-        }
-      });
-
-      // Handle stress
-      if (ans.stress_level !== undefined) {
-        const stressStr = ans.stress_level === 3 ? "Rendah" : ans.stress_level === 6 ? "Sedang" : "Tinggi";
-        reconstructedMessages.push({ text: "Mari kita evaluasi tingkat stres Anda berdasarkan pertanyaan-pertanyaan sebelumnya.", sender: "bot" });
-        reconstructedMessages.push({ text: `(Rekaman) Tingkat stres: ${stressStr}`, sender: "user" });
-      }
-
-      // Create the single combined result bubble
-      const severityStr = data.severity === 'high' ? 'Tinggi' : data.severity === 'moderate' ? 'Sedang' : 'Rendah';
-      const score = data.score || 0;
-      const insights = data.aiInsights || "Perhatikan gaya hidup dan pola makan Anda.";
-
-      const summaryElement = (
-        <div className="flex flex-col gap-3 w-full">
-          <div className="flex items-center gap-2 text-[#1e3a5a] font-bold pb-2 border-b border-slate-100">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-green-500">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-              <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
-            Analisis Selesai
-          </div>
+        // Reconstruct Q&A
+        chatSteps.forEach(step => {
+          if (step.key.startsWith("stress")) return; 
+          const dbKey = mapKeyToDb[step.key];
+          let answerVal = ans[dbKey];
           
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2 text-sm">
-            <p className="font-semibold text-slate-700 border-b border-slate-200 pb-1 mb-2">Ringkasan Data Skrining</p>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-              <p><span className="text-slate-500">Usia:</span> {ans.age} thn</p>
-              <p><span className="text-slate-500">BMI:</span> {ans.bmi}</p>
-              <p><span className="text-slate-500">Tensi:</span> {ans.systolic_bp}/{ans.diastolic_bp} mmHg</p>
-              <p><span className="text-slate-500">Kolesterol:</span> {ans.cholesterol_mg_dl} mg/dL</p>
-              <p><span className="text-slate-500">Detak Jantung:</span> {ans.resting_heart_rate} bpm</p>
-              <p><span className="text-slate-500">Gula Diet:</span> {ans.diet_quality_score}/7</p>
-              <p><span className="text-slate-500">Aktivitas:</span> {ans.physical_activity_hours_per_week} jam/mgg</p>
-              <p><span className="text-slate-500">Langkah:</span> {ans.daily_steps}</p>
-              <p className="col-span-2"><span className="text-slate-500">Riwayat Keluarga:</span> {ans.family_history_heart_disease === 1 ? "Ya" : "Tidak"}</p>
-            </div>
-          </div>
+          if (step.key === "familyHistory" && answerVal !== undefined) {
+            answerVal = answerVal === 1 ? "Ya" : "Tidak";
+          }
+          
+          if (answerVal !== undefined && answerVal !== null) {
+            reconstructedMessages.push({ text: step.question, sender: "bot" });
+            reconstructedMessages.push({ text: answerVal.toString(), sender: "user" });
+          }
+        });
 
-          <div className="bg-[#1e3a5a]/5 p-4 rounded-xl border border-[#1e3a5a]/10 mt-1">
-            <p className="text-sm font-semibold text-slate-700 mb-2">Hasil Prediksi Risiko Kardiovaskular</p>
-            <div className="flex items-center gap-3 mb-3">
-              <span className="text-4xl font-bold text-[#1e3a5a]">{score}%</span>
-              <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                severityStr === 'Tinggi' ? 'bg-red-100 text-red-700' : 
-                severityStr === 'Sedang' ? 'bg-yellow-100 text-yellow-700' : 
-                'bg-green-100 text-green-700'
-              }`}>{severityStr}</span>
-            </div>
-            <p className="text-sm text-slate-700 leading-relaxed text-justify"><strong>Rekomendasi AI:</strong> {insights}</p>
-          </div>
-        </div>
-      );
+        // Handle stress
+        if (ans.stress_level !== undefined) {
+          const stressStr = ans.stress_level === 3 ? "Rendah" : ans.stress_level === 6 ? "Sedang" : "Tinggi";
+          reconstructedMessages.push({ text: "Mari kita evaluasi tingkat stres Anda berdasarkan pertanyaan-pertanyaan sebelumnya.", sender: "bot" });
+          reconstructedMessages.push({ text: `(Rekaman) Tingkat stres: ${stressStr}`, sender: "user" });
+        }
 
-      // Append results
-      reconstructedMessages.push(
-        { text: summaryElement, sender: "bot" },
-        { text: "Ketik 'Mulai Asesmen Baru' atau gunakan icon di pojok kanan atas jika Anda ingin melakukan evaluasi baru.", sender: "bot" }
-      );
+        // Create the single combined result bubble
+        const severityStr = data.severity === 'high' ? 'Tinggi' : data.severity === 'moderate' ? 'Sedang' : 'Rendah';
+        const score = data.score || 0;
+        const insights = data.aiInsights || "Perhatikan gaya hidup dan pola makan Anda.";
 
-      setMessages(reconstructedMessages);
+        reconstructedMessages.push(
+          { type: "result", data: { score, severityStr, insights, finalAnswers: ans }, sender: "bot" },
+          { text: "Ketik 'Mulai Asesmen Baru' atau gunakan icon di pojok kanan atas jika Anda ingin melakukan evaluasi baru.", sender: "bot" }
+        );
+
+        setMessages(reconstructedMessages);
+      }
+      
       setCurrentStep(chatSteps.length); // Disable input
       setAnswers({});
       setInputValue("");
@@ -585,7 +526,55 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                       : "bg-white border border-slate-200 text-slate-800 rounded-tl-sm"
                   }`}
                 >
-                  {msg.text}
+                  {msg.isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#1e3a5a] animate-spin">
+                        <path d="M5 22h14"></path>
+                        <path d="M5 2h14"></path>
+                        <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path>
+                        <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path>
+                      </svg>
+                      <span>Tunggu sebentar, AI kami sedang menganalisis risiko kardiovaskular Anda...</span>
+                    </div>
+                  ) : msg.type === "result" ? (
+                    <div className="flex flex-col gap-3 w-full">
+                      <div className="flex items-center gap-2 text-[#1e3a5a] font-bold pb-2 border-b border-slate-100">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-green-500">
+                          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        Analisis Selesai
+                      </div>
+                      
+                      <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2 text-sm">
+                        <p className="font-semibold text-slate-700 border-b border-slate-200 pb-1 mb-2">Ringkasan Data Skrining</p>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                          <p><span className="text-slate-500">Usia:</span> {msg.data.finalAnswers.age} thn</p>
+                          <p><span className="text-slate-500">BMI:</span> {msg.data.finalAnswers.bmi}</p>
+                          <p><span className="text-slate-500">Tensi:</span> {msg.data.finalAnswers.systolicBp || msg.data.finalAnswers.systolic_bp}/{msg.data.finalAnswers.diastolicBp || msg.data.finalAnswers.diastolic_bp} mmHg</p>
+                          <p><span className="text-slate-500">Kolesterol:</span> {msg.data.finalAnswers.cholesterol || msg.data.finalAnswers.cholesterol_mg_dl} mg/dL</p>
+                          <p><span className="text-slate-500">Detak Jantung:</span> {msg.data.finalAnswers.heartRate || msg.data.finalAnswers.resting_heart_rate} bpm</p>
+                          <p><span className="text-slate-500">Gula Diet:</span> {msg.data.finalAnswers.dietLevel || msg.data.finalAnswers.diet_quality_score}/7</p>
+                          <p><span className="text-slate-500">Aktivitas:</span> {msg.data.finalAnswers.physicalActivity || msg.data.finalAnswers.physical_activity_hours_per_week} jam/mgg</p>
+                          <p><span className="text-slate-500">Langkah:</span> {msg.data.finalAnswers.dailySteps || msg.data.finalAnswers.daily_steps}</p>
+                          <p className="col-span-2"><span className="text-slate-500">Riwayat Keluarga:</span> {msg.data.finalAnswers.familyHistory || (msg.data.finalAnswers.family_history_heart_disease === 1 ? "Ya" : "Tidak")}</p>
+                        </div>
+                      </div>
+
+                      <div className="bg-[#1e3a5a]/5 p-4 rounded-xl border border-[#1e3a5a]/10 mt-1">
+                        <p className="text-sm font-semibold text-slate-700 mb-2">Hasil Prediksi Risiko Kardiovaskular</p>
+                        <div className="flex items-center gap-3 mb-3">
+                          <span className="text-4xl font-bold text-[#1e3a5a]">{msg.data.score}%</span>
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                            msg.data.severityStr === 'Tinggi' ? 'bg-red-100 text-red-700' : 
+                            msg.data.severityStr === 'Sedang' ? 'bg-yellow-100 text-yellow-700' : 
+                            'bg-green-100 text-green-700'
+                          }`}>{msg.data.severityStr}</span>
+                        </div>
+                        <p className="text-sm text-slate-700 leading-relaxed text-justify"><strong>Rekomendasi AI:</strong> {msg.data.insights}</p>
+                      </div>
+                    </div>
+                  ) : msg.text}
                 </div>
               </div>
             ))}

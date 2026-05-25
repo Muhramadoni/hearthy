@@ -14,18 +14,39 @@ const assessmentModel = {
    * @param {Object} data - Objek berisi kumpulan data (jawaban, skor, wawasan AI, dll).
    * @returns {Promise<Object>} Baris data asesmen yang baru saja dimasukkan (inserted row).
    */
-  create: async ({ userId, type, answers, score, maxScore, severity, recommendations, aiInsights }) => {
+  create: async ({ userId, type, answers, chatHistory, score, maxScore, severity, recommendations, aiInsights }) => {
     const { rows } = await pool.query(
       `INSERT INTO assessments
-         (user_id, type, answers, score, max_score, severity, recommendations, ai_insights)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+         (user_id, type, answers, chat_history, score, max_score, severity, recommendations, ai_insights)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
        RETURNING *`,
       [
         userId, type,
         JSON.stringify(answers),
+        JSON.stringify(chatHistory || []),
         score, maxScore, severity,
         JSON.stringify(recommendations),
         aiInsights,
+      ]
+    );
+    return rows[0];
+  },
+
+  update: async (id, { userId, type, answers, chatHistory, score, maxScore, severity, recommendations, aiInsights }) => {
+    const { rows } = await pool.query(
+      `UPDATE assessments
+       SET type = $2, answers = $3, chat_history = $10, score = $4, max_score = $5, severity = $6, recommendations = $7, ai_insights = $8, updated_at = NOW()
+       WHERE id = $1 AND user_id = $9
+       RETURNING *`,
+      [
+        id,
+        type,
+        JSON.stringify(answers),
+        score, maxScore, severity,
+        JSON.stringify(recommendations),
+        aiInsights,
+        userId,
+        JSON.stringify(chatHistory || [])
       ]
     );
     return rows[0];

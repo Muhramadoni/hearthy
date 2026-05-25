@@ -24,6 +24,9 @@ router.get('/recommendations',   assessmentController.getRecommendations);
 // POST /api/assessments/predict
 router.post('/predict',          assessmentController.predictCardiovascularRisk);
 
+// PUT /api/assessments/predict/:id
+router.put('/predict/:id',       assessmentController.updateCardiovascularRisk);
+
 // GET  /api/assessments/:id
 router.get('/:id',               assessmentController.getAssessmentById);
 
