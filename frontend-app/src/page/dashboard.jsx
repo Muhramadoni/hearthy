@@ -9,16 +9,7 @@ import iconGrafik from "../icon/icon-grafik.svg";
 import { useEffect, useState } from "react";
 import { getAssessmentSummary, getAssessments } from "../services/assessmentService.js";
 
-/**
- * Konfigurasi metrik default jika pengguna belum memiliki data riwayat.
- * @type {Array<{title: string, value: string, unit: string}>}
- */
-const defaultMetricItems = [
-  { title: "Tekanan darah", value: "0 /0", unit: "mmHg" },
-  { title: "Detak jantung", value: "0", unit: "BPM" },
-  { title: "BMI", value: "0", unit: "kg/m²" },
-  { title: "Kolesterol", value: "0", unit: "mg/dL" },
-];
+
 
 /**
  * Komponen pembantu untuk menganimasikan transisi angka dari 0 menuju nilai target.
@@ -73,7 +64,7 @@ function AnimatedNumber({ value, duration = 1500 }) {
  * @returns {JSX.Element} Antarmuka pengguna Halaman Dasbor.
  */
 export default function DashboardPage({ currentPage, onNavigate }) {
-  const [metricItems, setMetricItems] = useState(defaultMetricItems);
+  const [screeningData, setScreeningData] = useState([]);
   const [riskStatus, setRiskStatus] = useState("Belum ada data");
   const [riskScore, setRiskScore] = useState(0);
   const [lastCheck, setLastCheck] = useState("-");
@@ -103,13 +94,21 @@ export default function DashboardPage({ currentPage, onNavigate }) {
           const dateObj = new Date(cardioSummary.created_at || Date.now());
           setLastCheck(dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }));
           
-          // Metrics
+          // Metrics (Screening Data)
           const ans = cardioSummary.answers || {};
-          setMetricItems([
-            { title: "Tekanan darah", value: `${ans.systolic_bp || 0} /${ans.diastolic_bp || 0}`, unit: "mmHg" },
-            { title: "Detak jantung", value: `${ans.resting_heart_rate || 0}`, unit: "BPM" },
-            { title: "BMI", value: `${ans.bmi || 0}`, unit: "kg/m²" },
-            { title: "Kolesterol", value: `${ans.cholesterol_mg_dl || 0}`, unit: "mg/dL" },
+          setScreeningData([
+            `Usia: ${ans.age || "-"} Tahun`,
+            `BMI: ${ans.bmi || "-"}`,
+            `Tekanan Darah: ${ans.systolic_bp || "-"}/${ans.diastolic_bp || "-"} mmHg`,
+            `Kolesterol: ${ans.cholesterol_mg_dl || "-"} mg/dL`,
+            `Denyut Jantung: ${ans.resting_heart_rate || "-"} BPM`,
+            `Langkah: ${ans.daily_steps || "-"} langkah`,
+            `Tidur: ${ans.sleep_hours || "-"} jam`,
+            `Riwayat Keluarga: ${ans.family_history_heart_disease ? "Ya" : "Tidak"}`,
+            `Kualitas Diet (0-7): ${ans.diet_quality_score || "-"}`,
+            `Aktivitas Fisik: ${ans.physical_activity_hours_per_week || "-"} jam/minggu`,
+            `Tingkat Stres (0-10): ${ans.stress_level || "-"}`,
+            `Alkohol: ${ans.alcohol_units_per_week || "-"} unit/minggu`,
           ]);
 
           // Recommendation
@@ -240,33 +239,52 @@ export default function DashboardPage({ currentPage, onNavigate }) {
           </article>
         </section>
 
+        {/* Gauge Chart Section */}
+        <section className="mt-10">
+          <article className="rounded-[32px] bg-white p-8 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
+            <h2 className="text-xl font-semibold text-slate-950">Grafik Risiko Kardiovaskular</h2>
+            <p className="mt-2 text-sm leading-7 text-slate-600">
+              Visualisasi tingkat risiko berdasarkan parameter klinis Anda.
+            </p>
+
+            <div className="mt-8 flex items-center justify-center">
+              <div className="relative h-[240px] w-[240px] sm:h-[300px] sm:w-[300px] rounded-full bg-[#E8EBEE] shadow-inner shadow-slate-200/80">
+                <div className={`absolute inset-0 rounded-full border-8 border-transparent ${
+                  (riskStatus.toLowerCase().includes('high') || riskStatus.toLowerCase().includes('tinggi')) ? 'border-t-[#ef4444] border-r-[#ef4444] border-b-[#ef4444]' :
+                  (riskStatus.toLowerCase().includes('moderate') || riskStatus.toLowerCase().includes('sedang')) ? 'border-t-[#fbbf24] border-r-[#fbbf24]' :
+                  'border-t-[#22c55e]'
+                } border-l-[#f8fafc]`} />
+                <div className="absolute inset-16 sm:inset-20 rounded-full bg-white flex items-center justify-center">
+                  <span className="text-3xl sm:text-4xl font-bold text-slate-800"><AnimatedNumber value={riskScore} />%</span>
+                </div>
+                <div className="absolute inset-20 sm:inset-24 rounded-full bg-transparent" />
+              </div>
+            </div>
+          </article>
+        </section>
+
         <section className="mt-10 grid gap-6 lg:grid-cols-[1.05fr_1.95fr]">
-          <div className="grid gap-4 sm:grid-cols-2">
-            {metricItems.map((metric) => (
-              <article
-                key={metric.title}
-                className="rounded-[32px] bg-white p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70"
-              >
-                <h2 className="text-base font-semibold text-slate-900">
-                  {metric.title}
-                </h2>
-                <p className={`mt-6 font-bold ${getStatusTextColor(riskStatus)}`}>
-                  <span className="text-4xl">
-                    <AnimatedNumber value={metric.value.split(" /")[0]} />
-                  </span>
-                  {metric.value.includes(" /") && (
-                    <span className="text-2xl text-[#000000]">
-                      {" "}
-                      /<AnimatedNumber value={metric.value.split(" /")[1]} />
-                    </span>
-                  )}
-                </p>
-                <span className="mt-8 inline-flex rounded-full bg-[#1e3a5a] px-4 py-2 text-sm font-semibold text-white">
-                  {metric.unit}
-                </span>
-              </article>
-            ))}
-          </div>
+          <article className="rounded-[32px] bg-white p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
+            <div className="mb-4">
+              <h2 className="text-xl font-semibold text-slate-950">
+                Data Skrining Anda
+              </h2>
+            </div>
+            <div className="space-y-3 max-h-[420px] overflow-y-auto pr-2">
+              {screeningData.length > 0 ? screeningData.map((item, index) => (
+                <div
+                  key={index}
+                  className="rounded-3xl bg-[#E8EBEE] px-5 py-4 text-sm text-slate-800 shadow-sm"
+                >
+                  {item}
+                </div>
+              )) : (
+                <div className="flex h-full min-h-[200px] items-center justify-center text-slate-500 text-sm">
+                  Belum ada data skrining.
+                </div>
+              )}
+            </div>
+          </article>
 
           <article className="rounded-[32px] bg-white p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
             <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

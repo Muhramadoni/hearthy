@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import HomePage from "./page/homepage.jsx";
 import DashboardPage from "./page/dashboard.jsx";
 import AssessmentPage from "./page/assessment.jsx";
-import HistoryPage from "./page/history.jsx";
 import UserProfilePage from "./page/user-profile.jsx";
 import LoginPage from "./page/login.jsx";
 import RegisterPage from "./page/register.jsx";
@@ -11,7 +10,7 @@ import HistoryDetailPage from "./page/history-detail.jsx";
 import { isAuthenticated } from "./services/authService";
 
 // Halaman yang membutuhkan login
-const PROTECTED_PAGES = ["dashboard", "assessment", "history", "history-detail", "profile"];
+const PROTECTED_PAGES = ["dashboard", "assessment", "history-detail", "profile"];
 
 export default function App() {
   const getInitialPage = () => {
@@ -57,9 +56,6 @@ export default function App() {
       )}
       {currentPage === "assessment" && (
         <AssessmentPage currentPage={currentPage} onNavigate={handleNavigate} />
-      )}
-      {currentPage === "history" && (
-        <HistoryPage currentPage={currentPage} onNavigate={handleNavigate} />
       )}
       {currentPage === "history-detail" && (
         <HistoryDetailPage

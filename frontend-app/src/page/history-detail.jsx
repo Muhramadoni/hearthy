@@ -78,21 +78,6 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
     );
   }
 
-  const ans = assessment.answers || {};
-  const detailItems = [
-    `Usia: ${ans.age || "-"} Tahun`,
-    `BMI: ${ans.bmi || "-"}`,
-    `Tekanan Darah: ${ans.systolic_bp || "-"}/${ans.diastolic_bp || "-"} mmHg`,
-    `Kolesterol: ${ans.cholesterol_mg_dl || "-"} mg/dL`,
-    `Denyut Jantung: ${ans.resting_heart_rate || "-"} BPM`,
-    `Langkah: ${ans.daily_steps || "-"} langkah`,
-    `Tidur: ${ans.sleep_hours || "-"} jam`,
-    `Riwayat Keluarga: ${ans.family_history_heart_disease ? "Ya" : "Tidak"}`,
-    `Kualitas Diet (0-7): ${ans.diet_quality_score || "-"}`,
-    `Aktivitas Fisik: ${ans.physical_activity_hours_per_week || "-"} jam/minggu`,
-    `Tingkat Stres (0-10): ${ans.stress_level || "-"}`,
-    `Alkohol: ${ans.alcohol_units_per_week || "-"} unit/minggu`,
-  ];
   
   const recommendations = Array.isArray(assessment.recommendations) 
     ? assessment.recommendations 
@@ -151,7 +136,7 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
             </div>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] print:flex print:flex-col">
+          <div className="flex flex-col gap-6 print:flex-col">
             <div className="rounded-[32px] bg-white p-8 shadow-[0_24px_80px_-38px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70 print:bg-white print:shadow-none print:border-b print:border-slate-200 print:rounded-none print:p-0 print:pb-8">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -173,62 +158,8 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
               </div>
 
               <p className="mt-5 text-sm leading-7 text-slate-600">
-                Berikut model grafik parameter klinis anda untuk membantu
-                menunjukkan area risiko yang perlu mendapatkan perhatian lebih.
+                {assessment.aiInsights || "Berdasarkan analisis risiko Anda, kami menyarankan Anda untuk memperhatikan gaya hidup dan pola makan."}
               </p>
-
-              <div className="mt-8 flex items-center justify-center">
-                <div className="relative h-[240px] w-[240px] sm:h-[300px] sm:w-[300px] print:h-[180px] print:w-[180px] rounded-full bg-[#E8EBEE] shadow-inner shadow-slate-200/80">
-                  <div className={`absolute inset-0 rounded-full border-8 border-transparent ${assessment.severity === 'high' ? 'border-t-[#ef4444] border-r-[#ef4444] border-b-[#ef4444]' : assessment.severity === 'moderate' ? 'border-t-[#fbbf24] border-r-[#fbbf24]' : 'border-t-[#22c55e]'} border-l-[#f8fafc]`} />
-                  <div className="absolute inset-16 sm:inset-20 print:inset-8 rounded-full bg-white flex items-center justify-center">
-                    <span className="text-3xl sm:text-4xl print:text-2xl font-bold text-slate-800">{assessment.score || 0}%</span>
-                  </div>
-                  <div className="absolute inset-20 sm:inset-24 print:inset-12 rounded-full bg-transparent" />
-                </div>
-              </div>
-
-              <div className="mt-8 grid gap-4 sm:grid-cols-3 print:grid-cols-3">
-                <div className="rounded-3xl bg-[#E8EBEE] p-4 text-center shadow-sm print:shadow-none print:border print:border-slate-200 print:rounded-lg">
-                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500 print:text-slate-500">
-                    Tekanan Darah
-                  </p>
-                  <p className="mt-3 text-sm font-semibold text-slate-950">
-                    {ans.systolic_bp || 0}/{ans.diastolic_bp || 0}
-                  </p>
-                </div>
-                <div className="rounded-3xl bg-[#E8EBEE] p-4 text-center shadow-sm print:shadow-none print:border print:border-slate-200 print:rounded-lg">
-                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500 print:text-slate-500">
-                    Denyut Jantung
-                  </p>
-                  <p className="mt-3 text-sm font-semibold text-slate-950">
-                    {ans.resting_heart_rate || 0} BPM
-                  </p>
-                </div>
-                <div className="rounded-3xl bg-[#E8EBEE] p-4 text-center shadow-sm print:shadow-none print:border print:border-slate-200 print:rounded-lg">
-                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500 print:text-slate-500">
-                    Kolesterol
-                  </p>
-                  <p className="mt-3 text-sm font-semibold text-slate-950">
-                    {ans.cholesterol_mg_dl || 0} mg/dL
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-[32px] bg-white p-8 shadow-[0_24px_80px_-38px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70 print:p-0 print:shadow-none print:mt-6">
-              <h3 className="text-xl font-semibold text-slate-950">
-                Data Skrining Anda
-              </h3>
-              <div className="mt-6 space-y-3 max-h-[420px] overflow-y-auto pr-2 print:max-h-none print:overflow-visible print:pr-0 print:grid print:grid-cols-2 print:gap-2 print:space-y-0">
-                {detailItems.map((item, index) => (
-                  <div
-                    key={index}
-                    className="rounded-3xl bg-[#E8EBEE] px-5 py-4 text-sm text-slate-800 shadow-sm print:shadow-none print:border print:border-slate-200 print:bg-white print:rounded-md print:py-1.5 print:px-3 print:text-xs"
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
 

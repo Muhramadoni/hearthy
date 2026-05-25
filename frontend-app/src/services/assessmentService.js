@@ -115,3 +115,19 @@ export async function getAssessmentById(id) {
   if (!res.ok) throw new Error(data.message || 'Failed to fetch assessment details.');
   return data.data;
 }
+
+/**
+ * Menghapus satu riwayat asesmen berdasarkan ID.
+ * @param {string} id - UUID atau pengenal unik asesmen.
+ * @returns {Promise<Object>} Respons sukses.
+ * @throws {Error} Jika gagal menghapus data.
+ */
+export async function deleteAssessment(id) {
+  const res = await fetch(`${BASE_URL}/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Failed to delete assessment.');
+  return data;
+}
