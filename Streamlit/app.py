@@ -4,22 +4,24 @@ import numpy as np
 import plotly.express as px
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
+import os
 
 
 # ======================================================
 # PAGE CONFIG
 # ======================================================
 st.set_page_config(
-    page_title="Dashboard Cardiovascular Risk Analysis",
+    page_title="Hearthy — Dashboard Cardiovascular Risk Analysis",
     page_icon="❤️",
     layout="wide"
 )
 
 
 # ======================================================
-# DATA PATH
+# DATA PATH (relative to this script)
 # ======================================================
-DATA_PATH = r"C:\Users\Thinkpad\Downloads\Streamlit Capstone\cardiovascular_risk_dataset_clean (1).csv"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(BASE_DIR, "..", "AI", "content", "cardiovascular_risk_dataset_feature_engineered.csv")
 
 
 # ======================================================
@@ -31,19 +33,20 @@ SMOKING_ORDER = ["Never", "Former", "Current"]
 FAMILY_ORDER = ["No", "Yes"]
 BMI_ORDER = ["Underweight", "Normal", "Overweight", "Obese"]
 
+# Color palette — matched to dashboard.jsx Hearthy theme
 COLORS = {
-    "navy": "#0B1F5B",
+    "navy": "#1e3a5a",
     "blue": "#2563EB",
-    "green": "#22A55A",
-    "orange": "#F59E0B",
-    "red": "#EF4444",
-    "purple": "#7C3AED",
-    "teal": "#14B8A6",
-    "bg": "#F5F8FD",
-    "card": "#FFFFFF",
-    "border": "#DCE6F2",
-    "text": "#1E293B",
-    "muted": "#64748B",
+    "green": "#22c55e",
+    "orange": "#f59e0b",
+    "red": "#ef4444",
+    "purple": "#7c3aed",
+    "teal": "#14b8a6",
+    "bg": "#f0f0f0",
+    "card": "#ffffff",
+    "border": "#e2e8f0",
+    "text": "#1e293b",
+    "muted": "#64748b",
 }
 
 RISK_COLORS = {
@@ -54,18 +57,21 @@ RISK_COLORS = {
 
 
 # ======================================================
-# CSS
+# CSS — Hearthy-themed (matched to dashboard.jsx)
 # ======================================================
 st.markdown(
     f"""
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
         html, body, [data-testid="stAppViewContainer"] {{
-            background-color: {COLORS["bg"]};
+            background-color: {COLORS["bg"]} !important;
             color: {COLORS["text"]};
+            font-family: 'Inter', sans-serif !important;
         }}
 
         [data-testid="stHeader"] {{
-            background: rgba(0,0,0,0);
+            background: rgba(0,0,0,0) !important;
         }}
 
         [data-testid="stToolbar"], #MainMenu, footer {{
@@ -74,134 +80,169 @@ st.markdown(
 
         .block-container {{
             max-width: 1600px;
-            padding-top: 1rem;
+            padding-top: 1.5rem;
             padding-bottom: 2rem;
             padding-left: 1.5rem;
             padding-right: 1.5rem;
         }}
 
-        .header-box {{
-            background: linear-gradient(135deg, #FFFFFF 0%, #F0F6FF 100%);
+        /* ── Header ── */
+        .hearthy-header {{
+            background: white;
+            border-radius: 32px;
+            padding: 32px 36px;
+            box-shadow: 0 18px 50px -28px rgba(15,23,42,0.16);
             border: 1px solid {COLORS["border"]};
-            border-radius: 22px;
-            padding: 24px 28px;
-            box-shadow: 0 6px 22px rgba(15,23,42,0.05);
-            margin-bottom: 18px;
+            margin-bottom: 24px;
         }}
 
-        .header-title {{
-            font-size: 38px;
-            font-weight: 900;
-            color: {COLORS["navy"]};
-            line-height: 1.1;
+        .hearthy-header-top {{
+            display: flex;
+            align-items: center;
+            gap: 14px;
             margin-bottom: 6px;
         }}
 
-        .header-subtitle {{
-            font-size: 16px;
-            color: {COLORS["muted"]};
-            font-weight: 500;
+        .hearthy-header-title {{
+            font-size: 32px;
+            font-weight: 800;
+            color: {COLORS["navy"]};
+            line-height: 1.15;
         }}
 
+        .hearthy-header-subtitle {{
+            font-size: 15px;
+            color: {COLORS["muted"]};
+            font-weight: 500;
+            margin-top: 4px;
+        }}
+
+        .hearthy-header-desc {{
+            font-size: 14px;
+            color: {COLORS["muted"]};
+            font-weight: 400;
+            line-height: 1.7;
+            max-width: 720px;
+            margin-top: 8px;
+        }}
+
+        /* ── Filter label ── */
         .filter-title {{
             font-size: 18px;
-            font-weight: 900;
+            font-weight: 800;
             color: {COLORS["navy"]};
             margin-bottom: 8px;
         }}
 
+        /* ── KPI Cards ── */
         .kpi-card {{
             background: white;
+            border-radius: 32px;
+            padding: 24px 22px;
+            box-shadow: 0 18px 50px -28px rgba(15,23,42,0.16);
             border: 1px solid {COLORS["border"]};
-            border-radius: 18px;
-            padding: 20px 18px;
-            box-shadow: 0 5px 16px rgba(15,23,42,0.05);
-            min-height: 135px;
+            min-height: 145px;
         }}
 
         .kpi-label {{
             font-size: 14px;
-            font-weight: 800;
-            color: {COLORS["navy"]};
-            margin-bottom: 10px;
+            font-weight: 600;
+            color: {COLORS["muted"]};
+            margin-bottom: 12px;
             line-height: 1.25;
         }}
 
         .kpi-value {{
-            font-size: 34px;
-            font-weight: 900;
+            font-size: 36px;
+            font-weight: 800;
             line-height: 1;
         }}
 
         .kpi-unit {{
-            font-size: 14px;
-            font-weight: 700;
+            font-size: 13px;
+            font-weight: 600;
             color: {COLORS["muted"]};
-            margin-top: 8px;
+            margin-top: 10px;
         }}
 
+        /* ── Section title ── */
         .section-title {{
             font-size: 22px;
-            font-weight: 900;
+            font-weight: 800;
             color: {COLORS["navy"]};
-            margin-top: 18px;
-            margin-bottom: 12px;
+            margin-top: 20px;
+            margin-bottom: 14px;
         }}
 
+        /* ── Chart title with badge ── */
         .chart-title {{
-            font-size: 17px;
-            font-weight: 900;
+            font-size: 16px;
+            font-weight: 700;
             color: {COLORS["navy"]};
             margin-bottom: 10px;
-            line-height: 1.25;
+            line-height: 1.3;
         }}
 
         .chart-badge {{
             display: inline-flex;
-            width: 26px;
-            height: 26px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            background: {COLORS["blue"]};
+            background: {COLORS["navy"]};
             color: white;
             align-items: center;
             justify-content: center;
             font-size: 13px;
-            font-weight: 900;
-            margin-right: 8px;
+            font-weight: 800;
+            margin-right: 10px;
         }}
 
+        /* ── Priority / Insight cards ── */
         .priority-item {{
-            background: #F8FBFF;
-            border: 1px solid #E8EEF7;
-            border-radius: 14px;
-            padding: 14px 14px;
+            background: rgba(30, 58, 90, 0.06);
+            border: 1px solid rgba(30, 58, 90, 0.1);
+            border-radius: 24px;
+            padding: 16px 18px;
             margin-bottom: 12px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }}
+
+        .priority-bullet {{
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: {COLORS["navy"]};
+            flex-shrink: 0;
+            margin-top: 4px;
         }}
 
         .priority-title {{
             font-size: 14px;
-            font-weight: 900;
+            font-weight: 700;
             color: {COLORS["navy"]};
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }}
 
         .priority-sub {{
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
             color: {COLORS["muted"]};
-            line-height: 1.35;
+            line-height: 1.45;
         }}
 
+        /* ── Streamlit overrides ── */
         .stSelectbox label {{
             color: {COLORS["navy"]} !important;
             font-size: 14px !important;
-            font-weight: 800 !important;
+            font-weight: 700 !important;
         }}
 
         div[data-baseweb="select"] > div {{
             background: white !important;
             border: 1px solid {COLORS["border"]} !important;
-            border-radius: 12px !important;
+            border-radius: 16px !important;
             min-height: 44px !important;
             color: {COLORS["text"]} !important;
         }}
@@ -212,10 +253,60 @@ st.markdown(
 
         [data-testid="stVerticalBlockBorderWrapper"] {{
             background: white !important;
-            border-radius: 18px !important;
+            border-radius: 32px !important;
             border: 1px solid {COLORS["border"]} !important;
-            box-shadow: 0 5px 16px rgba(15,23,42,0.05) !important;
-            padding: 10px !important;
+            box-shadow: 0 18px 50px -28px rgba(15,23,42,0.16) !important;
+            padding: 14px !important;
+        }}
+
+        /* ── Insight Summary Card ── */
+        .insight-card {{
+            background: white;
+            border-radius: 32px;
+            padding: 28px 28px;
+            box-shadow: 0 18px 50px -28px rgba(15,23,42,0.16);
+            border: 1px solid {COLORS["border"]};
+        }}
+
+        .insight-title {{
+            font-size: 20px;
+            font-weight: 800;
+            color: {COLORS["navy"]};
+            margin-bottom: 16px;
+        }}
+
+        .insight-text {{
+            font-size: 14px;
+            color: {COLORS["text"]};
+            line-height: 1.75;
+        }}
+
+        /* ── Divider ── */
+        hr {{
+            border: none;
+            border-top: 1px solid {COLORS["border"]};
+            margin: 20px 0;
+        }}
+
+        /* ── Conclusion box ── */
+        .conclusion-box {{
+            background: linear-gradient(135deg, {COLORS["navy"]} 0%, #2d5a8a 100%);
+            border-radius: 32px;
+            padding: 32px 36px;
+            color: white;
+            margin-top: 8px;
+        }}
+
+        .conclusion-title {{
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 14px;
+        }}
+
+        .conclusion-text {{
+            font-size: 14px;
+            line-height: 1.8;
+            opacity: 0.92;
         }}
     </style>
     """,
@@ -231,18 +322,10 @@ def load_data(path):
     df = pd.read_csv(path)
 
     numeric_cols = [
-        "age",
-        "bmi",
-        "systolic_bp",
-        "diastolic_bp",
-        "cholesterol_mg_dl",
-        "resting_heart_rate",
-        "daily_steps",
-        "stress_level",
-        "physical_activity_hours_per_week",
-        "sleep_hours",
-        "diet_quality_score",
-        "alcohol_units_per_week",
+        "age", "bmi", "systolic_bp", "diastolic_bp",
+        "cholesterol_mg_dl", "resting_heart_rate", "daily_steps",
+        "stress_level", "physical_activity_hours_per_week",
+        "sleep_hours", "diet_quality_score", "alcohol_units_per_week",
         "heart_disease_risk_score",
     ]
 
@@ -250,6 +333,7 @@ def load_data(path):
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
+    # Ensure categorical columns
     if "age_group" not in df.columns:
         df["age_group"] = pd.cut(
             df["age"],
@@ -265,6 +349,21 @@ def load_data(path):
             labels=BMI_ORDER,
             right=False,
         ).astype(str)
+
+    # Map smoking_status numeric to text if needed
+    if df["smoking_status"].dtype in ["int64", "float64"]:
+        smoking_map = {0: "Never", 1: "Former", 2: "Current"}
+        df["smoking_status"] = df["smoking_status"].map(smoking_map).fillna("Never")
+
+    # Map family_history numeric to text if needed
+    if df["family_history_heart_disease"].dtype in ["int64", "float64"]:
+        family_map = {0: "No", 1: "Yes"}
+        df["family_history_heart_disease"] = df["family_history_heart_disease"].map(family_map).fillna("No")
+
+    # Map risk_category numeric to text if needed
+    if df["risk_category"].dtype in ["int64", "float64"]:
+        risk_map = {0: "Low", 1: "Medium", 2: "High"}
+        df["risk_category"] = df["risk_category"].map(risk_map).fillna("Low")
 
     return df
 
@@ -290,28 +389,14 @@ def style_fig(fig, height=420, showlegend=True, margin=None):
         paper_bgcolor="white",
         plot_bgcolor="white",
         margin=margin,
-        font=dict(
-            family="Arial",
-            size=12,
-            color=COLORS["text"],
-        ),
+        font=dict(family="Inter, Arial, sans-serif", size=12, color=COLORS["text"]),
         showlegend=showlegend,
         legend=dict(
             orientation="h",
-            yanchor="bottom",
-            y=1.08,
-            xanchor="left",
-            x=0,
-            font=dict(
-                size=12,
-                color=COLORS["text"],
-            ),
-            title=dict(
-                font=dict(
-                    size=12,
-                    color=COLORS["navy"],
-                )
-            ),
+            yanchor="bottom", y=1.08,
+            xanchor="left", x=0,
+            font=dict(size=12, color=COLORS["text"]),
+            title=dict(font=dict(size=12, color=COLORS["navy"])),
             bgcolor="rgba(255,255,255,0)",
         ),
     )
@@ -379,28 +464,25 @@ def make_small_lifestyle_chart(data, column, title, y_title, color_map):
         paper_bgcolor="white",
         plot_bgcolor="white",
         margin=dict(l=45, r=25, t=30, b=45),
-        font=dict(family="Arial", size=12, color=COLORS["text"]),
+        font=dict(family="Inter, Arial, sans-serif", size=12, color=COLORS["text"]),
         showlegend=False,
         xaxis_title="Kategori Risiko",
         yaxis_title=y_title,
         title=dict(
             text=title,
             font=dict(size=15, color=COLORS["navy"]),
-            x=0,
-            xanchor="left",
+            x=0, xanchor="left",
         ),
     )
 
     fig.update_xaxes(
-        showgrid=False,
-        linecolor="#D5E1EE",
+        showgrid=False, linecolor="#D5E1EE",
         tickfont=dict(size=11, color=COLORS["text"]),
         title_font=dict(size=12, color=COLORS["text"]),
     )
 
     fig.update_yaxes(
-        gridcolor="#EEF3F8",
-        linecolor="#D5E1EE",
+        gridcolor="#EEF3F8", linecolor="#D5E1EE",
         tickfont=dict(size=11, color=COLORS["text"]),
         title_font=dict(size=12, color=COLORS["text"]),
     )
@@ -418,8 +500,7 @@ def make_scatter_matrix_dashboard(data, numeric_features, target_col):
     ]
 
     fig = make_subplots(
-        rows=n_rows,
-        cols=n_cols,
+        rows=n_rows, cols=n_cols,
         subplot_titles=subplot_titles,
         horizontal_spacing=0.08,
         vertical_spacing=0.12,
@@ -433,42 +514,36 @@ def make_scatter_matrix_dashboard(data, numeric_features, target_col):
 
         fig.add_trace(
             go.Scatter(
-                x=temp[feature],
-                y=temp[target_col],
+                x=temp[feature], y=temp[target_col],
                 mode="markers",
                 marker=dict(
                     size=5,
-                    color="rgba(90, 88, 170, 0.35)",
+                    color="rgba(30, 58, 90, 0.25)",
                     line=dict(width=0),
                 ),
                 name=feature,
                 showlegend=False,
             ),
-            row=row,
-            col=col,
+            row=row, col=col,
         )
 
         if len(temp) >= 2 and temp[feature].nunique() > 1:
             x = temp[feature].values
             y = temp[target_col].values
-
             coef = np.polyfit(x, y, 1)
             poly_fn = np.poly1d(coef)
-
             x_line = np.linspace(np.nanmin(x), np.nanmax(x), 100)
             y_line = poly_fn(x_line)
 
             fig.add_trace(
                 go.Scatter(
-                    x=x_line,
-                    y=y_line,
+                    x=x_line, y=y_line,
                     mode="lines",
-                    line=dict(color="#F97316", width=2),
+                    line=dict(color=COLORS["red"], width=2),
                     name=f"Trend {feature}",
                     showlegend=False,
                 ),
-                row=row,
-                col=col,
+                row=row, col=col,
             )
 
         fig.update_xaxes(title_text=feature, row=row, col=col)
@@ -478,26 +553,23 @@ def make_scatter_matrix_dashboard(data, numeric_features, target_col):
         height=360 * n_rows,
         title=dict(
             text="Relationship Between Numeric Features and Heart Disease Risk Score",
-            x=0.5,
-            xanchor="center",
-            font=dict(size=22, color=COLORS["navy"]),
+            x=0.5, xanchor="center",
+            font=dict(size=20, color=COLORS["navy"]),
         ),
         paper_bgcolor="white",
         plot_bgcolor="white",
-        font=dict(family="Arial", size=11, color=COLORS["text"]),
+        font=dict(family="Inter, Arial, sans-serif", size=11, color=COLORS["text"]),
         margin=dict(l=40, r=40, t=80, b=40),
     )
 
     fig.update_xaxes(
-        showgrid=False,
-        linecolor="#D5E1EE",
+        showgrid=False, linecolor="#D5E1EE",
         tickfont=dict(size=10, color=COLORS["text"]),
         title_font=dict(size=11, color=COLORS["text"]),
     )
 
     fig.update_yaxes(
-        gridcolor="#EEF3F8",
-        linecolor="#D5E1EE",
+        gridcolor="#EEF3F8", linecolor="#D5E1EE",
         tickfont=dict(size=10, color=COLORS["text"]),
         title_font=dict(size=11, color=COLORS["text"]),
     )
@@ -506,14 +578,21 @@ def make_scatter_matrix_dashboard(data, numeric_features, target_col):
 
 
 # ======================================================
-# HEADER
+# HEADER — Hearthy style
 # ======================================================
 st.markdown(
     """
-    <div class="header-box">
-        <div class="header-title">❤️ Dashboard Cardiovascular Risk Analysis</div>
-        <div class="header-subtitle">
-            Analisis risiko kardiovaskular berdasarkan faktor klinis dan gaya hidup pasien
+    <div class="hearthy-header">
+        <div class="hearthy-header-top">
+            <span style="font-size: 36px;">❤️</span>
+            <div>
+                <div class="hearthy-header-subtitle">Ringkasan analisis data kardiovaskular</div>
+                <div class="hearthy-header-title">Dashboard Cardiovascular Risk</div>
+            </div>
+        </div>
+        <div class="hearthy-header-desc">
+            Lihat distribusi risiko penyakit jantung, perbandingan indikator klinis & gaya hidup,
+            serta insight dan kesimpulan berbasis data dalam satu tampilan interaktif.
         </div>
     </div>
     """,
@@ -548,13 +627,13 @@ with f3:
 
 with f4:
     selected_age = st.selectbox(
-        "Age",
+        "Kelompok Usia",
         ["Semua"] + [x for x in AGE_ORDER if x in df["age_group"].dropna().astype(str).unique().tolist()],
     )
 
 with f5:
     selected_bmi = st.selectbox(
-        "BMI",
+        "Kategori BMI",
         ["Semua"] + [x for x in BMI_ORDER if x in df["bmi_category"].dropna().astype(str).unique().tolist()],
     )
 
@@ -590,6 +669,7 @@ if filtered.empty:
 st.divider()
 
 total_patients = len(filtered)
+avg_age = safe_mean(filtered, "age")
 avg_cholesterol = safe_mean(filtered, "cholesterol_mg_dl")
 avg_steps = safe_mean(filtered, "daily_steps")
 avg_heart_risk = safe_mean(filtered, "heart_disease_risk_score")
@@ -598,7 +678,7 @@ avg_activity = safe_mean(filtered, "physical_activity_hours_per_week")
 k1, k2, k3, k4, k5 = st.columns(5)
 
 with k1:
-    kpi_card("Jumlah Pasien", f"{total_patients:,.0f}", "pasien", COLORS["blue"])
+    kpi_card("Jumlah Pasien", f"{total_patients:,.0f}", "pasien", COLORS["navy"])
 
 with k2:
     kpi_card("Rata-rata Kolesterol", f"{avg_cholesterol:,.0f}", "mg/dL", COLORS["green"])
@@ -610,15 +690,15 @@ with k4:
     kpi_card("Rata-rata Heart Risk", f"{avg_heart_risk:,.1f}", "score", COLORS["red"])
 
 with k5:
-    kpi_card("Rata-rata Aktivitas Seminggu", f"{avg_activity:,.1f}", "jam/minggu", COLORS["purple"])
+    kpi_card("Rata-rata Aktivitas", f"{avg_activity:,.1f}", "jam/minggu", COLORS["purple"])
 
 
 st.info(
     f"Data ditampilkan berdasarkan filter aktif: "
-    f"Kategori Risiko = {selected_risk}, "
-    f"Status Merokok = {selected_smoking}, "
-    f"Riwayat Keluarga = {selected_family}, "
-    f"Age = {selected_age}, "
+    f"Risiko = {selected_risk}, "
+    f"Merokok = {selected_smoking}, "
+    f"Riwayat = {selected_family}, "
+    f"Usia = {selected_age}, "
     f"BMI = {selected_bmi}."
 )
 
@@ -626,7 +706,7 @@ st.divider()
 
 
 # ======================================================
-# CHART DATA
+# CHART DATA PREPARATION
 # ======================================================
 risk_count = (
     filtered["risk_category"]
@@ -717,18 +797,13 @@ family_long = family_prop.melt(
 
 
 feature_cols = [
-    "age",
-    "bmi",
-    "cholesterol_mg_dl",
-    "systolic_bp",
-    "diastolic_bp",
-    "physical_activity_hours_per_week",
-    "diet_quality_score",
-    "daily_steps",
+    "age", "bmi", "cholesterol_mg_dl", "systolic_bp",
+    "diastolic_bp", "physical_activity_hours_per_week",
+    "diet_quality_score", "daily_steps",
 ]
 
 feature_labels = {
-    "age": "Age",
+    "age": "Usia",
     "bmi": "BMI",
     "cholesterol_mg_dl": "Kolesterol",
     "systolic_bp": "Sistolik",
@@ -751,6 +826,8 @@ feature_delta["direction"] = np.where(feature_delta["delta_pct"] >= 0, "Naik", "
 # ======================================================
 # FIGURES
 # ======================================================
+
+# A — Donut: Risk Distribution
 fig_risk = px.pie(
     risk_count,
     names="risk_category",
@@ -775,26 +852,24 @@ fig_risk.update_layout(
     font=dict(size=12, color=COLORS["text"]),
     legend=dict(
         orientation="v",
-        x=0.78,
-        y=0.86,
+        x=0.78, y=0.86,
         font=dict(size=12, color=COLORS["text"]),
         title=dict(text="Kategori Risiko"),
     ),
     annotations=[
         dict(
             text=f"<b>Total</b><br>{risk_count['count'].sum():,.0f}",
-            x=0.36,
-            y=0.50,
+            x=0.36, y=0.50,
             showarrow=False,
             font=dict(size=16, color=COLORS["navy"]),
-            xanchor="center",
-            yanchor="middle",
+            xanchor="center", yanchor="middle",
             align="center",
         )
     ],
 )
 
 
+# B — Line: Age vs Risk Score
 fig_age = px.line(
     age_risk_score,
     x="age_group",
@@ -818,6 +893,7 @@ fig_age.update_layout(
 fig_age = style_fig(fig_age, height=420, showlegend=False)
 
 
+# C — Clinical Grouped Bar
 fig_clinical = px.bar(
     clinical_long,
     x="risk_category",
@@ -834,21 +910,15 @@ fig_clinical = px.bar(
 )
 
 fig_clinical.update_traces(textposition="outside")
-
 fig_clinical.update_layout(
     xaxis_title="Kategori Risiko",
     yaxis_title="Rata-rata",
     legend_title_text="Indikator Klinis",
 )
-
-fig_clinical = style_fig(
-    fig_clinical,
-    height=420,
-    showlegend=True,
-    margin=dict(l=55, r=30, t=75, b=60),
-)
+fig_clinical = style_fig(fig_clinical, height=420, showlegend=True, margin=dict(l=55, r=30, t=75, b=60))
 
 
+# D — Smoking Stacked Bar
 fig_smoking = px.bar(
     smoking_long,
     x="persentase",
@@ -880,14 +950,10 @@ fig_smoking.update_layout(
     legend_title_text="Status Merokok",
 )
 
-fig_smoking = style_fig(
-    fig_smoking,
-    height=420,
-    showlegend=True,
-    margin=dict(l=90, r=30, t=75, b=60),
-)
+fig_smoking = style_fig(fig_smoking, height=420, showlegend=True, margin=dict(l=90, r=30, t=75, b=60))
 
 
+# E — Family History Stacked Bar
 fig_family = px.bar(
     family_long,
     x="persentase",
@@ -918,14 +984,10 @@ fig_family.update_layout(
     legend_title_text="Riwayat Keluarga",
 )
 
-fig_family = style_fig(
-    fig_family,
-    height=420,
-    showlegend=True,
-    margin=dict(l=90, r=30, t=75, b=60),
-)
+fig_family = style_fig(fig_family, height=420, showlegend=True, margin=dict(l=90, r=30, t=75, b=60))
 
 
+# F — Feature Delta Bar
 fig_feature = px.bar(
     feature_delta,
     x="delta_pct",
@@ -950,68 +1012,42 @@ fig_feature.update_layout(
     yaxis_title="",
 )
 
-fig_feature = style_fig(
-    fig_feature,
-    height=420,
-    showlegend=False,
-    margin=dict(l=140, r=50, t=40, b=60),
-)
+fig_feature = style_fig(fig_feature, height=420, showlegend=False, margin=dict(l=140, r=50, t=40, b=60))
 
 
-# Lifestyle separated figures
+# Lifestyle Charts
 fig_activity = make_small_lifestyle_chart(
-    lifestyle_avg,
-    "physical_activity_hours_per_week",
-    "Rata-rata Aktivitas Fisik",
-    "Jam per Minggu",
-    RISK_COLORS,
+    lifestyle_avg, "physical_activity_hours_per_week",
+    "Rata-rata Aktivitas Fisik", "Jam per Minggu", RISK_COLORS,
 )
 
 fig_steps = make_small_lifestyle_chart(
-    lifestyle_avg,
-    "daily_steps",
-    "Rata-rata Langkah Harian",
-    "Langkah per Hari",
-    RISK_COLORS,
+    lifestyle_avg, "daily_steps",
+    "Rata-rata Langkah Harian", "Langkah per Hari", RISK_COLORS,
 )
 
 fig_sleep = make_small_lifestyle_chart(
-    lifestyle_avg,
-    "sleep_hours",
-    "Rata-rata Durasi Tidur",
-    "Jam per Hari",
-    RISK_COLORS,
+    lifestyle_avg, "sleep_hours",
+    "Rata-rata Durasi Tidur", "Jam per Hari", RISK_COLORS,
 )
 
 fig_diet = make_small_lifestyle_chart(
-    lifestyle_avg,
-    "diet_quality_score",
-    "Rata-rata Kualitas Diet",
-    "Skor Diet",
-    RISK_COLORS,
+    lifestyle_avg, "diet_quality_score",
+    "Rata-rata Kualitas Diet", "Skor Diet", RISK_COLORS,
 )
 
 fig_alcohol = make_small_lifestyle_chart(
-    lifestyle_avg,
-    "alcohol_units_per_week",
-    "Rata-rata Konsumsi Alkohol",
-    "Unit per Minggu",
-    RISK_COLORS,
+    lifestyle_avg, "alcohol_units_per_week",
+    "Rata-rata Konsumsi Alkohol", "Unit per Minggu", RISK_COLORS,
 )
 
 
-# Scatterplot relationship figures
+# Scatter Matrix
 scatter_features = [
-    "age",
-    "bmi",
-    "systolic_bp",
-    "diastolic_bp",
-    "cholesterol_mg_dl",
-    "resting_heart_rate",
-    "daily_steps",
-    "physical_activity_hours_per_week",
-    "sleep_hours",
-    "alcohol_units_per_week",
+    "age", "bmi", "systolic_bp", "diastolic_bp",
+    "cholesterol_mg_dl", "resting_heart_rate",
+    "daily_steps", "physical_activity_hours_per_week",
+    "sleep_hours", "alcohol_units_per_week",
 ]
 
 scatter_features = [
@@ -1020,9 +1056,7 @@ scatter_features = [
 ]
 
 fig_scatter = make_scatter_matrix_dashboard(
-    filtered,
-    scatter_features,
-    "heart_disease_risk_score",
+    filtered, scatter_features, "heart_disease_risk_score",
 )
 
 
@@ -1069,7 +1103,7 @@ with row3_col2:
 
 
 # ======================================================
-# POLA GAYA HIDUP DIPISAH
+# LIFESTYLE SECTION
 # ======================================================
 st.markdown('<div class="section-title">G. Pola Gaya Hidup per Kategori Risiko</div>', unsafe_allow_html=True)
 
@@ -1100,10 +1134,10 @@ with g5:
 
 
 # ======================================================
-# SCATTERPLOT RELATIONSHIP
+# SCATTER RELATIONSHIP
 # ======================================================
 st.markdown(
-    '<div class="section-title">H. Relationship Between Numeric Features and Heart Disease Risk Score</div>',
+    '<div class="section-title">H. Korelasi Fitur Numerik terhadap Heart Disease Risk Score</div>',
     unsafe_allow_html=True,
 )
 
@@ -1112,37 +1146,176 @@ with st.container(border=True):
 
 
 # ======================================================
-# PRIORITAS EDUKASI
+# INSIGHT & KESIMPULAN (Task requirement)
 # ======================================================
-st.markdown('<div class="section-title">I. Prioritas Edukasi Pencegahan</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">I. Insight & Kesimpulan</div>', unsafe_allow_html=True)
+
+# Compute dynamic insights from the data
+high_risk_pct = (len(df[df["risk_category"] == "High"]) / len(df) * 100) if len(df) > 0 else 0
+low_risk_pct = (len(df[df["risk_category"] == "Low"]) / len(df) * 100) if len(df) > 0 else 0
+medium_risk_pct = 100 - high_risk_pct - low_risk_pct
+
+high_avg_bp = df[df["risk_category"] == "High"]["systolic_bp"].mean() if len(df[df["risk_category"] == "High"]) > 0 else 0
+low_avg_bp = df[df["risk_category"] == "Low"]["systolic_bp"].mean() if len(df[df["risk_category"] == "Low"]) > 0 else 0
+high_avg_chol = df[df["risk_category"] == "High"]["cholesterol_mg_dl"].mean() if len(df[df["risk_category"] == "High"]) > 0 else 0
+low_avg_chol = df[df["risk_category"] == "Low"]["cholesterol_mg_dl"].mean() if len(df[df["risk_category"] == "Low"]) > 0 else 0
+high_avg_steps = df[df["risk_category"] == "High"]["daily_steps"].mean() if len(df[df["risk_category"] == "High"]) > 0 else 0
+low_avg_steps = df[df["risk_category"] == "Low"]["daily_steps"].mean() if len(df[df["risk_category"] == "Low"]) > 0 else 0
+high_avg_sleep = df[df["risk_category"] == "High"]["sleep_hours"].mean() if len(df[df["risk_category"] == "High"]) > 0 else 0
+low_avg_sleep = df[df["risk_category"] == "Low"]["sleep_hours"].mean() if len(df[df["risk_category"] == "Low"]) > 0 else 0
+
+# Top correlated feature
+if "heart_disease_risk_score" in df.columns:
+    corr_cols = [c for c in feature_cols if c in df.columns]
+    correlations = df[corr_cols + ["heart_disease_risk_score"]].corr()["heart_disease_risk_score"].drop("heart_disease_risk_score", errors="ignore").abs().sort_values(ascending=False)
+    top_corr_feature = correlations.index[0] if len(correlations) > 0 else "age"
+    top_corr_value = correlations.iloc[0] if len(correlations) > 0 else 0
+    top_corr_label = feature_labels.get(top_corr_feature, top_corr_feature)
+else:
+    top_corr_label = "N/A"
+    top_corr_value = 0
+
 
 with st.container(border=True):
     st.markdown(
-        """
-        <div class="priority-item">
-            <div class="priority-title">1. Prioritaskan pasien kategori High Risk.</div>
-            <div class="priority-sub">Kelompok ini paling membutuhkan monitoring dan edukasi pencegahan.</div>
-        </div>
+        f"""
+        <div style="padding: 8px 4px;">
+            <div class="priority-item">
+                <div class="priority-bullet"></div>
+                <div>
+                    <div class="priority-title">Distribusi Risiko Tidak Merata</div>
+                    <div class="priority-sub">
+                        Dari {len(df):,} data pasien, sebanyak <b>{high_risk_pct:.1f}%</b> termasuk High Risk,
+                        <b>{medium_risk_pct:.1f}%</b> Medium Risk, dan <b>{low_risk_pct:.1f}%</b> Low Risk.
+                        Hal ini menunjukkan perlunya perhatian khusus pada kelompok risiko tinggi.
+                    </div>
+                </div>
+            </div>
 
-        <div class="priority-item">
-            <div class="priority-title">2. Kontrol tekanan darah dan kolesterol secara rutin.</div>
-            <div class="priority-sub">Dua indikator ini dominan pada pasien berisiko tinggi.</div>
-        </div>
+            <div class="priority-item">
+                <div class="priority-bullet"></div>
+                <div>
+                    <div class="priority-title">Tekanan Darah & Kolesterol adalah Indikator Utama</div>
+                    <div class="priority-sub">
+                        Pasien High Risk memiliki rata-rata tekanan darah sistolik <b>{high_avg_bp:.0f} mmHg</b>
+                        (vs Low Risk: {low_avg_bp:.0f} mmHg) dan kolesterol <b>{high_avg_chol:.0f} mg/dL</b>
+                        (vs Low Risk: {low_avg_chol:.0f} mg/dL). Kedua parameter ini perlu dimonitor ketat.
+                    </div>
+                </div>
+            </div>
 
-        <div class="priority-item">
-            <div class="priority-title">3. Dorong aktivitas fisik dan peningkatan langkah harian.</div>
-            <div class="priority-sub">Gaya hidup kurang aktif berkaitan dengan risiko yang lebih tinggi.</div>
-        </div>
+            <div class="priority-item">
+                <div class="priority-bullet"></div>
+                <div>
+                    <div class="priority-title">Gaya Hidup Aktif Berperan Penting</div>
+                    <div class="priority-sub">
+                        Pasien Low Risk rata-rata berjalan <b>{low_avg_steps:,.0f} langkah/hari</b>
+                        (vs High Risk: {high_avg_steps:,.0f}) dan tidur <b>{low_avg_sleep:.1f} jam/hari</b>
+                        (vs High Risk: {high_avg_sleep:.1f} jam). Aktivitas fisik dan istirahat yang cukup terbukti menurunkan risiko.
+                    </div>
+                </div>
+            </div>
 
-        <div class="priority-item">
-            <div class="priority-title">4. Perbaiki kualitas diet dan tidur pasien.</div>
-            <div class="priority-sub">Pola hidup sehat membantu menurunkan faktor risiko kardiovaskular.</div>
-        </div>
+            <div class="priority-item">
+                <div class="priority-bullet"></div>
+                <div>
+                    <div class="priority-title">Fitur dengan Korelasi Tertinggi</div>
+                    <div class="priority-sub">
+                        Fitur <b>{top_corr_label}</b> memiliki korelasi tertinggi terhadap Heart Disease Risk Score
+                        (r = {top_corr_value:.3f}). Fitur ini menjadi prediktor utama dalam model prediksi.
+                    </div>
+                </div>
+            </div>
 
-        <div class="priority-item">
-            <div class="priority-title">5. Fokus pada pasien dengan riwayat keluarga penyakit jantung.</div>
-            <div class="priority-sub">Kelompok ini perlu skrining dan edukasi lebih dini.</div>
+            <div class="priority-item">
+                <div class="priority-bullet"></div>
+                <div>
+                    <div class="priority-title">Usia Meningkatkan Risiko Secara Progresif</div>
+                    <div class="priority-sub">
+                        Grafik tren menunjukkan peningkatan rata-rata skor risiko seiring bertambahnya usia.
+                        Skrining dini sangat penting untuk pasien usia 40 tahun ke atas.
+                    </div>
+                </div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
+
+
+# ======================================================
+# PRIORITAS EDUKASI PENCEGAHAN
+# ======================================================
+st.markdown('<div class="section-title">J. Prioritas Edukasi Pencegahan</div>', unsafe_allow_html=True)
+
+with st.container(border=True):
+    st.markdown(
+        """
+        <div style="padding: 8px 4px;">
+            <div class="priority-item">
+                <div class="priority-bullet"></div>
+                <div>
+                    <div class="priority-title">1. Prioritaskan pasien kategori High Risk.</div>
+                    <div class="priority-sub">Kelompok ini paling membutuhkan monitoring dan edukasi pencegahan.</div>
+                </div>
+            </div>
+
+            <div class="priority-item">
+                <div class="priority-bullet"></div>
+                <div>
+                    <div class="priority-title">2. Kontrol tekanan darah dan kolesterol secara rutin.</div>
+                    <div class="priority-sub">Dua indikator ini dominan pada pasien berisiko tinggi.</div>
+                </div>
+            </div>
+
+            <div class="priority-item">
+                <div class="priority-bullet"></div>
+                <div>
+                    <div class="priority-title">3. Dorong aktivitas fisik dan peningkatan langkah harian.</div>
+                    <div class="priority-sub">Gaya hidup kurang aktif berkaitan dengan risiko yang lebih tinggi.</div>
+                </div>
+            </div>
+
+            <div class="priority-item">
+                <div class="priority-bullet"></div>
+                <div>
+                    <div class="priority-title">4. Perbaiki kualitas diet dan tidur pasien.</div>
+                    <div class="priority-sub">Pola hidup sehat membantu menurunkan faktor risiko kardiovaskular.</div>
+                </div>
+            </div>
+
+            <div class="priority-item">
+                <div class="priority-bullet"></div>
+                <div>
+                    <div class="priority-title">5. Fokus pada pasien dengan riwayat keluarga penyakit jantung.</div>
+                    <div class="priority-sub">Kelompok ini perlu skrining dan edukasi lebih dini.</div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ======================================================
+# KESIMPULAN AKHIR
+# ======================================================
+st.markdown(
+    f"""
+    <div class="conclusion-box">
+        <div class="conclusion-title">📋 Kesimpulan Akhir</div>
+        <div class="conclusion-text">
+            Berdasarkan analisis data {len(df):,} pasien, ditemukan bahwa tekanan darah sistolik, kolesterol,
+            dan usia merupakan tiga faktor utama yang paling berpengaruh terhadap risiko penyakit kardiovaskular.
+            Pasien dengan kategori <b>High Risk</b> menunjukkan pola klinis yang konsisten yaitu tekanan darah tinggi
+            dan kadar kolesterol di atas normal. Dari sisi gaya hidup, kurangnya aktivitas fisik dan pola tidur
+            yang buruk juga berkorelasi dengan peningkatan risiko. <br/><br/>
+            Rekomendasi utama adalah melakukan skrining berkala terhadap tekanan darah dan kolesterol,
+            mendorong peningkatan aktivitas fisik minimal 150 menit per minggu, serta memberikan edukasi
+            gizi seimbang kepada seluruh pasien, terutama yang berada pada kategori risiko tinggi dan memiliki
+            riwayat keluarga penyakit jantung.
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)

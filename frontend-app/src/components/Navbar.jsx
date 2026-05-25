@@ -65,6 +65,7 @@ export default function Navbar({ currentPage = "home", onNavigate, showLoginButt
   const navItems = [
     { id: "dashboard", label: "Dashboard" },
     { id: "assessment", label: "Assessment" },
+    { id: "analytics", label: "Analytics" },
   ];
 
   return (

@@ -7,10 +7,11 @@ import LoginPage from "./page/login.jsx";
 import RegisterPage from "./page/register.jsx";
 import ResetPasswordPage from "./page/reset.jsx";
 import HistoryDetailPage from "./page/history-detail.jsx";
+import AnalyticsPage from "./page/analytics.jsx";
 import { isAuthenticated } from "./services/authService";
 
 // Halaman yang membutuhkan login
-const PROTECTED_PAGES = ["dashboard", "assessment", "history-detail", "profile"];
+const PROTECTED_PAGES = ["dashboard", "assessment", "history-detail", "profile", "analytics"];
 
 export default function App() {
   const getInitialPage = () => {
@@ -53,6 +54,9 @@ export default function App() {
       )}
       {currentPage === "dashboard" && (
         <DashboardPage currentPage={currentPage} onNavigate={handleNavigate} />
+      )}
+      {currentPage === "analytics" && (
+        <AnalyticsPage currentPage={currentPage} onNavigate={handleNavigate} />
       )}
       {currentPage === "assessment" && (
         <AssessmentPage currentPage={currentPage} onNavigate={handleNavigate} />
