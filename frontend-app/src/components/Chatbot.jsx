@@ -5,11 +5,12 @@ export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
-      text: "Halo! Saya adalah chatbot dummy untuk membantu Anda. Apa yang bisa saya bantu?",
+      text: "Halo! Saya adalah HearthyBot. Ada yang bisa saya bantu terkait kesehatan jantung Anda?",
       sender: "bot",
     },
   ]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState(getCurrentUser());
 
   useEffect(() => {
@@ -20,17 +21,56 @@ export default function Chatbot() {
 
   if (!user) return null;
 
-  const handleSend = () => {
-    if (input.trim()) {
-      setMessages((prev) => [
-        ...prev,
-        { text: input, sender: "user" },
-        {
-          text: "Ini adalah respons dummy dari chatbot. Silakan ajukan pertanyaan lain!",
-          sender: "bot",
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
+    
+    const userMessage = input.trim();
+    setInput("");
+    
+    // Konversi riwayat pesan untuk dikirim ke API
+    const history = messages
+      .filter(msg => msg.sender !== "loading")
+      .map(msg => ({
+        role: msg.sender === "user" ? "user" : "model",
+        content: msg.text
+      }));
+
+    setMessages((prev) => [
+      ...prev,
+      { text: userMessage, sender: "user" },
+      { text: "Berpikir...", sender: "loading" }
+    ]);
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("http://localhost:8000/api/v1/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
         },
-      ]);
-      setInput("");
+        body: JSON.stringify({
+          message: userMessage,
+          history: history
+        })
+      });
+
+      const data = await response.json();
+      
+      setMessages((prev) => {
+        const newMsgs = prev.filter(msg => msg.sender !== "loading");
+        if (response.ok && data.status === "success") {
+          return [...newMsgs, { text: data.reply, sender: "bot" }];
+        } else {
+          return [...newMsgs, { text: "Maaf, terjadi kesalahan saat menghubungi server.", sender: "bot" }];
+        }
+      });
+    } catch (error) {
+      setMessages((prev) => {
+        const newMsgs = prev.filter(msg => msg.sender !== "loading");
+        return [...newMsgs, { text: "Maaf, tidak dapat terhubung ke server AI.", sender: "bot" }];
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -74,7 +114,7 @@ export default function Chatbot() {
                 <polyline points="12 6 12 12 16 14"></polyline>
               </svg>
             </button>
-            <button title="Chat Baru" className="p-2 hover:bg-slate-100 rounded-full transition">
+            <button onClick={() => setMessages([{ text: "Halo! Saya adalah HearthyBot. Ada yang bisa saya bantu terkait kesehatan jantung Anda?", sender: "bot" }])} title="Chat Baru" className="p-2 hover:bg-slate-100 rounded-full transition">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -94,9 +134,11 @@ export default function Chatbot() {
           {messages.map((msg, idx) => (
             <div
               key={idx}
-              className={`p-3 rounded-2xl text-sm max-w-[85%] ${
+              className={`p-3 rounded-2xl text-sm max-w-[85%] whitespace-pre-wrap ${
                 msg.sender === "user"
                   ? "bg-[#1e3a5a] text-white ml-auto rounded-tr-sm"
+                  : msg.sender === "loading"
+                  ? "bg-slate-100 text-slate-500 mr-auto rounded-tl-sm animate-pulse"
                   : "bg-white border border-slate-200 text-slate-900 mr-auto rounded-tl-sm shadow-sm"
               }`}
             >
@@ -112,7 +154,8 @@ export default function Chatbot() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && handleSend()}
-              className="flex-1 border border-slate-300 rounded-2xl px-4 py-2.5 text-sm focus:border-[#1e3a5a] focus:ring-1 focus:ring-[#1e3a5a] focus:outline-none"
+              disabled={isLoading}
+              className={`flex-1 border border-slate-300 rounded-2xl px-4 py-2.5 text-sm focus:border-[#1e3a5a] focus:ring-1 focus:ring-[#1e3a5a] focus:outline-none ${isLoading ? "bg-slate-100" : ""}`}
               placeholder="Ketik pesan Anda..."
             />
             <button

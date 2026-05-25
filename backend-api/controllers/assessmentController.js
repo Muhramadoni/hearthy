@@ -12,6 +12,73 @@ const { generateCardioRecommendations, formatRecommendationsForDB } = require('.
  * Memuat berbagai *handler* untuk _endpoint_ `/api/assessments`.
  */
 const assessmentController = {
+  // POST /api/assessments/chat
+  assessmentChat: async (req, res, next) => {
+    try {
+      const { message, chat_history, collected_data } = req.body;
+      
+      const response = await fetch('http://127.0.0.1:8000/api/v1/assessment/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, chat_history, collected_data })
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`FastAPI AI Server error: ${errorText}`);
+      }
+      
+      const data = await response.json();
+      
+      // If prediction is complete, we also save it to DB just like predictCardiovascularRisk
+      if (data.is_complete && data.prediction_result) {
+        const pResult = data.prediction_result;
+        
+        const rawRecs = generateCardioRecommendations(data.collected_data);
+        const generatedRecommendations = formatRecommendationsForDB(rawRecs);
+        
+        const severity_mapped = pResult.risk_category === "High" ? "high" : pResult.risk_category === "Medium" ? "moderate" : "low";
+        const generatedInsights = `Berdasarkan hasil prediksi AI, tingkat risiko penyakit kardiovaskular Anda berada pada kategori ${severity_mapped === 'high' ? 'Tinggi' : severity_mapped === 'moderate' ? 'Sedang' : 'Rendah'}. ${severity_mapped === 'low' ? 'Terus jaga kebiasaan sehat Anda!' : 'Ada beberapa parameter yang perlu mendapat perhatian khusus untuk mencegah risiko memburuk.'}`;
+        
+        let updatedChatHistory = chat_history || [];
+        updatedChatHistory.push({ text: message, sender: 'user' });
+        updatedChatHistory.push({ text: data.reply, sender: 'bot' });
+        
+        updatedChatHistory.push({
+          type: "result",
+          data: { 
+            score: Math.round(pResult.risk_score), 
+            severityStr: severity_mapped === 'high' ? 'Tinggi' : severity_mapped === 'moderate' ? 'Sedang' : 'Rendah', 
+            insights: generatedInsights, 
+            finalAnswers: data.collected_data 
+          },
+          sender: "bot"
+        });
+        updatedChatHistory.push({
+          text: "Ketik 'Mulai Asesmen Baru' atau gunakan icon di pojok kanan atas jika Anda ingin melakukan evaluasi baru.",
+          sender: "bot"
+        });
+        
+        const assessment = await assessmentModel.create({
+          userId: req.user.id,
+          type: 'cardiovascular',
+          answers: data.collected_data,
+          chatHistory: updatedChatHistory,
+          score: Math.round(pResult.risk_score),
+          maxScore: 100,
+          severity: severity_mapped,
+          recommendations: generatedRecommendations,
+          aiInsights: generatedInsights,
+        });
+        
+        data.assessment_id = assessment.id;
+        data.final_chat_history = updatedChatHistory;
+      }
+      
+      res.json({ status: 'success', data });
+    } catch (err) { next(err); }
+  },
+
   // POST /api/assessments/predict
   predictCardiovascularRisk: async (req, res, next) => {
     try {

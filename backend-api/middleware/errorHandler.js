@@ -32,9 +32,7 @@ const errorHandler = (err, req, res, next) => { // eslint-disable-line no-unused
   const statusCode = err.statusCode || err.status || 500;
   res.status(statusCode).json({
     status: 'error',
-    message: statusCode === 500
-      ? 'Internal server error. Please try again later.'
-      : err.message,
+    message: err.message || 'Internal server error. Please try again later.',
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   });
 };

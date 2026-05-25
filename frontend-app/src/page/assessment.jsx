@@ -8,80 +8,33 @@ import Navbar from "../components/Navbar.jsx";
 import { getAssessments, getAssessmentById, deleteAssessment } from "../services/assessmentService.js";
 import Swal from "sweetalert2";
 
-const stressOptions = ["Tidak pernah", "Hampir tidak pernah", "Kadang-kadang", "Cukup sering", "Sangat sering"];
-
-const chatSteps = [
-  { key: "age", question: "Halo! Mari kita mulai asesmen risiko kardiovaskular Anda. Berapa usia Anda?", type: "number" },
-  { key: "bmi", question: "Berapa BMI (Indeks Massa Tubuh) Anda?", type: "number" },
-  { key: "systolicBp", question: "Berapa tekanan darah sistolik Anda (angka atas, misal 120)?", type: "number" },
-  { key: "diastolicBp", question: "Berapa tekanan darah diastolik Anda (angka bawah, misal 80)?", type: "number" },
-  { key: "cholesterol", question: "Berapa kadar kolesterol Anda (mg/dL)?", type: "number" },
-  { key: "heartRate", question: "Berapa detak jantung istirahat Anda (bpm)?", type: "number" },
-  { key: "familyHistory", question: "Apakah Anda memiliki riwayat keluarga dengan penyakit jantung?", type: "options", options: ["Ya", "Tidak"] },
-  { key: "dietLevel", question: "Bagaimana Anda menilai kualitas diet Anda dari skala 1 (Sangat Buruk) hingga 7 (Sangat Baik)?", type: "number" },
-  { key: "alcoholUnits", question: "Berapa kali Anda mengonsumsi alkohol per minggu?", type: "number" },
-  { key: "dailySteps", question: "Berapa rata-rata jumlah langkah kaki Anda per hari?", type: "number" },
-  { key: "stress1", question: "Mari kita evaluasi tingkat stres Anda. Seberapa sering kamu merasa kesal karena sesuatu yang terjadi secara tidak terduga?", type: "options", options: stressOptions },
-  { key: "stress2", question: "Seberapa sering kamu merasa tidak mampu mengendalikan hal-hal penting dalam hidupmu?", type: "options", options: stressOptions },
-  { key: "stress3", question: "Seberapa sering kamu merasa gugup dan tertekan?", type: "options", options: stressOptions },
-  { key: "stress4", question: "Seberapa sering kamu merasa yakin dengan kemampuanmu menangani masalah pribadi?", type: "options", options: stressOptions },
-  { key: "stress5", question: "Seberapa sering kamu merasa bahwa segala sesuatu berjalan sesuai keinginanmu?", type: "options", options: stressOptions },
-  { key: "stress6", question: "Seberapa sering kamu merasa tidak mampu mengatasi semua hal yang harus kamu lakukan?", type: "options", options: stressOptions },
-  { key: "stress7", question: "Seberapa sering kamu mampu mengendalikan rasa jengkel dalam hidupmu?", type: "options", options: stressOptions },
-  { key: "stress8", question: "Seberapa sering kamu merasa bahwa kamu menguasai keadaan?", type: "options", options: stressOptions },
-  { key: "stress9", question: "Seberapa sering kamu merasa marah karena hal-hal di luar kendalimu?", type: "options", options: stressOptions },
-  { key: "stress10", question: "Seberapa sering kamu merasa kesulitan yang menumpuk begitu banyak sehingga kamu tidak bisa mengatasinya?", type: "options", options: stressOptions },
-  { key: "physicalActivity", question: "Berapa jam aktivitas fisik yang Anda lakukan per minggu?", type: "number" },
-  { key: "sleepDuration", question: "Berapa jam rata-rata Anda tidur per malam?", type: "number" },
-];
-
 export default function AssessmentPage({ currentPage, onNavigate }) {
-  const [currentStep, setCurrentStep] = useState(() => {
-    const saved = sessionStorage.getItem("hearthy_currentStep");
-    return saved ? parseInt(saved, 10) : 0;
-  });
-
-  const [answers, setAnswers] = useState(() => {
-    const saved = sessionStorage.getItem("hearthy_answers");
-    return saved ? JSON.parse(saved) : {};
-  });
-
   const [messages, setMessages] = useState(() => {
     const activeId = sessionStorage.getItem("hearthy_active_history_id");
     if (activeId) {
       return [{ text: "Memuat riwayat...", sender: "bot" }];
     }
     
-    const savedAnswers = sessionStorage.getItem("hearthy_answers");
-    const savedStep = sessionStorage.getItem("hearthy_currentStep");
-    
-    if (savedAnswers && savedStep) {
-      const parsedAnswers = JSON.parse(savedAnswers);
-      const stepInt = parseInt(savedStep, 10);
-      const reconstructed = [];
-      
-      for (let i = 0; i <= stepInt; i++) {
-        if (i === chatSteps.length) break;
-        reconstructed.push({ text: chatSteps[i].question, sender: "bot", options: chatSteps[i].options });
-        
-        if (i < stepInt) {
-          const ansVal = parsedAnswers[chatSteps[i].key];
-          if (ansVal !== undefined) {
-             reconstructed[reconstructed.length - 1].options = undefined;
-             reconstructed.push({ text: ansVal.toString(), sender: "user" });
-          }
-        }
-      }
-      if (reconstructed.length > 0) return reconstructed;
+    const savedMessages = sessionStorage.getItem("hearthy_agent_messages");
+    if (savedMessages) {
+      return JSON.parse(savedMessages);
     }
 
-    return [{ text: chatSteps[0].question, sender: "bot", options: chatSteps[0].options }];
+    return [];
   });
+  
+  const [collectedData, setCollectedData] = useState(() => {
+    const saved = sessionStorage.getItem("hearthy_agent_collected");
+    return saved ? JSON.parse(saved) : {};
+  });
+
   const [inputValue, setInputValue] = useState("");
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [historyRecords, setHistoryRecords] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [isInputDisabled, setIsInputDisabled] = useState(false);
+  const [isAgentTyping, setIsAgentTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
   // Close dropdown when clicking outside
@@ -93,9 +46,17 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
 
   // Save state to sessionStorage
   useEffect(() => {
-    sessionStorage.setItem("hearthy_currentStep", currentStep.toString());
-    sessionStorage.setItem("hearthy_answers", JSON.stringify(answers));
-  }, [currentStep, answers]);
+    sessionStorage.setItem("hearthy_agent_messages", JSON.stringify(messages));
+    sessionStorage.setItem("hearthy_agent_collected", JSON.stringify(collectedData));
+  }, [messages, collectedData]);
+
+  // Initial greeting if no messages
+  useEffect(() => {
+    const activeId = sessionStorage.getItem("hearthy_active_history_id");
+    if (!activeId && messages.length === 0 && !isAgentTyping) {
+      sendToAgent("Halo, saya ingin memulai asesmen risiko jantung.");
+    }
+  }, [messages]);
 
   // Load active history on mount if it exists
   useEffect(() => {
@@ -111,7 +72,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isAgentTyping]);
 
   useEffect(() => {
     document.title = "Assessment - Web Hearty";
@@ -133,184 +94,96 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
     loadHistory();
   }, []);
 
-  const calculateStressLevel = (stressAns) => {
-    const scores = {
-      "Tidak pernah": 0,
-      "Hampir tidak pernah": 1,
-      "Kadang-kadang": 2,
-      "Cukup sering": 3,
-      "Sangat sering": 4,
-    };
-    
-    let totalScore = 0;
-    const reverseQuestions = ["stress4", "stress5", "stress7", "stress8"];
-    
-    for (let i = 1; i <= 10; i++) {
-      const key = `stress${i}`;
-      let score = scores[stressAns[key]];
-      if (reverseQuestions.includes(key)) {
-        score = 4 - score;
-      }
-      totalScore += score;
+  const sendToAgent = async (userMessage) => {
+    const token = localStorage.getItem("hearthy_token");
+    if (!token) {
+      setMessages(prev => [...prev, { text: "Anda harus login untuk menggunakan fitur ini.", sender: "bot" }]);
+      return;
     }
 
-    if (totalScore <= 13) return 3;
-    if (totalScore <= 26) return 6;
-    return 9;
-  };
+    if (userMessage.toLowerCase() === "mulai asesmen baru" || userMessage.toLowerCase() === "baru") {
+      handleNewChat();
+      return;
+    }
 
-  const submitAssessment = async (finalAnswers) => {
-    const familyVal = finalAnswers.familyHistory === "Ya" ? 1 : 0;
-    const stressVal = calculateStressLevel(finalAnswers);
-
-    const extractNumber = (val) => {
-      if (typeof val === 'number') return val;
-      const match = String(val).match(/-?\d+(\.\d+)?/);
-      return match ? parseFloat(match[0]) : 0;
-    };
-
-    const payload = {
-      answers: {
-        age: parseInt(extractNumber(finalAnswers.age)),
-        bmi: parseFloat(extractNumber(finalAnswers.bmi)),
-        systolic_bp: parseInt(extractNumber(finalAnswers.systolicBp)),
-        diastolic_bp: parseInt(extractNumber(finalAnswers.diastolicBp)),
-        cholesterol_mg_dl: parseInt(extractNumber(finalAnswers.cholesterol)),
-        resting_heart_rate: parseInt(extractNumber(finalAnswers.heartRate)),
-        daily_steps: parseInt(extractNumber(finalAnswers.dailySteps)),
-        stress_level: stressVal,
-        physical_activity_hours_per_week: parseInt(extractNumber(finalAnswers.physicalActivity)),
-        sleep_hours: parseFloat(extractNumber(finalAnswers.sleepDuration)),
-        family_history_heart_disease: familyVal,
-        diet_quality_score: parseInt(extractNumber(finalAnswers.dietLevel)),
-        alcohol_units_per_week: parseFloat(extractNumber(finalAnswers.alcoholUnits)),
-      },
-      chatHistory: messages.filter(msg => !msg.isLoading).map((msg, idx, arr) => {
-        if (idx === arr.length - 1) return { ...msg, options: undefined };
-        return msg;
-      })
-    };
+    // Add user message to UI immediately if it's not the initial hidden trigger
+    if (userMessage !== "Halo, saya ingin memulai asesmen risiko jantung.") {
+      setMessages(prev => [...prev, { text: userMessage, sender: "user" }]);
+    }
+    
+    setInputValue("");
+    setIsAgentTyping(true);
+    setIsInputDisabled(true);
 
     try {
-      const token = localStorage.getItem("hearthy_token");
-      const activeId = sessionStorage.getItem("hearthy_active_history_id");
-      
-      let url = "http://localhost:5000/api/assessments/predict";
-      let method = "POST";
-      
-      if (activeId) {
-        url = `http://localhost:5000/api/assessments/predict/${activeId}`;
-        method = "PUT";
-      }
-
-      const res = await fetch(url, {
-        method: method,
+      const res = await fetch("http://localhost:5000/api/assessments/chat", {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          message: userMessage,
+          chat_history: messages.filter(m => m.type !== 'result'),
+          collected_data: collectedData
+        })
       });
-      
+
       const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Gagal menghubungi AI");
+
+      const aiData = data.data;
       
-      if (!res.ok) {
-        throw new Error(data.message || "Gagal melakukan prediksi");
+      // Update collected data state
+      if (aiData.collected_data) {
+        setCollectedData(aiData.collected_data);
       }
 
-      const newAssessmentId = data.data.assessment.id;
-      sessionStorage.setItem("hearthy_active_history_id", newAssessmentId);
-      
-      const newMessages = data.data.assessment.chat_history || [];
-      if (newMessages.length > 0) {
-        setMessages(newMessages);
+      // Add AI reply to UI
+      setMessages(prev => [...prev, { text: aiData.reply, sender: "bot" }]);
+
+      // If assessment is complete, the backend already calculated the score and returned it
+      if (aiData.is_complete && aiData.prediction_result) {
+        const pResult = aiData.prediction_result;
+        const severityStr = pResult.risk_category === "High" ? "Tinggi" : pResult.risk_category === "Medium" ? "Sedang" : "Rendah";
+        const insights = `Berdasarkan hasil prediksi AI, tingkat risiko penyakit kardiovaskular Anda berada pada kategori ${severityStr}. ${severityStr === 'Rendah' ? 'Terus jaga kebiasaan sehat Anda!' : 'Ada beberapa parameter yang perlu mendapat perhatian khusus untuk mencegah risiko memburuk.'}`;
+        
+        setMessages(prev => [
+          ...prev,
+          {
+            type: "result",
+            data: { 
+              score: Math.round(pResult.risk_score), 
+              severityStr: severityStr, 
+              insights: insights, 
+              finalAnswers: aiData.collected_data 
+            },
+            sender: "bot"
+          },
+          { text: "Ketik 'Mulai Asesmen Baru' atau gunakan icon di pojok kanan atas jika Anda ingin melakukan evaluasi baru.", sender: "bot" }
+        ]);
+        
+        if (aiData.assessment_id) {
+          sessionStorage.setItem("hearthy_active_history_id", aiData.assessment_id);
+        }
+      } else {
+        setIsInputDisabled(false);
       }
-
-
-      setCurrentStep(chatSteps.length); // Disable input
 
     } catch (error) {
       setMessages(prev => [
         ...prev,
-        { text: `❌ Terjadi kesalahan: ${error.message}. Silakan muat ulang halaman.`, sender: "bot" }
+        { text: `❌ Terjadi kesalahan: ${error.message}. Silakan coba ketik ulang jawaban Anda.`, sender: "bot" }
       ]);
+      setIsInputDisabled(false);
+    } finally {
+      setIsAgentTyping(false);
     }
   };
 
-  const handleSend = (val) => {
-    const value = val || inputValue;
-    if (!value.trim()) return;
-
-    if (value.toLowerCase() === "mulai asesmen baru" || value.toLowerCase() === "baru") {
-      // sessionStorage.removeItem("hearthy_active_history_id");
-      sessionStorage.removeItem("hearthy_currentStep");
-      sessionStorage.removeItem("hearthy_answers");
-      setMessages((prev) => [
-        ...prev,
-        { text: value, sender: "user" },
-        { text: chatSteps[0].question, sender: "bot", options: chatSteps[0].options }
-      ]);
-      setCurrentStep(0);
-      setAnswers({});
-      setInputValue("");
-      return;
-    }
-
-    if (currentStep >= chatSteps.length) {
-      setMessages((prev) => [
-        ...prev,
-        { text: value, sender: "user" },
-        { text: "Sesi asesmen ini telah selesai. Ketik 'Mulai Asesmen Baru' jika Anda ingin mengulang tes.", sender: "bot" }
-      ]);
-      setInputValue("");
-      return;
-    }
-
-    const step = chatSteps[currentStep];
-    const newAnswers = { ...answers, [step.key]: value };
-    setAnswers(newAnswers);
-    setInputValue("");
-
-    setMessages((prev) => {
-      const updatedMessages = prev.map((msg, idx) => {
-        if (idx === prev.length - 1) return { ...msg, options: undefined };
-        return msg;
-      });
-      return [...updatedMessages, { text: value, sender: "user" }];
-    });
-
-    const nextStepIndex = currentStep + 1;
-    if (nextStepIndex < chatSteps.length) {
-      setTimeout(() => {
-        setCurrentStep(nextStepIndex);
-        setMessages((prev) => [
-          ...prev,
-          { text: chatSteps[nextStepIndex].question, sender: "bot", options: chatSteps[nextStepIndex].options }
-        ]);
-      }, 500);
-    } else {
-      setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          { 
-            text: (
-              <div className="flex items-center gap-2">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#1e3a5a] animate-spin">
-                  <path d="M5 22h14"></path>
-                  <path d="M5 2h14"></path>
-                  <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path>
-                  <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path>
-                </svg>
-                <span>Tunggu sebentar, AI kami sedang menganalisis risiko kardiovaskular Anda...</span>
-              </div>
-            ), 
-            sender: "bot",
-            isLoading: true
-          }
-        ]);
-        submitAssessment(newAnswers);
-      }, 500);
-    }
+  const handleSend = () => {
+    if (!inputValue.trim()) return;
+    sendToAgent(inputValue);
   };
 
   const handleKeyPress = (e) => {
@@ -321,90 +194,41 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
 
   const handleNewChat = () => {
     sessionStorage.removeItem("hearthy_active_history_id");
-    sessionStorage.removeItem("hearthy_currentStep");
-    sessionStorage.removeItem("hearthy_answers");
-    setMessages([{ text: chatSteps[0].question, sender: "bot", options: chatSteps[0].options }]);
-    setCurrentStep(0);
-    setAnswers({});
+    sessionStorage.removeItem("hearthy_agent_messages");
+    sessionStorage.removeItem("hearthy_agent_collected");
+    setMessages([]);
+    setCollectedData({});
     setInputValue("");
+    setIsInputDisabled(false);
   };
 
   const handleHistoryClick = async (id) => {
-    // If clicking the 3-dots menu, don't trigger history load
     if (activeDropdown === id) return;
 
     try {
       sessionStorage.setItem("hearthy_active_history_id", id);
-      // Fetch full assessment detail
       const res = await getAssessmentById(id);
       const data = res.assessment;
       const dateStr = new Date(data.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
 
-      // Check if chat_history exists
       if (data.chat_history && data.chat_history.length > 0) {
         setMessages(data.chat_history);
       } else {
-        // Fallback for old records
         const ans = data.answers || {};
-        const reconstructedMessages = [
-          { text: `📅 Menampilkan riwayat percakapan asesmen tanggal ${dateStr} WIB.`, sender: "bot" }
-        ];
-
-        const mapKeyToDb = {
-          age: "age",
-          bmi: "bmi",
-          systolicBp: "systolic_bp",
-          diastolicBp: "diastolic_bp",
-          cholesterol: "cholesterol_mg_dl",
-          heartRate: "resting_heart_rate",
-          familyHistory: "family_history_heart_disease",
-          dietLevel: "diet_quality_score",
-          alcoholUnits: "alcohol_units_per_week",
-          dailySteps: "daily_steps",
-          physicalActivity: "physical_activity_hours_per_week",
-          sleepDuration: "sleep_hours"
-        };
-
-        // Reconstruct Q&A
-        chatSteps.forEach(step => {
-          if (step.key.startsWith("stress")) return; 
-          const dbKey = mapKeyToDb[step.key];
-          let answerVal = ans[dbKey];
-          
-          if (step.key === "familyHistory" && answerVal !== undefined) {
-            answerVal = answerVal === 1 ? "Ya" : "Tidak";
-          }
-          
-          if (answerVal !== undefined && answerVal !== null) {
-            reconstructedMessages.push({ text: step.question, sender: "bot" });
-            reconstructedMessages.push({ text: answerVal.toString(), sender: "user" });
-          }
-        });
-
-        // Handle stress
-        if (ans.stress_level !== undefined) {
-          const stressStr = ans.stress_level === 3 ? "Rendah" : ans.stress_level === 6 ? "Sedang" : "Tinggi";
-          reconstructedMessages.push({ text: "Mari kita evaluasi tingkat stres Anda berdasarkan pertanyaan-pertanyaan sebelumnya.", sender: "bot" });
-          reconstructedMessages.push({ text: `(Rekaman) Tingkat stres: ${stressStr}`, sender: "user" });
-        }
-
-        // Create the single combined result bubble
         const severityStr = data.severity === 'high' ? 'Tinggi' : data.severity === 'moderate' ? 'Sedang' : 'Rendah';
         const score = data.score || 0;
         const insights = data.aiInsights || "Perhatikan gaya hidup dan pola makan Anda.";
 
-        reconstructedMessages.push(
+        setMessages([
+          { text: `📅 Menampilkan riwayat percakapan asesmen tanggal ${dateStr} WIB.`, sender: "bot" },
           { type: "result", data: { score, severityStr, insights, finalAnswers: ans }, sender: "bot" },
           { text: "Ketik 'Mulai Asesmen Baru' atau gunakan icon di pojok kanan atas jika Anda ingin melakukan evaluasi baru.", sender: "bot" }
-        );
-
-        setMessages(reconstructedMessages);
+        ]);
       }
       
-      setCurrentStep(chatSteps.length); // Disable input
-      setAnswers({});
+      setIsInputDisabled(true);
       setInputValue("");
-      setIsHistoryOpen(false); // Close sidebar
+      setIsHistoryOpen(false);
     } catch (err) {
       console.error(err);
       setMessages([{ text: "Gagal memuat detail riwayat. Silakan coba lagi.", sender: "bot" }]);
@@ -455,9 +279,6 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
     }
   };
 
-  const currentOptions = messages[messages.length - 1]?.options;
-  const isInputDisabled = !!currentOptions;
-
   const filteredHistoryRecords = historyRecords.filter((record) => {
     if (!selectedDate) return true;
     const recordDate = new Date(record.created_at).toISOString().split('T')[0];
@@ -471,7 +292,6 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
         onNavigate={onNavigate ?? (() => {})}
       />
 
-      {/* Card Chatbot */}
       <main className="flex-1 mx-auto w-full max-w-screen-2xl px-4 md:px-6 py-2 md:py-4 flex flex-col h-[calc(100vh-120px)]">
         <div className="bg-white rounded-[32px] shadow-[0_24px_80px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70 flex flex-col h-full overflow-hidden">
           {/* Chat Header */}
@@ -484,7 +304,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
             </div>
             <div>
               <h2 className="text-base font-bold text-slate-900">Hearthy - Asesmen AI</h2>
-              <p className="text-xs text-slate-500">Chatbot Prediksi Risiko Kardiovaskular</p>
+              <p className="text-xs text-slate-500">Wawancara Medis Terpandu</p>
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -526,17 +346,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                       : "bg-white border border-slate-200 text-slate-800 rounded-tl-sm"
                   }`}
                 >
-                  {msg.isLoading ? (
-                    <div className="flex items-center gap-2">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#1e3a5a] animate-spin">
-                        <path d="M5 22h14"></path>
-                        <path d="M5 2h14"></path>
-                        <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path>
-                        <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path>
-                      </svg>
-                      <span>Tunggu sebentar, AI kami sedang menganalisis risiko kardiovaskular Anda...</span>
-                    </div>
-                  ) : msg.type === "result" ? (
+                  {msg.type === "result" ? (
                     <div className="flex flex-col gap-3 w-full">
                       <div className="flex items-center gap-2 text-[#1e3a5a] font-bold pb-2 border-b border-slate-100">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-green-500">
@@ -551,13 +361,13 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                         <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                           <p><span className="text-slate-500">Usia:</span> {msg.data.finalAnswers.age} thn</p>
                           <p><span className="text-slate-500">BMI:</span> {msg.data.finalAnswers.bmi}</p>
-                          <p><span className="text-slate-500">Tensi:</span> {msg.data.finalAnswers.systolicBp || msg.data.finalAnswers.systolic_bp}/{msg.data.finalAnswers.diastolicBp || msg.data.finalAnswers.diastolic_bp} mmHg</p>
-                          <p><span className="text-slate-500">Kolesterol:</span> {msg.data.finalAnswers.cholesterol || msg.data.finalAnswers.cholesterol_mg_dl} mg/dL</p>
-                          <p><span className="text-slate-500">Detak Jantung:</span> {msg.data.finalAnswers.heartRate || msg.data.finalAnswers.resting_heart_rate} bpm</p>
-                          <p><span className="text-slate-500">Gula Diet:</span> {msg.data.finalAnswers.dietLevel || msg.data.finalAnswers.diet_quality_score}/7</p>
-                          <p><span className="text-slate-500">Aktivitas:</span> {msg.data.finalAnswers.physicalActivity || msg.data.finalAnswers.physical_activity_hours_per_week} jam/mgg</p>
-                          <p><span className="text-slate-500">Langkah:</span> {msg.data.finalAnswers.dailySteps || msg.data.finalAnswers.daily_steps}</p>
-                          <p className="col-span-2"><span className="text-slate-500">Riwayat Keluarga:</span> {msg.data.finalAnswers.familyHistory || (msg.data.finalAnswers.family_history_heart_disease === 1 ? "Ya" : "Tidak")}</p>
+                          <p><span className="text-slate-500">Tensi:</span> {msg.data.finalAnswers.systolic_bp}/{msg.data.finalAnswers.diastolic_bp} mmHg</p>
+                          <p><span className="text-slate-500">Kolesterol:</span> {msg.data.finalAnswers.cholesterol_mg_dl} mg/dL</p>
+                          <p><span className="text-slate-500">Detak Jantung:</span> {msg.data.finalAnswers.resting_heart_rate} bpm</p>
+                          <p><span className="text-slate-500">Gula Diet:</span> {msg.data.finalAnswers.diet_quality_score}/10</p>
+                          <p><span className="text-slate-500">Aktivitas:</span> {msg.data.finalAnswers.physical_activity_hours_per_week} jam/mgg</p>
+                          <p><span className="text-slate-500">Langkah:</span> {msg.data.finalAnswers.daily_steps}</p>
+                          <p className="col-span-2"><span className="text-slate-500">Riwayat Keluarga:</span> {msg.data.finalAnswers.family_history_heart_disease ? "Ya" : "Tidak"}</p>
                         </div>
                       </div>
 
@@ -579,18 +389,15 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
               </div>
             ))}
             
-            {/* Quick Reply Options */}
-            {currentOptions && (
-              <div className="flex flex-wrap gap-2 mt-2 w-full">
-                {currentOptions.map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => handleSend(opt)}
-                    className="px-5 py-2.5 bg-white border border-[#1e3a5a] text-[#1e3a5a] rounded-full text-sm font-medium hover:bg-[#1e3a5a] hover:text-white transition-colors shadow-sm"
-                  >
-                    {opt}
-                  </button>
-                ))}
+            {isAgentTyping && (
+              <div className="flex justify-start">
+                <div className="px-5 py-3.5 rounded-2xl text-[15px] max-w-[85%] bg-white border border-slate-200 text-slate-800 rounded-tl-sm flex items-center gap-2">
+                  <div className="flex gap-1">
+                    <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></span>
+                    <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></span>
+                    <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></span>
+                  </div>
+                </div>
               </div>
             )}
             <div ref={messagesEndRef} />
@@ -605,17 +412,17 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              disabled={isInputDisabled}
+              disabled={isInputDisabled || isAgentTyping}
               className={`flex-1 border-2 border-slate-200 rounded-2xl px-5 py-3.5 text-[15px] focus:border-[#1e3a5a] focus:ring-4 focus:ring-[#1e3a5a]/10 focus:outline-none transition-all ${
-                isInputDisabled ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-white text-slate-900"
+                isInputDisabled || isAgentTyping ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-white text-slate-900"
               }`}
-              placeholder={isInputDisabled ? "Pilih salah satu opsi di atas..." : "Ketik jawaban Anda..."}
+              placeholder={isInputDisabled ? "Sesi selesai..." : "Ketik jawaban Anda..."}
             />
             <button
               onClick={() => handleSend()}
-              disabled={isInputDisabled || !inputValue.trim()}
+              disabled={isInputDisabled || isAgentTyping || !inputValue.trim()}
               className={`px-6 py-3.5 rounded-2xl font-medium transition-all flex items-center justify-center gap-2 ${
-                isInputDisabled || !inputValue.trim()
+                isInputDisabled || isAgentTyping || !inputValue.trim()
                   ? "bg-slate-200 text-slate-400 cursor-not-allowed"
                   : "bg-[#1e3a5a] text-white hover:bg-[#173652] hover:shadow-lg hover:shadow-[#1e3a5a]/20"
               }`}
@@ -763,7 +570,3 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
     </div>
   );
 }
-
-
-
-
