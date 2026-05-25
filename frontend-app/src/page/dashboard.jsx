@@ -4,7 +4,6 @@
  * skor terbaru, metrik fisik (tekanan darah, BMI, dll.), dan grafik tren riwayat asesmen.
  */
 import Navbar from "../components/Navbar.jsx";
-import Chatbot from "../components/Chatbot.jsx";
 import iconGrafik from "../icon/icon-grafik.svg";
 import { useEffect, useState } from "react";
 import { getAssessmentSummary, getAssessments } from "../services/assessmentService.js";
@@ -394,7 +393,6 @@ export default function DashboardPage({ currentPage, onNavigate }) {
           </article>
         </section>
       </main>
-      <Chatbot />
     </div>
   );
 }

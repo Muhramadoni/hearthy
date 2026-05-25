@@ -10,7 +10,6 @@ import iconAI from "../icon/icon-AI.svg";
 import iconHasilSkrining from "../icon/icon-hasil-skrining.svg";
 import { useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
-import Chatbot from "../components/Chatbot.jsx";
 import { isAuthenticated } from "../services/authService";
 
 /**
@@ -532,7 +531,6 @@ function App({ currentPage, onNavigate }) {
           </div>
         </div>
       </footer>
-      <Chatbot />
     </div>
   );
 }

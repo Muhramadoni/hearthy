@@ -5,7 +5,6 @@
  */
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar.jsx";
-import Chatbot from "../components/Chatbot.jsx";
 import { getAssessmentById } from "../services/assessmentService.js";
 import Swal from "sweetalert2";
 
@@ -185,7 +184,6 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
       </main>
       
       <div className="print:hidden">
-        <Chatbot />
       </div>
     </div>
   );

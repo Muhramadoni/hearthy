@@ -5,7 +5,6 @@
  */
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar.jsx";
-import Chatbot from "../components/Chatbot.jsx";
 import iconUser from "../icon/icon-user.svg";
 import iconEdit from "../icon/icon-edit.svg";
 import { fetchProfile, updateProfile } from "../services/userService";
@@ -311,7 +310,6 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
         </div>
       )}
 
-      <Chatbot />
     </div>
   );
 }
