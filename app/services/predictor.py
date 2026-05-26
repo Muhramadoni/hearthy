@@ -234,7 +234,7 @@ class HearthyPredictor:
 
         if score_norm is not None:
             risk_score = float(score_norm[0][0]) * SCORE_MAX
-            # Sinkronisasi label kategori dengan skor regresi agar logis di UI
+            # Sinkronisasi label kategori dengan skor regresi agar selaras di UI
             if risk_score < 33.33:
                 risk_category = "Low"
             elif risk_score < 66.67:
