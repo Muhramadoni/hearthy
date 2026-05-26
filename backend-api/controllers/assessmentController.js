@@ -38,7 +38,9 @@ const assessmentController = {
         const generatedRecommendations = formatRecommendationsForDB(rawRecs);
         
         const severity_mapped = pResult.risk_category === "High" ? "high" : pResult.risk_category === "Medium" ? "moderate" : "low";
-        const generatedInsights = `Berdasarkan hasil prediksi AI, tingkat risiko penyakit kardiovaskular Anda berada pada kategori ${severity_mapped === 'high' ? 'Tinggi' : severity_mapped === 'moderate' ? 'Sedang' : 'Rendah'}. ${severity_mapped === 'low' ? 'Terus jaga kebiasaan sehat Anda!' : 'Ada beberapa parameter yang perlu mendapat perhatian khusus untuk mencegah risiko memburuk.'}`;
+        
+        // Gunakan rekomendasi panjang dari Gemini, BUKAN teks hardcode pendek
+        const generatedInsights = pResult.recommendations || `Berdasarkan hasil prediksi AI...`;
         
         let updatedChatHistory = chat_history || [];
         updatedChatHistory.push({ text: message, sender: 'user' });
@@ -54,11 +56,7 @@ const assessmentController = {
           },
           sender: "bot"
         });
-        updatedChatHistory.push({
-          text: "Ketik 'Mulai Asesmen Baru' atau gunakan icon di pojok kanan atas jika Anda ingin melakukan evaluasi baru.",
-          sender: "bot"
-        });
-        
+
         const assessment = await assessmentModel.create({
           userId: req.user.id,
           type: 'cardiovascular',
@@ -167,7 +165,7 @@ const assessmentController = {
       const rawRecs = generateCardioRecommendations(answers);
       const generatedRecommendations = formatRecommendationsForDB(rawRecs);
 
-      const generatedInsights = `Berdasarkan hasil prediksi AI, tingkat risiko penyakit kardiovaskular Anda berada pada kategori ${severity_mapped === 'high' ? 'Tinggi' : severity_mapped === 'moderate' ? 'Sedang' : 'Rendah'}. ${severity_mapped === 'low' ? 'Terus jaga kebiasaan sehat Anda!' : 'Ada beberapa parameter yang perlu mendapat perhatian khusus untuk mencegah risiko memburuk.'}`;
+      const generatedInsights = predictionResult.recommendations || `Berdasarkan hasil prediksi AI...`;
 
       let updatedChatHistory = chatHistory || [];
       if (updatedChatHistory.length > 0) {

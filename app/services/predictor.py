@@ -234,10 +234,10 @@ class HearthyPredictor:
 
         if score_norm is not None:
             risk_score = float(score_norm[0][0]) * SCORE_MAX
-            # Sinkronisasi label kategori dengan skor regresi agar selaras di UI
-            if risk_score < 33.33:
+            # Sinkronisasi label kategori dengan skor regresi menggunakan standar medis
+            if risk_score < 10.0:
                 risk_category = "Low"
-            elif risk_score < 66.67:
+            elif risk_score < 20.0:
                 risk_category = "Medium"
             else:
                 risk_category = "High"
