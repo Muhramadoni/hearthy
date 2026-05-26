@@ -38,22 +38,6 @@ export async function createAssessment(type, answers) {
   return data.data;
 }
 
-/**
- * Meminta prediksi risiko kardiovaskular berdasarkan data klinis pengguna melalui model AI.
- * @param {Object} answers - Kumpulan data klinis dan gaya hidup pengguna.
- * @returns {Promise<Object>} Hasil prediksi risiko, skor, dan rekomendasi awal.
- * @throws {Error} Jika proses prediksi gagal.
- */
-export async function predictCardiovascularRisk(answers) {
-  const res = await fetch(`${BASE_URL}/predict`, {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ answers }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Failed to predict risk.');
-  return data.data;
-}
 
 /**
  * Mengambil daftar riwayat asesmen yang pernah dilakukan oleh pengguna.
