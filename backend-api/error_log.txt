@@ -1,0 +1,10 @@
+[ERROR] POST /api/assessments/chat — FastAPI AI Server error: {"detail":"1 validation error for PredictionRequest\nbmi\n  Input should be greater than or equal to 10 [type=greater_than_equal, input_value=7.68, input_type=float]\n    For further information visit https://errors.pydantic.dev/2.13/v/greater_than_equal"}
+Error: FastAPI AI Server error: {"detail":"1 validation error for PredictionRequest\nbmi\n  Input should be greater than or equal to 10 [type=greater_than_equal, input_value=7.68, input_type=float]\n    For further information visit https://errors.pydantic.dev/2.13/v/greater_than_equal"}
+    at assessmentChat (C:\Projects\hearthy\backend-api\controllers\assessmentController.js:28:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+
+[ERROR] POST /api/assessments/chat — FastAPI AI Server error: {"detail":"1 validation error for PredictionRequest\nbmi\n  Input should be greater than or equal to 10 [type=greater_than_equal, input_value=8.95, input_type=float]\n    For further information visit https://errors.pydantic.dev/2.13/v/greater_than_equal"}
+Error: FastAPI AI Server error: {"detail":"1 validation error for PredictionRequest\nbmi\n  Input should be greater than or equal to 10 [type=greater_than_equal, input_value=8.95, input_type=float]\n    For further information visit https://errors.pydantic.dev/2.13/v/greater_than_equal"}
+    at assessmentChat (C:\Projects\hearthy\backend-api\controllers\assessmentController.js:28:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+

@@ -12,8 +12,11 @@
  * @param {Object} res - Objek respons HTTP.
  * @param {Function} next - Fungsi next (tidak digunakan di sini tapi diperlukan oleh Express untuk mendeteksi *error handler*).
  */
+const fs = require('fs');
 const errorHandler = (err, req, res, next) => { // eslint-disable-line no-unused-vars
-  console.error(`[ERROR] ${req.method} ${req.originalUrl} — ${err.message}`);
+  const errMsg = `[ERROR] ${req.method} ${req.originalUrl} — ${err.message}\n${err.stack}\n\n`;
+  console.error(errMsg);
+  try { fs.appendFileSync('error_log.txt', errMsg); } catch(e) {}
   if (process.env.NODE_ENV === 'development') console.error(err.stack);
 
   // PostgreSQL unique violation
