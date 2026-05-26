@@ -68,6 +68,7 @@ def assessment_chat(
         if is_complete:
             # Calculate stress
             stress_level = calculate_stress_level(extracted)
+            extracted["stress_level"] = stress_level
             
             # Map to PredictionRequest
             pred_req = PredictionRequest(
