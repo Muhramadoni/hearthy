@@ -341,8 +341,8 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                   }`}
                 >
                   {msg.type === "result" ? (
-                    <div className="flex flex-col gap-3 w-full">
-                      <div className="flex items-center gap-2 text-[#1e3a5a] font-bold pb-2 border-b border-slate-100">
+                    <div className="flex flex-col w-full max-h-[60vh] sm:max-h-[500px]">
+                      <div className="flex items-center gap-2 text-[#1e3a5a] font-bold pb-3 border-b border-slate-100 shrink-0">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-green-500">
                           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                           <polyline points="22 4 12 14.01 9 11.01"></polyline>
@@ -350,7 +350,8 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                         Analisis Selesai
                       </div>
                       
-                      <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2 text-sm">
+                      <div className="flex flex-col gap-3 overflow-y-auto pr-2 mt-3 pb-2">
+                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2 text-sm shrink-0">
                         <p className="font-semibold text-slate-700 border-b border-slate-200 pb-1 mb-2">Ringkasan Data Skrining</p>
                         <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                           <p><span className="text-slate-500">Usia:</span> {msg.data.finalAnswers.age} thn</p>
@@ -365,7 +366,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                         </div>
                       </div>
 
-                      <div className="bg-[#1e3a5a]/5 p-4 rounded-xl border border-[#1e3a5a]/10 mt-1">
+                      <div className="bg-[#1e3a5a]/5 p-4 rounded-xl border border-[#1e3a5a]/10 mt-1 shrink-0">
                         <p className="text-sm font-semibold text-slate-700 mb-2">Hasil Prediksi Risiko Kardiovaskular</p>
                         <div className="flex items-center gap-3 mb-3">
                           <span className="text-4xl font-bold text-[#1e3a5a]">{msg.data.score}%</span>
@@ -391,6 +392,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                             {msg.data.insights}
                           </ReactMarkdown>
                         </div>
+                      </div>
                       </div>
                     </div>
                   ) : (

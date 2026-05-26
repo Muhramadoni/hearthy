@@ -5,7 +5,7 @@
  */
 const assessmentModel = require('../models/assessmentModel');
 const { predictCardiovascularRisk } = require('../utils/aiService');
-const { generateCardioRecommendations, formatRecommendationsForDB } = require('../utils/cardioRecommendations');
+
 
 /**
  * Objek Pengontrol (Controller) Asesmen Kesehatan.
@@ -34,8 +34,7 @@ const assessmentController = {
       if (data.is_complete && data.prediction_result) {
         const pResult = data.prediction_result;
         
-        const rawRecs = generateCardioRecommendations(data.collected_data);
-        const generatedRecommendations = formatRecommendationsForDB(rawRecs);
+        const generatedRecommendations = "[]";
         
         const severity_mapped = pResult.risk_category === "High" ? "high" : pResult.risk_category === "Medium" ? "moderate" : "low";
         
@@ -162,8 +161,7 @@ const assessmentController = {
       const { risk_category, score, severity_mapped } = predictionResult;
 
       // Generate localized recommendations and insights based on answers
-      const rawRecs = generateCardioRecommendations(answers);
-      const generatedRecommendations = formatRecommendationsForDB(rawRecs);
+      const generatedRecommendations = "[]";
 
       const generatedInsights = predictionResult.recommendations || `Berdasarkan hasil prediksi AI...`;
 

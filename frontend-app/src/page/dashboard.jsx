@@ -7,6 +7,8 @@ import Navbar from "../components/Navbar.jsx";
 import iconGrafik from "../icon/icon-grafik.svg";
 import { useEffect, useState } from "react";
 import { getAssessmentSummary, getAssessments } from "../services/assessmentService.js";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 
 
@@ -67,8 +69,7 @@ export default function DashboardPage({ currentPage, onNavigate }) {
   const [riskStatus, setRiskStatus] = useState("Belum ada data");
   const [riskScore, setRiskScore] = useState(0);
   const [lastCheck, setLastCheck] = useState("-");
-  const [recommendations, setRecommendations] = useState(["Lakukan asesmen untuk mendapatkan rekomendasi."]);
-  const [dynamicCauses, setDynamicCauses] = useState(["Belum ada data"]);
+  const [aiInsights, setAiInsights] = useState("Lakukan asesmen untuk mendapatkan analisis dan rekomendasi AI.");
   
   const [chartData, setChartData] = useState({ points: [], labels: [], path: "" });
 
@@ -110,28 +111,14 @@ export default function DashboardPage({ currentPage, onNavigate }) {
             `Alkohol: ${ans.alcohol_units_per_week || "-"} unit/minggu`,
           ]);
 
-          // Recommendation
-          if (cardioSummary.recommendations && cardioSummary.recommendations.length > 0) {
-            setRecommendations(cardioSummary.recommendations);
-          } else if (cardioSummary.aiInsights) {
-            setRecommendations([cardioSummary.aiInsights]);
+          // AI Insights
+          if (cardioSummary.ai_insights) {
+            // Hapus sapaan awal jika ada
+            let cleanInsights = cardioSummary.ai_insights
+              .replace(/Halo!? (Saya|Bapak\/Ibu,? salam sehat dari) HearthyBot!?(, siap membantu Anda menjaga kesehatan jantung\.)?/gi, '')
+              .replace(/Terima kasih sudah menggunakan aplikasi Hearthy\.?/gi, '');
+            setAiInsights(cleanInsights.trim());
           }
-          
-          // Causes
-          const newCauses = [];
-          if (ans.systolic_bp >= 130 || ans.diastolic_bp >= 80) newCauses.push("Tekanan Darah Tinggi");
-          if (ans.cholesterol_mg_dl >= 200) newCauses.push("Kadar Kolesterol Tinggi");
-          if (ans.daily_steps < 5000 || ans.physical_activity_hours_per_week < 2.5) newCauses.push("Kurangnya Aktivitas Fisik");
-          if (ans.bmi >= 25) newCauses.push("Berat Badan Berlebih (Overweight/Obesitas)");
-          if (ans.sleep_hours < 6) newCauses.push("Kurangnya Waktu Istirahat (Tidur)");
-          if (ans.stress_level >= 7) newCauses.push("Tingkat Stres Tinggi");
-          if (ans.diet_quality_score <= 3) newCauses.push("Pola Makan Tidak Seimbang");
-          if (ans.alcohol_units_per_week >= 7) newCauses.push("Konsumsi Alkohol Berlebih");
-          
-          if (newCauses.length === 0) {
-             newCauses.push("Tidak ada penyebab risiko utama yang terdeteksi.");
-          }
-          setDynamicCauses(newCauses);
         }
 
         // Setup Chart
@@ -359,36 +346,44 @@ export default function DashboardPage({ currentPage, onNavigate }) {
           </article>
         </section>
 
-        <section className="mt-8 grid gap-6 xl:grid-cols-[1.5fr_1fr]">
+        <section className="mt-8">
           <article className="rounded-[32px] bg-[#ffffff] p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
-            <h2 className="text-xl font-semibold text-slate-950">
-              Rekomendasi
+            <h2 className="text-xl font-semibold text-slate-950 mb-4">
+              Analisis & Rekomendasi AI
             </h2>
-            <div className="mt-5 space-y-3 max-h-[350px] overflow-y-auto pr-2">
-              {recommendations.map((rec, idx) => (
-                <div
-                  key={idx}
-                  className="flex gap-3 rounded-3xl bg-[#1e3a5a]/10 p-4"
-                >
-                  <span className="mt-1 h-3.5 w-3.5 rounded-full bg-[#1e3a5a] shrink-0" />
-                  <p className="text-sm leading-7 text-slate-700">{rec}</p>
-                </div>
-              ))}
-            </div>
-          </article>
-
-          <article className="rounded-[30px] bg-white p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
-            <h2 className="text-xl font-semibold text-slate-950">Penyebab</h2>
-            <div className="mt-5 space-y-3">
-              {dynamicCauses.map((cause, idx) => (
-                <div
-                  key={idx}
-                  className="flex gap-3 rounded-3xl bg-[#1e3a5a]/10 p-4"
-                >
-                  <span className="mt-1 h-3.5 w-3.5 rounded-full bg-[#1e3a5a] shrink-0" />
-                  <p className="text-sm leading-7 text-slate-700">{cause}</p>
-                </div>
-              ))}
+            <div className="text-sm text-slate-700 leading-relaxed text-justify prose prose-sm max-w-none">
+              <ReactMarkdown 
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  p: ({node, ...props}) => <p className="mb-4 last:mb-0" {...props} />,
+                  ul: ({node, ...props}) => <ul className="mt-4 space-y-3" {...props} />,
+                  ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-4 space-y-2" {...props} />,
+                  li: ({node, ...props}) => {
+                    // Cek apakah di dalam ul atau ol
+                    const isOrdered = node.parent && node.parent.tagName === 'ol';
+                    if (isOrdered) {
+                      return <li className="pl-1 text-slate-700 leading-relaxed" {...props} />;
+                    }
+                    return (
+                      <li className="flex gap-4 items-start rounded-2xl bg-[#1e3a5a]/[0.03] p-4 border border-[#1e3a5a]/10 shadow-sm transition-all hover:bg-[#1e3a5a]/[0.05]" {...props}>
+                        <div className="mt-0.5 shrink-0 flex h-5 w-5 items-center justify-center rounded-full bg-[#1e3a5a] text-white shadow-sm">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        <div className="text-sm leading-relaxed text-slate-700">{props.children}</div>
+                      </li>
+                    );
+                  },
+                  strong: ({node, ...props}) => <strong className="font-semibold text-[#1e3a5a]" {...props} />,
+                  h3: ({node, ...props}) => (
+                    <h3 className="flex items-center gap-3 text-lg font-bold mt-8 mb-4 text-slate-800" {...props}>
+                      <span className="h-6 w-1.5 rounded-full bg-[#1e3a5a] shadow-sm"></span>
+                      {props.children}
+                    </h3>
+                  )
+                }}
+              >
+                {aiInsights}
+              </ReactMarkdown>
             </div>
           </article>
         </section>
