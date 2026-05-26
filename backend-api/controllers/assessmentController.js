@@ -79,6 +79,58 @@ const assessmentController = {
     } catch (err) { next(err); }
   },
 
+  // POST /api/assessments/chat/:id
+  continueAssessmentChat: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { message } = req.body;
+      
+      const assessment = await assessmentModel.findById(id, req.user.id);
+      if (!assessment) return res.status(404).json({ status: 'error', message: "Assessment not found" });
+      
+      // format history for FastAPI
+      const historyForFastAPI = [];
+      for (const msg of assessment.chat_history || []) {
+         if (msg.sender === 'user' && msg.text) historyForFastAPI.push({ role: 'user', content: msg.text });
+         else if (msg.sender === 'bot' && msg.text && msg.type !== 'result') historyForFastAPI.push({ role: 'model', content: msg.text });
+      }
+
+      // call POST http://127.0.0.1:8000/api/v1/chat
+      const response = await fetch('http://127.0.0.1:8000/api/v1/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, history: historyForFastAPI })
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`FastAPI AI Server error: ${errText}`);
+      }
+
+      const data = await response.json();
+
+      // update chat_history in DB
+      let updatedHistory = assessment.chat_history || [];
+      updatedHistory.push({ text: message, sender: 'user' });
+      updatedHistory.push({ text: data.reply, sender: 'bot' });
+
+      // Update Database
+      await assessmentModel.update(id, {
+        userId: req.user.id,
+        type: assessment.type,
+        answers: assessment.answers,
+        chatHistory: updatedHistory,
+        score: assessment.score,
+        maxScore: assessment.max_score,
+        severity: assessment.severity,
+        recommendations: assessment.recommendations,
+        aiInsights: assessment.ai_insights
+      });
+
+      res.json({ status: 'success', data: { reply: data.reply, final_chat_history: updatedHistory }});
+    } catch (err) { next(err); }
+  },
+
   // POST /api/assessments/predict
   predictCardiovascularRisk: async (req, res, next) => {
     try {

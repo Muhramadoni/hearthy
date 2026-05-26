@@ -8,3 +8,8 @@ Error: FastAPI AI Server error: {"detail":"1 validation error for PredictionRequ
     at assessmentChat (C:\Projects\hearthy\backend-api\controllers\assessmentController.js:28:15)
     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
 
+[ERROR] POST /api/assessments/chat/ef7d35bf-b0ac-44f8-8451-c18d3945eec5 — FastAPI AI Server error: {"detail":"[WinError 10054] An existing connection was forcibly closed by the remote host"}
+Error: FastAPI AI Server error: {"detail":"[WinError 10054] An existing connection was forcibly closed by the remote host"}
+    at continueAssessmentChat (C:\Projects\hearthy\backend-api\controllers\assessmentController.js:107:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+
