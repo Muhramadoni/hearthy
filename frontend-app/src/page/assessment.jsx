@@ -7,6 +7,8 @@ import { useState, useEffect, useRef } from "react";
 import Navbar from "../components/Navbar.jsx";
 import { getAssessments, getAssessmentById, deleteAssessment } from "../services/assessmentService.js";
 import Swal from "sweetalert2";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function AssessmentPage({ currentPage, onNavigate }) {
   const [messages, setMessages] = useState(() => {
@@ -116,7 +118,12 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
     setIsInputDisabled(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/assessments/chat", {
+      const activeId = sessionStorage.getItem("hearthy_active_history_id");
+      const endpoint = activeId 
+        ? `http://localhost:5000/api/assessments/chat/${activeId}`
+        : "http://localhost:5000/api/assessments/chat";
+
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -129,18 +136,24 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
         })
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Gagal menghubungi AI");
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Gagal menghubungi AI");
+      }
+      
+      const resJson = await res.json();
+      const aiData = resJson.data;
 
-      const aiData = data.data;
+      if (aiData.final_chat_history) {
+        setMessages(aiData.final_chat_history);
+      } else {
+        setMessages(prev => [...prev, { text: aiData.reply, sender: "bot" }]);
+      }
       
       // Update collected data state
       if (aiData.collected_data) {
         setCollectedData(aiData.collected_data);
       }
-
-      // Add AI reply to UI
-      setMessages(prev => [...prev, { text: aiData.reply, sender: "bot" }]);
 
       // If assessment is complete, the backend already calculated the score and returned it
       if (aiData.is_complete && aiData.prediction_result) {
@@ -226,7 +239,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
         ]);
       }
       
-      setIsInputDisabled(true);
+      setIsInputDisabled(false);
       setInputValue("");
       setIsHistoryOpen(false);
     } catch (err) {
@@ -384,7 +397,22 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                         <p className="text-sm text-slate-700 leading-relaxed text-justify"><strong>Rekomendasi AI:</strong> {msg.data.insights}</p>
                       </div>
                     </div>
-                  ) : msg.text}
+                  ) : (
+                    <div className="text-sm leading-relaxed prose prose-sm max-w-none">
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                          ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-2 space-y-1" {...props} />,
+                          ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-2 space-y-1" {...props} />,
+                          li: ({node, ...props}) => <li className="pl-1" {...props} />,
+                          strong: ({node, ...props}) => <strong className="font-bold text-inherit" {...props} />
+                        }}
+                      >
+                        {msg.text}
+                      </ReactMarkdown>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -412,11 +440,17 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              disabled={isInputDisabled || isAgentTyping}
+              disabled={isInputDisabled && !sessionStorage.getItem("hearthy_active_history_id")}
               className={`flex-1 border-2 border-slate-200 rounded-2xl px-5 py-3.5 text-[15px] focus:border-[#1e3a5a] focus:ring-4 focus:ring-[#1e3a5a]/10 focus:outline-none transition-all ${
-                isInputDisabled || isAgentTyping ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-white text-slate-900"
+                isInputDisabled && !sessionStorage.getItem("hearthy_active_history_id") ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-white text-slate-900"
               }`}
-              placeholder={isInputDisabled ? "Sesi selesai..." : "Ketik jawaban Anda..."}
+              placeholder={
+                isInputDisabled && !sessionStorage.getItem("hearthy_active_history_id")
+                  ? "Asesmen selesai..." 
+                  : sessionStorage.getItem("hearthy_active_history_id")
+                    ? "Tanyakan sesuatu tentang hasil ini..."
+                    : "Ketik jawaban Anda..."
+              }
             />
             <button
               onClick={() => handleSend()}

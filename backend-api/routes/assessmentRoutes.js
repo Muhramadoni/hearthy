@@ -23,6 +23,9 @@ router.get('/recommendations',   assessmentController.getRecommendations);
 // POST /api/assessments/chat
 router.post('/chat',             assessmentController.assessmentChat);
 
+// POST /api/assessments/chat/:id
+router.post('/chat/:id',         assessmentController.continueAssessmentChat);
+
 
 // POST /api/assessments/predict
 router.post('/predict',          assessmentController.predictCardiovascularRisk);
