@@ -8,3 +8,13 @@ Error: FastAPI AI Server error: {"detail":"1 validation error for PredictionRequ
     at assessmentChat (C:\Projects\hearthy\backend-api\controllers\assessmentController.js:28:15)
     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
 
+[ERROR] POST /api/assessments/chat — FastAPI AI Server error: {"detail":"404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-3.1-flash-lite-preview is no longer available. Please update your code to use a newer model for the latest features and improvements.', 'status': 'NOT_FOUND'}}"}
+Error: FastAPI AI Server error: {"detail":"404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-3.1-flash-lite-preview is no longer available. Please update your code to use a newer model for the latest features and improvements.', 'status': 'NOT_FOUND'}}"}
+    at assessmentChat (C:\Users\ASUS\OneDrive\Documents\GitHub\hearthy\backend-api\controllers\assessmentController.js:28:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+
+[ERROR] POST /api/assessments/chat — FastAPI AI Server error: {"detail":"404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-3.1-flash-lite-preview is no longer available. Please update your code to use a newer model for the latest features and improvements.', 'status': 'NOT_FOUND'}}"}
+Error: FastAPI AI Server error: {"detail":"404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-3.1-flash-lite-preview is no longer available. Please update your code to use a newer model for the latest features and improvements.', 'status': 'NOT_FOUND'}}"}
+    at assessmentChat (C:\Users\ASUS\OneDrive\Documents\GitHub\hearthy\backend-api\controllers\assessmentController.js:28:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+
