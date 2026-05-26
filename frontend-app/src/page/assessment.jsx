@@ -286,7 +286,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
         onNavigate={onNavigate ?? (() => {})}
       />
 
-      <main className="flex-1 mx-auto w-full max-w-screen-2xl px-4 md:px-6 py-2 md:py-4 flex flex-col h-[calc(100vh-120px)]">
+      <main className="flex-1 mx-auto w-full max-w-5xl px-4 md:px-6 py-2 md:py-4 flex flex-col h-[calc(100vh-120px)]">
         <div className="bg-white rounded-[32px] shadow-[0_24px_80px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70 flex flex-col h-full overflow-hidden">
           {/* Chat Header */}
           <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-slate-100 z-10 relative">
@@ -334,7 +334,11 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                 className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`px-5 py-3.5 rounded-2xl text-[15px] max-w-[85%] sm:max-w-[70%] lg:max-w-[60%] shadow-sm ${
+                  className={`px-5 py-4 rounded-2xl text-[15px] shadow-sm transition-all ${
+                    msg.type === "result"
+                      ? "w-full max-w-[95vw] sm:max-w-[85%] lg:max-w-[800px]"
+                      : "max-w-[85%] sm:max-w-[70%] lg:max-w-[600px]"
+                  } ${
                     msg.sender === "user"
                       ? "bg-[#1e3a5a] text-white rounded-tr-sm"
                       : "bg-white border border-slate-200 text-slate-800 rounded-tl-sm"
@@ -353,7 +357,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                       <div className="flex flex-col gap-3 overflow-y-auto pr-2 mt-3 pb-2">
                         <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2 text-sm shrink-0">
                         <p className="font-semibold text-slate-700 border-b border-slate-200 pb-1 mb-2">Ringkasan Data Skrining</p>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
                           <p><span className="text-slate-500">Usia:</span> {msg.data.finalAnswers.age} thn</p>
                           <p><span className="text-slate-500">BMI:</span> {msg.data.finalAnswers.bmi}</p>
                           <p><span className="text-slate-500">Tensi:</span> {msg.data.finalAnswers.systolic_bp}/{msg.data.finalAnswers.diastolic_bp} mmHg</p>
