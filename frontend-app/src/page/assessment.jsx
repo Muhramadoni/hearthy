@@ -155,26 +155,8 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
         setCollectedData(aiData.collected_data);
       }
 
-      // If assessment is complete, the backend already calculated the score and returned it
+      // If assessment is complete, set the active history ID and disable input
       if (aiData.is_complete && aiData.prediction_result) {
-        const pResult = aiData.prediction_result;
-        const severityStr = pResult.risk_category === "High" ? "Tinggi" : pResult.risk_category === "Medium" ? "Sedang" : "Rendah";
-        const insights = `Berdasarkan hasil prediksi AI, tingkat risiko penyakit kardiovaskular Anda berada pada kategori ${severityStr}. ${severityStr === 'Rendah' ? 'Terus jaga kebiasaan sehat Anda!' : 'Ada beberapa parameter yang perlu mendapat perhatian khusus untuk mencegah risiko memburuk.'}`;
-        
-        setMessages(prev => [
-          ...prev,
-          {
-            type: "result",
-            data: { 
-              score: Math.round(pResult.risk_score), 
-              severityStr: severityStr, 
-              insights: insights, 
-              finalAnswers: aiData.collected_data 
-            },
-            sender: "bot"
-          },
-          { text: "Ketik 'Mulai Asesmen Baru' atau gunakan icon di pojok kanan atas jika Anda ingin melakukan evaluasi baru.", sender: "bot" }
-        ]);
         
         if (aiData.assessment_id) {
           sessionStorage.setItem("hearthy_active_history_id", aiData.assessment_id);
@@ -234,12 +216,11 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
 
         setMessages([
           { text: `📅 Menampilkan riwayat percakapan asesmen tanggal ${dateStr} WIB.`, sender: "bot" },
-          { type: "result", data: { score, severityStr, insights, finalAnswers: ans }, sender: "bot" },
-          { text: "Ketik 'Mulai Asesmen Baru' atau gunakan icon di pojok kanan atas jika Anda ingin melakukan evaluasi baru.", sender: "bot" }
+          { type: "result", data: { score, severityStr, insights, finalAnswers: ans }, sender: "bot" }
         ]);
       }
       
-      setIsInputDisabled(false);
+      setIsInputDisabled(true);
       setInputValue("");
       setIsHistoryOpen(false);
     } catch (err) {
@@ -394,7 +375,22 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                             'bg-green-100 text-green-700'
                           }`}>{msg.data.severityStr}</span>
                         </div>
-                        <p className="text-sm text-slate-700 leading-relaxed text-justify"><strong>Rekomendasi AI:</strong> {msg.data.insights}</p>
+                        <div className="text-sm text-slate-700 leading-relaxed text-justify prose prose-sm max-w-none">
+                          <strong className="block mb-2">Rekomendasi AI:</strong>
+                          <ReactMarkdown 
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                              p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                              ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-2 space-y-1" {...props} />,
+                              ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-2 space-y-1" {...props} />,
+                              li: ({node, ...props}) => <li className="pl-1" {...props} />,
+                              strong: ({node, ...props}) => <strong className="font-bold text-inherit" {...props} />,
+                              h3: ({node, ...props}) => <h3 className="text-base font-bold mt-4 mb-2" {...props} />
+                            }}
+                          >
+                            {msg.data.insights}
+                          </ReactMarkdown>
+                        </div>
                       </div>
                     </div>
                   ) : (
@@ -440,17 +436,11 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              disabled={isInputDisabled && !sessionStorage.getItem("hearthy_active_history_id")}
+              disabled={isInputDisabled}
               className={`flex-1 border-2 border-slate-200 rounded-2xl px-5 py-3.5 text-[15px] focus:border-[#1e3a5a] focus:ring-4 focus:ring-[#1e3a5a]/10 focus:outline-none transition-all ${
-                isInputDisabled && !sessionStorage.getItem("hearthy_active_history_id") ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-white text-slate-900"
+                isInputDisabled ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-white text-slate-900"
               }`}
-              placeholder={
-                isInputDisabled && !sessionStorage.getItem("hearthy_active_history_id")
-                  ? "Asesmen selesai..." 
-                  : sessionStorage.getItem("hearthy_active_history_id")
-                    ? "Tanyakan sesuatu tentang hasil ini..."
-                    : "Ketik jawaban Anda..."
-              }
+              placeholder={isInputDisabled ? "Asesmen selesai..." : "Ketik pesan Anda di sini..."}
             />
             <button
               onClick={() => handleSend()}
