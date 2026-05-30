@@ -27,7 +27,6 @@ export default function Chatbot() {
     const userMessage = input.trim();
     setInput("");
     
-    // Konversi riwayat pesan untuk dikirim ke API
     const history = messages
       .filter(msg => msg.sender !== "loading")
       .map(msg => ({
@@ -88,7 +87,6 @@ export default function Chatbot() {
         </button>
       </div>
 
-      {/* Sidebar Overlay */}
       {isOpen && (
         <div 
           className="fixed inset-0 z-40 bg-black/40 transition-opacity"
@@ -96,13 +94,11 @@ export default function Chatbot() {
         />
       )}
 
-      {/* Sidebar Panel */}
       <div 
         className={`fixed top-0 right-0 h-full w-full sm:w-96 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-200">
           <h2 className="text-lg font-semibold text-slate-950">
             Hearthy - Chatbot
@@ -129,7 +125,6 @@ export default function Chatbot() {
           </div>
         </div>
 
-        {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
           {messages.map((msg, idx) => (
             <div
@@ -147,7 +142,6 @@ export default function Chatbot() {
           ))}
         </div>
 
-        {/* Input Area */}
         <div className="p-4 border-t border-slate-200 bg-white">
           <div className="flex gap-2">
             <input

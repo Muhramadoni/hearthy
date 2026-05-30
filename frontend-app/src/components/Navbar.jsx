@@ -69,11 +69,9 @@ export default function Navbar({ currentPage = "home", onNavigate, showLoginButt
 
   return (
     <>
-      {/* Placeholder to prevent content from hiding under the fixed navbar */}
       <div className="h-[88px] md:h-[120px] w-full shrink-0" aria-hidden="true"></div>
 
       <header className="fixed top-0 left-0 right-0 z-40 pointer-events-none">
-        {/* Efek blur gradual untuk area di luar navbar (sebelum konten menyentuh tepi atas layar) */}
         <div className="absolute inset-0 backdrop-blur-md [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)]"></div>
         
         <div className="relative px-4 py-4 md:px-6 md:py-6">
@@ -152,7 +150,6 @@ export default function Navbar({ currentPage = "home", onNavigate, showLoginButt
               )}
             </div>
 
-            {/* Mobile Hamburger Menu Button */}
             <button
               type="button"
               className="md:hidden flex items-center justify-center p-2 text-slate-700 hover:bg-slate-100 rounded-xl transition"
@@ -167,13 +164,11 @@ export default function Navbar({ currentPage = "home", onNavigate, showLoginButt
         </div>
       </header>
 
-      {/* Mobile Sidebar */}
       <div 
         className={`fixed inset-0 z-[100] md:hidden transition-opacity duration-300 ${
           isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
       >
-        {/* Backdrop */}
         <div 
           className={`absolute inset-0 bg-slate-900/50 transition-opacity duration-300 ${
             isMobileMenuOpen ? "opacity-100" : "opacity-0"
@@ -181,7 +176,6 @@ export default function Navbar({ currentPage = "home", onNavigate, showLoginButt
           onClick={() => setIsMobileMenuOpen(false)}
         />
         
-        {/* Sidebar Content */}
         <div 
           className={`absolute inset-y-0 right-0 w-64 sm:w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${
             isMobileMenuOpen ? "translate-x-0" : "translate-x-full"

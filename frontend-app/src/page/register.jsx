@@ -1,8 +1,3 @@
-/**
- * @fileoverview Halaman Pendaftaran (Register Page).
- * Menyediakan antarmuka bagi pengguna baru untuk membuat akun Hearthy
- * dengan mengisi nama (username), alamat email, dan kata sandi.
- */
 import logoHearthy from "../image/logo-hearthy.png";
 import doctorImage from "../image/doctor-image.png";
 import iconShow from "../icon/icon-show.svg";
@@ -10,15 +5,6 @@ import iconHide from "../icon/icon-hide.svg";
 import { useEffect, useState } from "react";
 import { register } from "../services/authService";
 
-/**
- * Komponen Utama: Register
- * Mengelola status formulir pendaftaran, memvalidasi input (kecocokan kata sandi, panjang minimum),
- * dan menangani pemanggilan API pendaftaran (layanan autentikasi).
- *
- * @param {Object} props - Properti komponen.
- * @param {function} props.onNavigate - Fungsi *callback* untuk berpindah halaman.
- * @returns {JSX.Element} Antarmuka pengguna Halaman Pendaftaran.
- */
 export default function Register({ onNavigate }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -56,7 +42,6 @@ export default function Register({ onNavigate }) {
     setLoading(true);
     try {
       await register(name, email, password);
-      // Tampilkan notifikasi sukses lalu arahkan ke login
       setSuccess(true);
       setTimeout(() => {
         onNavigate?.("login");
@@ -105,7 +90,6 @@ export default function Register({ onNavigate }) {
           </h2>
           <p className="text-gray-500 mb-8">Daftarkan Akun Hearthy Anda</p>
 
-          {/* Notifikasi Sukses */}
           {success && (
             <div className="mb-5 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm flex items-center gap-2 animate-pulse">
               <span>✅</span>
@@ -113,7 +97,6 @@ export default function Register({ onNavigate }) {
             </div>
           )}
 
-          {/* Pesan Error */}
           {error && (
             <div className="mb-5 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm flex items-center gap-2">
               <span>⚠️</span>

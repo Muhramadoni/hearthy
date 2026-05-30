@@ -1,10 +1,3 @@
-/**
- * @fileoverview Pengontrol Publik (Public Controller).
- * Menangani permintaan untuk data statis publik yang tidak memerlukan autentikasi,
- * seperti daftar artikel kesehatan, tips harian, dan kategori asesmen.
- */
-// Static/mock data for public endpoints — replace with DB queries as needed
-
 const ARTICLES = [
   { id: '1', title: '10 Tips for Better Sleep', category: 'sleep', summary: 'Improve your sleep quality with these science-backed tips.', readTime: '5 min', publishedAt: '2024-01-15' },
   { id: '2', title: 'Managing Stress in Modern Life', category: 'mental_health', summary: 'Practical strategies to reduce daily stress and anxiety.', readTime: '7 min', publishedAt: '2024-02-01' },
@@ -41,16 +34,7 @@ const ASSESSMENT_TYPES = [
   { type: 'stress',        name: 'Stress Level',        description: 'Gauge your current stress and burnout risk',         questions: 10, icon: '🌊' },
 ];
 
-/**
- * Objek Pengontrol (Controller) Data Publik.
- * Memuat berbagai *handler* untuk _endpoint_ `/api/public`.
- */
 const publicController = {
-  /**
-   * Mengambil daftar artikel kesehatan, opsional dapat disaring berdasarkan kategori.
-   * @param {Object} req - Objek permintaan HTTP.
-   * @param {Object} res - Objek respons HTTP.
-   */
   getArticles: (req, res) => {
     const { category } = req.query;
     const data = category ? ARTICLES.filter(a => a.category === category) : ARTICLES;

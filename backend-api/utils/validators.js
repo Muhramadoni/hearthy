@@ -1,12 +1,4 @@
-/**
- * @fileoverview Kumpulan Validator (Validation Helpers).
- * Fungsi-fungsi ringan menggunakan *plain JavaScript* untuk memvalidasi input
- * dari pengguna sebelum diproses lebih lanjut oleh *controller*.
- */
-
 const createError = (message) => ({ error: { message } });
-
-// ── Auth Validators ───────────────────────────────────────────────────────────
 
 const validateRegister = ({ name, email, password } = {}) => {
   if (!name || typeof name !== 'string' || name.trim().length < 2) {
@@ -34,8 +26,6 @@ const validateLogin = ({ email, password } = {}) => {
   return { error: null };
 };
 
-// ── Profile Validator ─────────────────────────────────────────────────────────
-
 const validateProfileUpdate = (data = {}) => {
   const { phone, address } = data;
 
@@ -53,8 +43,6 @@ const validateProfileUpdate = (data = {}) => {
 
   return { error: null };
 };
-
-// ── Password Change Validator ─────────────────────────────────────────────────
 
 const validatePasswordChange = ({ currentPassword, newPassword } = {}) => {
   if (!currentPassword || typeof currentPassword !== 'string') {

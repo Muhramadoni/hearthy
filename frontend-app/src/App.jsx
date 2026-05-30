@@ -9,7 +9,6 @@ import ResetPasswordPage from "./page/reset.jsx";
 import HistoryDetailPage from "./page/history-detail.jsx";
 import { isAuthenticated } from "./services/authService";
 
-// Halaman yang membutuhkan login
 const PROTECTED_PAGES = ["dashboard", "assessment", "history-detail", "profile"];
 
 export default function App() {
@@ -36,7 +35,6 @@ export default function App() {
   }, [currentPage]);
 
   const handleNavigate = (page) => {
-    // Jika halaman protected tapi belum login → redirect ke login
     if (PROTECTED_PAGES.includes(page) && !isAuthenticated()) {
       setCurrentPage("login");
       window.scrollTo(0, 0);

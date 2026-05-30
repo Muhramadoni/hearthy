@@ -1,4 +1,3 @@
-#!/bin/bash
 echo "Downloading journals..."
 gdown --folder "https://drive.google.com/drive/folders/1xweGz8XNANh8oga23jeReMsbtd-QXdeC" -O app/data/journals
 

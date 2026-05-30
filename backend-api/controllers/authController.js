@@ -1,8 +1,3 @@
-/**
- * @fileoverview Pengontrol Autentikasi (Auth Controller).
- * Bertanggung jawab menangani proses pendaftaran pengguna, otentikasi kredensial (login),
- * manajemen sesi berbasis JWT, serta verifikasi dan reset kata sandi.
- */
 const bcrypt       = require('bcryptjs');
 const jwt          = require('jsonwebtoken');
 const userModel    = require('../models/userModel');
@@ -19,19 +14,7 @@ const safeUser = (u) => ({
   role: u.role, createdAt: u.created_at,
 });
 
-/**
- * Objek Pengontrol (Controller) Autentikasi Pengguna.
- * Memuat berbagai *handler* untuk _endpoint_ `/api/auth`.
- */
 const authController = {
-  // POST /api/auth/register
-  /**
-   * Menangani proses registrasi akun pengguna baru.
-   * Melakukan validasi input, _hashing_ kata sandi, dan pembuatan _record_ pengguna & profil.
-   * @param {Object} req - Objek permintaan HTTP.
-   * @param {Object} res - Objek respons HTTP.
-   * @param {Function} next - Fungsi *middleware* *error*.
-   */
   register: async (req, res, next) => {
     try {
       const { error } = validateRegister(req.body);
@@ -55,7 +38,6 @@ const authController = {
     } catch (err) { next(err); }
   },
 
-  // POST /api/auth/login
   login: async (req, res, next) => {
     try {
       const { error } = validateLogin(req.body);
@@ -81,12 +63,10 @@ const authController = {
     } catch (err) { next(err); }
   },
 
-  // POST /api/auth/logout
   logout: (req, res) => {
     res.json({ status: 'success', message: 'Logged out successfully. Stay healthy! 🌿' });
   },
 
-  // GET /api/auth/me
   me: async (req, res, next) => {
     try {
       const user    = await userModel.findById(req.user.id);
@@ -96,7 +76,6 @@ const authController = {
     } catch (err) { next(err); }
   },
 
-  // POST /api/auth/refresh
   refreshToken: async (req, res, next) => {
     try {
       const { token } = req.body;
@@ -120,7 +99,6 @@ const authController = {
       next(err);
     }
   },
-  // POST /api/auth/check-email
   checkEmail: async (req, res, next) => {
     try {
       const { email } = req.body;
@@ -135,7 +113,6 @@ const authController = {
     } catch (err) { next(err); }
   },
 
-  // POST /api/auth/reset-password
   resetPassword: async (req, res, next) => {
     try {
       const { email, newPassword } = req.body;

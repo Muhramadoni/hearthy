@@ -1,8 +1,3 @@
-/**
- * @fileoverview Halaman Dasbor (Dashboard Page).
- * Menampilkan ringkasan status risiko kesehatan jantung pengguna,
- * skor terbaru, metrik fisik (tekanan darah, BMI, dll.), dan grafik tren riwayat asesmen.
- */
 import Navbar from "../components/Navbar.jsx";
 import iconGrafik from "../icon/icon-grafik.svg";
 import { useEffect, useState } from "react";
@@ -11,15 +6,6 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 
-
-/**
- * Komponen pembantu untuk menganimasikan transisi angka dari 0 menuju nilai target.
- *
- * @param {Object} props - Properti komponen.
- * @param {number|string} props.value - Nilai target akhir (bisa berupa desimal).
- * @param {number} [props.duration=1500] - Durasi animasi dalam milidetik.
- * @returns {JSX.Element} Angka yang dianimasikan (dibungkus dalam React Fragment).
- */
 function AnimatedNumber({ value, duration = 1500 }) {
   const [count, setCount] = useState(0);
   
@@ -31,7 +17,7 @@ function AnimatedNumber({ value, duration = 1500 }) {
     const step = (timestamp) => {
       if (!startTimestamp) startTimestamp = timestamp;
       const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-      const easeProgress = progress * (2 - progress); // ease out quad
+      const easeProgress = progress * (2 - progress); 
       setCount(easeProgress * target);
       if (progress < 1) {
         rafId = window.requestAnimationFrame(step);
@@ -55,15 +41,7 @@ function AnimatedNumber({ value, duration = 1500 }) {
   return <>{isFloat ? count.toFixed(1) : Math.floor(count)}</>;
 }
 
-/**
- * Komponen Utama: DashboardPage
- * Mengambil ringkasan kesehatan dari API dan menyajikannya dalam format yang mudah dipahami (grafik, skor risiko).
- *
- * @param {Object} props - Properti komponen.
- * @param {string} props.currentPage - Penanda halaman aktif untuk navigasi Navbar.
- * @param {function} props.onNavigate - Fungsi navigasi ke halaman lain.
- * @returns {JSX.Element} Antarmuka pengguna Halaman Dasbor.
- */
+
 export default function DashboardPage({ currentPage, onNavigate }) {
   const [screeningData, setScreeningData] = useState([]);
   const [riskStatus, setRiskStatus] = useState("Belum ada data");
@@ -86,15 +64,12 @@ export default function DashboardPage({ currentPage, onNavigate }) {
         const cardioSummary = summaryRes.summary?.cardiovascular;
         
         if (cardioSummary) {
-          // Status & Score
           setRiskStatus(cardioSummary.severity || "Normal");
           setRiskScore(cardioSummary.score || 0);
           
-          // Last Check Date
           const dateObj = new Date(cardioSummary.created_at || Date.now());
           setLastCheck(dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }));
           
-          // Metrics (Screening Data)
           const ans = cardioSummary.answers || {};
           setScreeningData([
             `Usia: ${ans.age || "-"} Tahun`,
@@ -111,9 +86,7 @@ export default function DashboardPage({ currentPage, onNavigate }) {
             `Alkohol: ${ans.alcohol_units_per_week || "-"} unit/minggu`,
           ]);
 
-          // AI Insights
           if (cardioSummary.ai_insights) {
-            // Hapus sapaan awal jika ada
             let cleanInsights = cardioSummary.ai_insights
               .replace(/Halo!? (Saya|Bapak\/Ibu,? salam sehat dari) HearthyBot!?(, siap membantu Anda menjaga kesehatan jantung\.)?/gi, '')
               .replace(/Terima kasih sudah menggunakan aplikasi Hearthy\.?/gi, '');
@@ -121,11 +94,10 @@ export default function DashboardPage({ currentPage, onNavigate }) {
           }
         }
 
-        // Setup Chart
         const cardioHistory = (allAssessmentsRes.assessments || [])
           .filter(a => a.type === 'cardiovascular')
           .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
-          .slice(-7); // get last 7
+          .slice(-7);
 
         if (cardioHistory.length > 0) {
           const values = cardioHistory.map(h => h.score || 0);
@@ -135,7 +107,7 @@ export default function DashboardPage({ currentPage, onNavigate }) {
           });
 
           const minValue = Math.min(...values) - 2;
-          const maxValue = Math.max(...values, 10) + 2; // ensure at least 10 gap
+          const maxValue = Math.max(...values, 10) + 2; 
           
           const points = values.map((value, index) => {
             const x = 50 + index * 90;
@@ -225,7 +197,6 @@ export default function DashboardPage({ currentPage, onNavigate }) {
           </article>
         </section>
 
-        {/* Gauge Chart Section */}
         <section className="mt-10">
           <article className="rounded-[32px] bg-white p-8 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70">
             <h2 className="text-xl font-semibold text-slate-950">Grafik Risiko Kardiovaskular</h2>
@@ -359,7 +330,6 @@ export default function DashboardPage({ currentPage, onNavigate }) {
                   ul: ({node, ...props}) => <ul className="mt-4 space-y-3" {...props} />,
                   ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-4 space-y-2" {...props} />,
                   li: ({node, ...props}) => {
-                    // Cek apakah di dalam ul atau ol
                     const isOrdered = node.parent && node.parent.tagName === 'ol';
                     if (isOrdered) {
                       return <li className="pl-1 text-slate-700 leading-relaxed" {...props} />;

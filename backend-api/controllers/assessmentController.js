@@ -1,15 +1,7 @@
-/**
- * @fileoverview Pengontrol Asesmen (Assessment Controller).
- * Menangani logika bisnis untuk permintaan HTTP yang berkaitan dengan pembuatan,
- * prediksi AI, pengambilan riwayat, dan penghapusan data asesmen risiko kesehatan.
- */
 const assessmentModel = require('../models/assessmentModel');
-/**
- * Objek Pengontrol (Controller) Asesmen Kesehatan.
- * Memuat berbagai *handler* untuk _endpoint_ `/api/assessments`.
- */
+
 const assessmentController = {
-  // POST /api/assessments/chat
+
   assessmentChat: async (req, res, next) => {
     try {
       const { message, chat_history, collected_data } = req.body;
@@ -27,7 +19,6 @@ const assessmentController = {
       
       const data = await response.json();
       
-      // If prediction is complete, we also save it to DB just like predictCardiovascularRisk
       if (data.is_complete && data.prediction_result) {
         const pResult = data.prediction_result;
         
@@ -35,7 +26,6 @@ const assessmentController = {
         
         const severity_mapped = pResult.risk_category === "High" ? "high" : pResult.risk_category === "Medium" ? "moderate" : "low";
         
-        // Gunakan rekomendasi panjang dari Gemini, BUKAN teks hardcode pendek
         const generatedInsights = pResult.recommendations || `Berdasarkan hasil prediksi AI...`;
         
         let updatedChatHistory = chat_history || [];
@@ -73,7 +63,6 @@ const assessmentController = {
     } catch (err) { next(err); }
   },
 
-  // POST /api/assessments/chat/:id
   continueAssessmentChat: async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -82,14 +71,12 @@ const assessmentController = {
       const assessment = await assessmentModel.findById(id, req.user.id);
       if (!assessment) return res.status(404).json({ status: 'error', message: "Assessment not found" });
       
-      // format history for FastAPI
       const historyForFastAPI = [];
       for (const msg of assessment.chat_history || []) {
          if (msg.sender === 'user' && msg.text) historyForFastAPI.push({ role: 'user', content: msg.text });
          else if (msg.sender === 'bot' && msg.text && msg.type !== 'result') historyForFastAPI.push({ role: 'model', content: msg.text });
       }
 
-      // call POST http://127.0.0.1:8000/api/v1/chat
       const response = await fetch('http://127.0.0.1:8000/api/v1/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -103,12 +90,10 @@ const assessmentController = {
 
       const data = await response.json();
 
-      // update chat_history in DB
       let updatedHistory = assessment.chat_history || [];
       updatedHistory.push({ text: message, sender: 'user' });
       updatedHistory.push({ text: data.reply, sender: 'bot' });
 
-      // Update Database
       await assessmentModel.update(id, {
         userId: req.user.id,
         type: assessment.type,
@@ -125,10 +110,8 @@ const assessmentController = {
     } catch (err) { next(err); }
   },
 
-  // GET /api/assessments
   getAssessments: async (req, res, next) => {
     try {
-      // Lazy cleanup: delete records older than 1 year whenever history is fetched
       try {
         await assessmentModel.deleteOldRecords();
       } catch (cleanupErr) {
@@ -147,7 +130,6 @@ const assessmentController = {
     } catch (err) { next(err); }
   },
 
-  // GET /api/assessments/summary
   getSummary: async (req, res, next) => {
     try {
       const TYPES = ['mental_health', 'physical', 'sleep', 'nutrition', 'stress', 'cardiovascular'];
@@ -160,7 +142,6 @@ const assessmentController = {
     } catch (err) { next(err); }
   },
 
-  // GET /api/assessments/recommendations
   getRecommendations: async (req, res, next) => {
     try {
       const TYPES = ['mental_health', 'physical', 'sleep', 'nutrition', 'stress', 'cardiovascular'];
@@ -175,7 +156,6 @@ const assessmentController = {
     } catch (err) { next(err); }
   },
 
-  // GET /api/assessments/:id
   getAssessmentById: async (req, res, next) => {
     try {
       const assessment = await assessmentModel.findById(req.params.id, req.user.id);
@@ -186,7 +166,6 @@ const assessmentController = {
     } catch (err) { next(err); }
   },
 
-  // DELETE /api/assessments/:id
   deleteAssessment: async (req, res, next) => {
     try {
       const deleted = await assessmentModel.delete(req.params.id, req.user.id);

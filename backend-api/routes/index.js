@@ -1,7 +1,3 @@
-/**
- * @fileoverview Rute Induk API (Main API Routes).
- * Menggabungkan seluruh rute yang ada menjadi satu kesatuan di bawah path `/api`.
- */
 const express = require('express');
 const router  = express.Router();
 
@@ -10,7 +6,6 @@ const userRoutes       = require('./userRoutes');
 const assessmentRoutes = require('./assessmentRoutes');
 const publicRoutes     = require('./publicRoutes');
 
-// Info
 router.get('/', (req, res) => {
   res.json({
     status: 'success',

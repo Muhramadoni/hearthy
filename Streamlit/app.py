@@ -7,33 +7,20 @@ import plotly.graph_objects as go
 import os
 
 
-# ======================================================
-# PAGE CONFIG
-# ======================================================
 st.set_page_config(
     page_title="Hearthy — Dashboard Cardiovascular Risk Analysis",
     page_icon="❤️",
     layout="wide"
 )
 
-
-# ======================================================
-# DATA PATH (relative to this script)
-# ======================================================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(BASE_DIR, "..", "AI", "content", "cardiovascular_risk_dataset_feature_engineered.csv")
-
-
-# ======================================================
-# CONSTANTS
-# ======================================================
 RISK_ORDER = ["Low", "Medium", "High"]
 AGE_ORDER = ["<30", "30-39", "40-49", "50-59", "60-69", "70-79", "80+"]
 SMOKING_ORDER = ["Never", "Former", "Current"]
 FAMILY_ORDER = ["No", "Yes"]
 BMI_ORDER = ["Underweight", "Normal", "Overweight", "Obese"]
 
-# Color palette — matched to dashboard.jsx Hearthy theme
 COLORS = {
     "navy": "#1e3a5a",
     "blue": "#2563EB",
@@ -55,10 +42,6 @@ RISK_COLORS = {
     "High": COLORS["red"],
 }
 
-
-# ======================================================
-# CSS — Hearthy-themed (matched to dashboard.jsx)
-# ======================================================
 st.markdown(
     f"""
     <style>
@@ -313,10 +296,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
-# ======================================================
-# LOAD DATA
-# ======================================================
 @st.cache_data
 def load_data(path):
     df = pd.read_csv(path)
@@ -333,7 +312,6 @@ def load_data(path):
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
-    # Ensure categorical columns
     if "age_group" not in df.columns:
         df["age_group"] = pd.cut(
             df["age"],
@@ -350,17 +328,13 @@ def load_data(path):
             right=False,
         ).astype(str)
 
-    # Map smoking_status numeric to text if needed
     if df["smoking_status"].dtype in ["int64", "float64"]:
         smoking_map = {0: "Never", 1: "Former", 2: "Current"}
         df["smoking_status"] = df["smoking_status"].map(smoking_map).fillna("Never")
-
-    # Map family_history numeric to text if needed
     if df["family_history_heart_disease"].dtype in ["int64", "float64"]:
         family_map = {0: "No", 1: "Yes"}
         df["family_history_heart_disease"] = df["family_history_heart_disease"].map(family_map).fillna("No")
 
-    # Map risk_category numeric to text if needed
     if df["risk_category"].dtype in ["int64", "float64"]:
         risk_map = {0: "Low", 1: "Medium", 2: "High"}
         df["risk_category"] = df["risk_category"].map(risk_map).fillna("Low")
@@ -371,9 +345,6 @@ def load_data(path):
 df = load_data(DATA_PATH)
 
 
-# ======================================================
-# HELPER FUNCTIONS
-# ======================================================
 def safe_mean(dataframe, col):
     if dataframe.empty or col not in dataframe.columns:
         return 0
@@ -576,10 +547,6 @@ def make_scatter_matrix_dashboard(data, numeric_features, target_col):
 
     return fig
 
-
-# ======================================================
-# HEADER — Hearthy style
-# ======================================================
 st.markdown(
     """
     <div class="hearthy-header">
@@ -600,9 +567,6 @@ st.markdown(
 )
 
 
-# ======================================================
-# FILTERS
-# ======================================================
 st.markdown('<div class="filter-title">Filter Data</div>', unsafe_allow_html=True)
 
 f1, f2, f3, f4, f5 = st.columns(5)
@@ -637,10 +601,6 @@ with f5:
         ["Semua"] + [x for x in BMI_ORDER if x in df["bmi_category"].dropna().astype(str).unique().tolist()],
     )
 
-
-# ======================================================
-# APPLY FILTER
-# ======================================================
 filtered = df.copy()
 
 if selected_risk != "Semua":
@@ -662,10 +622,6 @@ if filtered.empty:
     st.warning("Tidak ada data yang sesuai dengan filter yang dipilih.")
     st.stop()
 
-
-# ======================================================
-# KPI
-# ======================================================
 st.divider()
 
 total_patients = len(filtered)
@@ -704,10 +660,6 @@ st.info(
 
 st.divider()
 
-
-# ======================================================
-# CHART DATA PREPARATION
-# ======================================================
 risk_count = (
     filtered["risk_category"]
     .value_counts()
@@ -822,12 +774,6 @@ feature_delta["feature_label"] = feature_delta["feature"].map(feature_labels)
 feature_delta = feature_delta.sort_values("delta_pct", ascending=True)
 feature_delta["direction"] = np.where(feature_delta["delta_pct"] >= 0, "Naik", "Turun")
 
-
-# ======================================================
-# FIGURES
-# ======================================================
-
-# A — Donut: Risk Distribution
 fig_risk = px.pie(
     risk_count,
     names="risk_category",
@@ -869,7 +815,6 @@ fig_risk.update_layout(
 )
 
 
-# B — Line: Age vs Risk Score
 fig_age = px.line(
     age_risk_score,
     x="age_group",
@@ -892,8 +837,6 @@ fig_age.update_layout(
 
 fig_age = style_fig(fig_age, height=420, showlegend=False)
 
-
-# C — Clinical Grouped Bar
 fig_clinical = px.bar(
     clinical_long,
     x="risk_category",
@@ -918,7 +861,6 @@ fig_clinical.update_layout(
 fig_clinical = style_fig(fig_clinical, height=420, showlegend=True, margin=dict(l=55, r=30, t=75, b=60))
 
 
-# D — Smoking Stacked Bar
 fig_smoking = px.bar(
     smoking_long,
     x="persentase",
@@ -953,7 +895,6 @@ fig_smoking.update_layout(
 fig_smoking = style_fig(fig_smoking, height=420, showlegend=True, margin=dict(l=90, r=30, t=75, b=60))
 
 
-# E — Family History Stacked Bar
 fig_family = px.bar(
     family_long,
     x="persentase",
@@ -987,7 +928,6 @@ fig_family.update_layout(
 fig_family = style_fig(fig_family, height=420, showlegend=True, margin=dict(l=90, r=30, t=75, b=60))
 
 
-# F — Feature Delta Bar
 fig_feature = px.bar(
     feature_delta,
     x="delta_pct",
@@ -1015,7 +955,6 @@ fig_feature.update_layout(
 fig_feature = style_fig(fig_feature, height=420, showlegend=False, margin=dict(l=140, r=50, t=40, b=60))
 
 
-# Lifestyle Charts
 fig_activity = make_small_lifestyle_chart(
     lifestyle_avg, "physical_activity_hours_per_week",
     "Rata-rata Aktivitas Fisik", "Jam per Minggu", RISK_COLORS,
@@ -1042,7 +981,6 @@ fig_alcohol = make_small_lifestyle_chart(
 )
 
 
-# Scatter Matrix
 scatter_features = [
     "age", "bmi", "systolic_bp", "diastolic_bp",
     "cholesterol_mg_dl", "resting_heart_rate",
@@ -1059,10 +997,6 @@ fig_scatter = make_scatter_matrix_dashboard(
     filtered, scatter_features, "heart_disease_risk_score",
 )
 
-
-# ======================================================
-# CHART LAYOUT
-# ======================================================
 row1_col1, row1_col2 = st.columns(2)
 
 with row1_col1:
@@ -1102,9 +1036,6 @@ with row3_col2:
         st.plotly_chart(fig_feature, use_container_width=True, config={"displayModeBar": False})
 
 
-# ======================================================
-# LIFESTYLE SECTION
-# ======================================================
 st.markdown('<div class="section-title">G. Pola Gaya Hidup per Kategori Risiko</div>', unsafe_allow_html=True)
 
 g1, g2, g3 = st.columns(3)
@@ -1133,9 +1064,6 @@ with g5:
         st.plotly_chart(fig_alcohol, use_container_width=True, config={"displayModeBar": False})
 
 
-# ======================================================
-# SCATTER RELATIONSHIP
-# ======================================================
 st.markdown(
     '<div class="section-title">H. Korelasi Fitur Numerik terhadap Heart Disease Risk Score</div>',
     unsafe_allow_html=True,
@@ -1145,12 +1073,7 @@ with st.container(border=True):
     st.plotly_chart(fig_scatter, use_container_width=True, config={"displayModeBar": False})
 
 
-# ======================================================
-# INSIGHT & KESIMPULAN (Task requirement)
-# ======================================================
 st.markdown('<div class="section-title">I. Insight & Kesimpulan</div>', unsafe_allow_html=True)
-
-# Compute dynamic insights from the data
 high_risk_pct = (len(df[df["risk_category"] == "High"]) / len(df) * 100) if len(df) > 0 else 0
 low_risk_pct = (len(df[df["risk_category"] == "Low"]) / len(df) * 100) if len(df) > 0 else 0
 medium_risk_pct = 100 - high_risk_pct - low_risk_pct
@@ -1164,7 +1087,6 @@ low_avg_steps = df[df["risk_category"] == "Low"]["daily_steps"].mean() if len(df
 high_avg_sleep = df[df["risk_category"] == "High"]["sleep_hours"].mean() if len(df[df["risk_category"] == "High"]) > 0 else 0
 low_avg_sleep = df[df["risk_category"] == "Low"]["sleep_hours"].mean() if len(df[df["risk_category"] == "Low"]) > 0 else 0
 
-# Top correlated feature
 if "heart_disease_risk_score" in df.columns:
     corr_cols = [c for c in feature_cols if c in df.columns]
     correlations = df[corr_cols + ["heart_disease_risk_score"]].corr()["heart_disease_risk_score"].drop("heart_disease_risk_score", errors="ignore").abs().sort_values(ascending=False)
@@ -1243,9 +1165,6 @@ with st.container(border=True):
     )
 
 
-# ======================================================
-# PRIORITAS EDUKASI PENCEGAHAN
-# ======================================================
 st.markdown('<div class="section-title">J. Prioritas Edukasi Pencegahan</div>', unsafe_allow_html=True)
 
 with st.container(border=True):
@@ -1296,10 +1215,6 @@ with st.container(border=True):
         unsafe_allow_html=True,
     )
 
-
-# ======================================================
-# KESIMPULAN AKHIR
-# ======================================================
 st.markdown(
     f"""
     <div class="conclusion-box">

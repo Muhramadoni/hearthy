@@ -1,24 +1,10 @@
-/**
- * @fileoverview Halaman Profil Pengguna (User Profile Page).
- * Menampilkan informasi identitas (username, email) serta data kontak (telepon, alamat).
- * Menyediakan antarmuka bagi pengguna untuk memperbarui data kontak mereka.
- */
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar.jsx";
 import iconUser from "../icon/icon-user.svg";
 import iconEdit from "../icon/icon-edit.svg";
 import { fetchProfile, updateProfile } from "../services/userService";
 
-/**
- * Komponen Utama: UserProfilePage
- * Berfungsi memuat data profil melalui pemanggilan API, menampilkannya,
- * dan mengelola modal pop-up yang memungkinkan pengguna memperbarui informasi profil mereka.
- *
- * @param {Object} props - Properti komponen.
- * @param {string} props.currentPage - Penanda halaman aktif untuk navigasi Navbar.
- * @param {function} props.onNavigate - Fungsi *callback* untuk berpindah halaman.
- * @returns {JSX.Element} Antarmuka pengguna Halaman Profil.
- */
+
 export default function UserProfilePage({ currentPage, onNavigate }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [loading, setLoading]                 = useState(true);
@@ -26,10 +12,8 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
   const [errorMsg, setErrorMsg]               = useState("");
   const [successMsg, setSuccessMsg]           = useState("");
 
-  // Data yang ditampilkan (dari API)
   const [userData, setUserData] = useState({ name: "", email: "" });
   const [formData, setFormData] = useState({ phone: "", address: "" });
-  // Salinan sementara untuk modal edit
   const [editData, setEditData] = useState({ phone: "", address: "" });
 
   useEffect(() => {
@@ -109,7 +93,6 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
           </h1>
         </div>
 
-        {/* Toast sukses */}
         {successMsg && (
           <div className="mx-auto mt-4 max-w-3xl rounded-2xl bg-green-50 border border-green-200 px-5 py-3 text-sm text-green-700 flex items-center justify-between">
             <span>{successMsg}</span>
@@ -118,7 +101,6 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
         )}
 
         <section className="mt-6 space-y-8">
-          {/* Card avatar + nama */}
           <article className="rounded-[28px] bg-white p-8 shadow-[0_20px_60px_-20px_rgba(15,23,42,0.12)]">
             {loading ? (
               <div className="flex items-center gap-6 animate-pulse">
@@ -156,7 +138,6 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
             )}
           </article>
 
-          {/* Card data pribadi */}
           <article className="rounded-[28px] bg-white p-8 shadow-[0_20px_60px_-20px_rgba(15,23,42,0.12)]">
             <h2 className="text-xl font-semibold text-[#1e3a5a]">Data Pribadi</h2>
 
@@ -168,7 +149,6 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
               </div>
             ) : (
               <div className="mt-8 grid gap-6 sm:grid-cols-2">
-                {/* Username (read-only) */}
                 <div className="sm:col-span-2">
                   <label className="mb-2 block text-sm font-medium text-slate-500">
                     Username
@@ -178,7 +158,6 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                   </div>
                 </div>
 
-                {/* Email (read-only) */}
                 <div className="sm:col-span-2">
                   <label className="mb-2 block text-sm font-medium text-slate-500">
                     Email
@@ -188,7 +167,6 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                   </div>
                 </div>
 
-                {/* Telepon */}
                 <div className="sm:col-span-2">
                   <label className="mb-2 block text-sm font-medium text-slate-500">
                     Telepon
@@ -198,7 +176,6 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                   </div>
                 </div>
 
-                {/* Alamat */}
                 <div className="sm:col-span-2">
                   <label className="mb-2 block text-sm font-medium text-slate-500">
                     Alamat
@@ -213,7 +190,6 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
         </section>
       </main>
 
-      {/* Edit Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-black/80 z-40" onClick={() => !saving && setIsEditModalOpen(false)} />
@@ -222,14 +198,12 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
               Edit Data Pribadi
             </h2>
 
-            {/* Error dalam modal */}
             {errorMsg && (
               <div className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
                 {errorMsg}
               </div>
             )}
 
-            {/* Username & Email — read-only dalam modal */}
             <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
               <div className="sm:col-span-1">
                 <label className="mb-1 block text-sm font-medium text-slate-500">
@@ -249,7 +223,6 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                 </div>
               </div>
 
-              {/* Telepon — editable */}
               <div className="sm:col-span-2">
                 <label className="mb-1 block text-sm font-medium text-slate-500">
                   Telepon
@@ -265,8 +238,7 @@ export default function UserProfilePage({ currentPage, onNavigate }) {
                 />
               </div>
 
-              {/* Alamat — editable */}
-              <div className="sm:col-span-2">
+                <div className="sm:col-span-2">
                 <label className="mb-1 block text-sm font-medium text-slate-500">
                   Alamat
                 </label>

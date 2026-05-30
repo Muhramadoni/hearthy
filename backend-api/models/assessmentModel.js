@@ -1,19 +1,7 @@
-/**
- * @fileoverview Model Asesmen (Assessment Model).
- * Menyediakan fungsi-fungsi untuk berinteraksi langsung dengan tabel `assessments` pada database PostgreSQL.
- * Mengelola proses CRUD (Create, Read, Update, Delete) data riwayat kesehatan.
- */
 const { pool } = require('../database/pool');
 
-/**
- * Objek Model Database untuk Asesmen Kesehatan.
- */
 const assessmentModel = {
-  /**
-   * Menyimpan data rekam hasil prediksi/asesmen yang baru dibuat oleh pengguna.
-   * @param {Object} data - Objek berisi kumpulan data (jawaban, skor, wawasan AI, dll).
-   * @returns {Promise<Object>} Baris data asesmen yang baru saja dimasukkan (inserted row).
-   */
+
   create: async ({ userId, type, answers, chatHistory, score, maxScore, severity, recommendations, aiInsights }) => {
     const { rows } = await pool.query(
       `INSERT INTO assessments

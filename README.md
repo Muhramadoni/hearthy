@@ -41,7 +41,6 @@ pip install -r requirements.txt
 ### 2. Setup .env
 ```bash
 cp .env.example .env
-# isi GEMINI_API_KEY dan path model
 ```
 
 ### 3. Build knowledge base (sekali jalan)

@@ -1,26 +1,10 @@
-/**
- * @fileoverview Pengontrol Pengguna (User Controller).
- * Mengelola fungsionalitas manajemen akun pengguna setelah login,
- * termasuk pengambilan/pembaruan profil, penggantian kata sandi, dan statistik.
- */
 const bcrypt          = require('bcryptjs');
 const userModel       = require('../models/userModel');
 const profileModel    = require('../models/profileModel');
 const assessmentModel = require('../models/assessmentModel');
 const { validateProfileUpdate, validatePasswordChange } = require('../utils/validators');
 
-/**
- * Objek Pengontrol (Controller) Manajemen Pengguna.
- * Memuat berbagai *handler* untuk _endpoint_ `/api/users`.
- */
 const userController = {
-  // GET /api/users/profile
-  /**
-   * Mengambil data akun dan profil terperinci milik pengguna yang sedang login.
-   * @param {Object} req - Objek permintaan HTTP.
-   * @param {Object} res - Objek respons HTTP.
-   * @param {Function} next - Fungsi *middleware* *error*.
-   */
   getProfile: async (req, res, next) => {
     try {
       const user    = await userModel.findById(req.user.id);
@@ -30,7 +14,6 @@ const userController = {
     } catch (err) { next(err); }
   },
 
-  // PUT /api/users/profile
   updateProfile: async (req, res, next) => {
     try {
       const { error } = validateProfileUpdate(req.body);
@@ -41,7 +24,6 @@ const userController = {
     } catch (err) { next(err); }
   },
 
-  // PUT /api/users/password
   changePassword: async (req, res, next) => {
     try {
       const { error } = validatePasswordChange(req.body);
@@ -60,7 +42,6 @@ const userController = {
     } catch (err) { next(err); }
   },
 
-  // GET /api/users/stats
   getStats: async (req, res, next) => {
     try {
       const total   = await assessmentModel.countByUser(req.user.id);
@@ -78,7 +59,6 @@ const userController = {
     } catch (err) { next(err); }
   },
 
-  // DELETE /api/users/account
   deleteAccount: async (req, res, next) => {
     try {
       await userModel.delete(req.user.id);

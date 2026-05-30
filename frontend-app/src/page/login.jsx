@@ -1,8 +1,3 @@
-/**
- * @fileoverview Halaman Autentikasi Masuk (Login Page).
- * Menyediakan antarmuka bagi pengguna untuk masuk ke dalam akun mereka
- * dengan menggunakan kombinasi alamat email dan kata sandi.
- */
 import logoHearthy from "../image/logo-hearthy.png";
 import doctorImage from "../image/doctor-image.png";
 import iconShow from "../icon/icon-show.svg";
@@ -10,15 +5,7 @@ import iconHide from "../icon/icon-hide.svg";
 import { useEffect, useState } from "react";
 import { login } from "../services/authService";
 
-/**
- * Komponen Utama: Login
- * Mengatur status formulir (email, password), proses pemanggilan API autentikasi,
- * penanganan kesalahan, dan memfasilitasi navigasi pasca-login.
- *
- * @param {Object} props - Properti komponen.
- * @param {function} props.onNavigate - Fungsi *callback* untuk berpindah halaman.
- * @returns {JSX.Element} Antarmuka pengguna Halaman Login.
- */
+
 export default function Login({ onNavigate }) {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -32,10 +19,9 @@ export default function Login({ onNavigate }) {
     const savedEmail = localStorage.getItem("rememberedEmail");
     
     if (savedEmail) {
-      // Menunggu sebentar lalu memunculkan email secara utuh sekaligus
       const timer = setTimeout(() => {
         setEmail(savedEmail);
-      }, 600); // jeda 600 milidetik
+      }, 600);
 
       return () => clearTimeout(timer);
     }
@@ -60,7 +46,6 @@ export default function Login({ onNavigate }) {
         localStorage.removeItem("rememberedEmail");
       }
       
-      // Login berhasil → navigasi ke dashboard
       onNavigate?.("dashboard");
     } catch (err) {
       setError(err.message);
@@ -108,7 +93,6 @@ export default function Login({ onNavigate }) {
             Silakan masuk ke akun Hearthy Anda
           </p>
 
-          {/* Pesan Error */}
           {error && (
             <div className="mb-5 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm flex items-center gap-2">
               <span>⚠️</span>

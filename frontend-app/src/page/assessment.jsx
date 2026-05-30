@@ -1,8 +1,3 @@
-/**
- * @fileoverview Halaman Asesmen (Assessment Page) - Full Chatbot.
- * Chatbot full-page untuk pengumpulan data klinis dan prediksi AI,
- * dilengkapi panel riwayat asesmen (History) yang bisa diakses via icon jam.
- */
 import { useState, useEffect, useRef } from "react";
 import Navbar from "../components/Navbar.jsx";
 import { getAssessments, getAssessmentById, deleteAssessment } from "../services/assessmentService.js";
@@ -39,20 +34,17 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
   const [isAgentTyping, setIsAgentTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = () => setActiveDropdown(null);
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  // Save state to sessionStorage
   useEffect(() => {
     sessionStorage.setItem("hearthy_agent_messages", JSON.stringify(messages));
     sessionStorage.setItem("hearthy_agent_collected", JSON.stringify(collectedData));
   }, [messages, collectedData]);
 
-  // Initial greeting if no messages
   useEffect(() => {
     const activeId = sessionStorage.getItem("hearthy_active_history_id");
     if (!activeId && messages.length === 0 && !isAgentTyping) {
@@ -60,7 +52,6 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
     }
   }, [messages]);
 
-  // Load active history on mount if it exists
   useEffect(() => {
     const activeId = sessionStorage.getItem("hearthy_active_history_id");
     if (activeId) {
@@ -80,7 +71,6 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
     document.title = "Assessment - Web Hearty";
   }, []);
 
-  // Load history records
   useEffect(() => {
     async function loadHistory() {
       try {
@@ -108,7 +98,6 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
       return;
     }
 
-    // Add user message to UI immediately if it's not the initial hidden trigger
     if (userMessage !== "Halo, saya ingin memulai asesmen risiko jantung.") {
       setMessages(prev => [...prev, { text: userMessage, sender: "user" }]);
     }
@@ -150,12 +139,9 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
         setMessages(prev => [...prev, { text: aiData.reply, sender: "bot" }]);
       }
       
-      // Update collected data state
       if (aiData.collected_data) {
         setCollectedData(aiData.collected_data);
       }
-
-      // If assessment is complete, set the active history ID and disable input
       if (aiData.is_complete && aiData.prediction_result) {
         
         if (aiData.assessment_id) {
@@ -288,7 +274,6 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
 
       <main className="flex-1 mx-auto w-full max-w-5xl px-4 md:px-6 py-2 md:py-4 flex flex-col h-[calc(100vh-120px)]">
         <div className="bg-white rounded-[32px] shadow-[0_24px_80px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70 flex flex-col h-full overflow-hidden">
-          {/* Chat Header */}
           <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-slate-100 z-10 relative">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-full bg-[#1e3a5a] flex items-center justify-center">
@@ -325,7 +310,6 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
           </div>
         </div>
 
-        {/* Messages Area */}
         <div className="flex-1 overflow-y-auto px-6 py-6 bg-slate-50/50">
           <div className="w-full space-y-5">
             {messages.map((msg, idx) => (
@@ -434,7 +418,6 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
           </div>
         </div>
 
-        {/* Input Area */}
         <div className="px-6 py-4 bg-white border-t border-slate-100 z-10 relative">
           <div className="w-full flex gap-3">
             <input
@@ -467,16 +450,12 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
         </div>
         </div>
       </main>
-
-      {/* History Sidebar Overlay */}
       {isHistoryOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/40 transition-opacity"
           onClick={() => setIsHistoryOpen(false)}
         />
       )}
-
-      {/* History Sidebar Panel */}
       <div
         className={`fixed top-0 right-0 h-full w-full sm:w-96 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
           isHistoryOpen ? "translate-x-0" : "translate-x-full"
@@ -503,8 +482,6 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
             </svg>
           </button>
         </div>
-
-        {/* Date Filter */}
         <div className="p-4 bg-white border-b border-slate-100 flex items-center gap-2">
           <input
             type="date"

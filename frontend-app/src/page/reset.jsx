@@ -1,8 +1,3 @@
-/**
- * @fileoverview Halaman Lupa Kata Sandi (Reset Password Page).
- * Menyediakan antarmuka multi-langkah (multi-step) untuk memverifikasi alamat email
- * dan mengatur ulang kata sandi pengguna yang lupa akunnya.
- */
 import logoHearthy from "../image/logo-hearthy.png";
 import doctorImage from "../image/doctor-image.png";
 import iconShow from "../icon/icon-show.svg";
@@ -10,30 +5,15 @@ import iconHide from "../icon/icon-hide.svg";
 import { useEffect, useState } from "react";
 import { checkEmail, resetPassword } from "../services/authService";
 
-/**
- * Komponen Utama: ResetPassword
- * Mengelola dua langkah proses reset:
- * 1. Meminta dan memverifikasi keberadaan alamat email.
- * 2. Mengambil kata sandi baru dan mengonfirmasinya.
- *
- * @param {Object} props - Properti komponen.
- * @param {function} props.onNavigate - Fungsi *callback* untuk berpindah halaman.
- * @returns {JSX.Element} Antarmuka pengguna Halaman Reset Kata Sandi.
- */
 export default function ResetPassword({ onNavigate }) {
-  // Step 1 = verifikasi email, Step 2 = isi password baru
   const [step, setStep] = useState(1);
-
-  // Step 1 state
   const [email, setEmail] = useState("");
 
-  // Step 2 state
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Shared state
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -42,7 +22,6 @@ export default function ResetPassword({ onNavigate }) {
     document.title = "Reset Password - Web Hearthy";
   }, []);
 
-  // ── Step 1: Verifikasi email ──────────────────────────────────
   const handleCheckEmail = async (e) => {
     e.preventDefault();
     setError("");
@@ -55,16 +34,14 @@ export default function ResetPassword({ onNavigate }) {
     setLoading(true);
     try {
       await checkEmail(email);
-      // Email terdaftar → lanjut ke step 2
       setStep(2);
     } catch (err) {
-      setError(err.message); // "Email tidak terdaftar."
+      setError(err.message); 
     } finally {
       setLoading(false);
     }
   };
 
-  // ── Step 2: Reset password ────────────────────────────────────
   const handleResetPassword = async (e) => {
     e.preventDefault();
     setError("");
@@ -87,7 +64,6 @@ export default function ResetPassword({ onNavigate }) {
     setLoading(true);
     try {
       await resetPassword(email, newPassword);
-      // Sukses → tampilkan notifikasi lalu redirect ke login
       setSuccess(true);
       setTimeout(() => {
         onNavigate?.("login");
@@ -101,7 +77,6 @@ export default function ResetPassword({ onNavigate }) {
 
   return (
     <div className="min-h-screen flex overflow-hidden bg-white">
-      {/* Panel kiri */}
       <div className="hidden lg:flex lg:w-1/2 bg-[#e8ecef] flex-col relative overflow-hidden">
         <div className="p-10 absolute top-0 left-0">
           <img
@@ -120,11 +95,8 @@ export default function ResetPassword({ onNavigate }) {
         </div>
       </div>
 
-      {/* Panel kanan */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md">
-
-          {/* Logo mobile */}
           <div className="lg:hidden mb-8 flex justify-center">
             <img
               src={logoHearthy}
@@ -134,7 +106,6 @@ export default function ResetPassword({ onNavigate }) {
             />
           </div>
 
-          {/* Indikator step */}
           <div className="flex items-center gap-2 mb-6">
             <div className={`h-2 flex-1 rounded-full transition-all ${step >= 1 ? "bg-[#1e3a5f]" : "bg-gray-200"}`} />
             <div className={`h-2 flex-1 rounded-full transition-all ${step >= 2 ? "bg-[#1e3a5f]" : "bg-gray-200"}`} />
@@ -149,7 +120,6 @@ export default function ResetPassword({ onNavigate }) {
               : `Buat password baru untuk ${email}`}
           </p>
 
-          {/* Notifikasi Sukses */}
           {success && (
             <div className="mb-5 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm flex items-center gap-2 animate-pulse">
               <span>✅</span>
@@ -157,7 +127,6 @@ export default function ResetPassword({ onNavigate }) {
             </div>
           )}
 
-          {/* Pesan Error */}
           {error && (
             <div className="mb-5 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm flex items-center gap-2">
               <span>⚠️</span>
@@ -165,7 +134,6 @@ export default function ResetPassword({ onNavigate }) {
             </div>
           )}
 
-          {/* ── Step 1: Form verifikasi email ── */}
           {step === 1 && (
             <form className="space-y-5" onSubmit={handleCheckEmail}>
               <div>
@@ -203,7 +171,6 @@ export default function ResetPassword({ onNavigate }) {
             </form>
           )}
 
-          {/* ── Step 2: Form reset password ── */}
           {step === 2 && !success && (
             <form className="space-y-5" onSubmit={handleResetPassword}>
               <div>

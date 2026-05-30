@@ -1,33 +1,16 @@
-/**
- * @fileoverview Middleware Penanganan Kesalahan (Error Handler).
- * Menangkap semua kesalahan (Error/Exception) yang terjadi selama pemrosesan request
- * dan mengembalikan respons JSON yang diformat dengan baik.
- */
-
-/**
- * Fungsi middleware untuk menangani *error* secara terpusat.
- * Menerjemahkan kode kesalahan database (PostgreSQL) menjadi pesan yang ramah pengguna.
- * @param {Error} err - Objek kesalahan yang ditangkap.
- * @param {Object} req - Objek permintaan HTTP.
- * @param {Object} res - Objek respons HTTP.
- * @param {Function} next - Fungsi next (tidak digunakan di sini tapi diperlukan oleh Express untuk mendeteksi *error handler*).
- */
 const fs = require('fs');
-const errorHandler = (err, req, res, next) => { // eslint-disable-line no-unused-vars
+const errorHandler = (err, req, res, next) => {
   const errMsg = `[ERROR] ${req.method} ${req.originalUrl} — ${err.message}\n${err.stack}\n\n`;
   console.error(errMsg);
   try { fs.appendFileSync('error_log.txt', errMsg); } catch(e) {}
   if (process.env.NODE_ENV === 'development') console.error(err.stack);
 
-  // PostgreSQL unique violation
   if (err.code === '23505') {
     return res.status(409).json({ status: 'error', message: 'A record with this value already exists.' });
   }
-  // PostgreSQL foreign key violation
   if (err.code === '23503') {
     return res.status(400).json({ status: 'error', message: 'Referenced record does not exist.' });
   }
-  // PostgreSQL invalid UUID
   if (err.code === '22P02') {
     return res.status(400).json({ status: 'error', message: 'Invalid ID format.' });
   }
