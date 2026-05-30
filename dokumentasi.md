@@ -1,37 +1,40 @@
 # Dokumentasi Setup Proyek Hearthy
 
-Hearthy adalah platform *preventive healthcare* berbasis web yang menggunakan teknologi *Deep Learning* dan *Machine Learning* untuk mendeteksi dini risiko penyakit kardiovaskular secara instan.
+## 1. Penjelasan Tentang Website dan Tujuannya
+Hearthy adalah platform *preventive healthcare* berbasis web yang dirancang untuk membantu pengguna memantau dan mendeteksi risiko penyakit, khususnya penyakit kardiovaskular. Dengan memanfaatkan teknologi *Machine Learning* dan *Artificial Intelligence* (AI), Hearthy menyediakan hasil analisis instan, wawasan (*insights*) kesehatan yang personal, serta chatbot interaktif yang siap memberikan edukasi pencegahan. Tujuannya adalah untuk meningkatkan kesadaran masyarakat akan pentingnya gaya hidup sehat serta memberikan sarana deteksi dini yang mudah diakses.
 
-Proyek ini terdiri dari dua bagian utama:
-1. **Frontend**: React.js dengan Vite dan Tailwind CSS v4.
-2. **Backend**: Node.js (Express), PostgreSQL, dan skrip Python untuk integrasi *Artificial Intelligence* (AI).
+## 2. Persyaratan Sistem
+Sebelum memulai setup proyek, pastikan perangkat Anda telah memenuhi persyaratan berikut:
+* **Node.js** (Minimal versi 18.x) - Untuk menjalankan Frontend dan Backend API.
+* **PostgreSQL** (Minimal versi 14.x) - Sebagai database utama penyimpan data.
+* **Python** (Minimal versi 3.8+) - Untuk menjalankan model AI (FastAPI) dan Dashboard (Streamlit).
+* **Git** (Opsional) - Untuk kebutuhan version control.
 
----
+## 3. Setup Database
+Proses ini mencakup pembuatan user, memberikan izin akses, serta membuat database dan tabel yang dibutuhkan.
 
-## 1. Persyaratan Sistem (Prerequisites)
-Pastikan sistem Anda sudah terinstal perangkat lunak berikut sebelum memulai:
-* **Node.js** (Minimal versi 18.x)
-* **PostgreSQL** (Minimal versi 14.x)
-* **Python** (Minimal versi 3.8+)
-* **Git** (Opsional, untuk *version control*)
-
----
-
-## 2. Setup Database (PostgreSQL)
-1. Buka terminal PostgreSQL Anda (pgAdmin atau `psql`).
-2. Buat database baru untuk proyek ini:
+1. Buka terminal PostgreSQL (`psql`) atau pgAdmin:
+   ```bash
+   psql -U postgres
+   ```
+2. Buat *user* baru dan berikan akses (*password* dapat disesuaikan):
+   ```sql
+   CREATE USER hearthy WITH PASSWORD 'hearthy123';
+   ```
+3. Buat database baru bernama `hearthy_db`:
    ```sql
    CREATE DATABASE hearthy_db;
    ```
-   *(Catat username dan password PostgreSQL Anda, secara default biasanya `postgres`)*
+4. Berikan izin akses penuh ke *user* yang baru dibuat:
+   ```sql
+   GRANT ALL PRIVILEGES ON DATABASE hearthy_db TO hearthy;
+   ```
+5. Untuk pembuatan tabel, kita akan menggunakan fitur migrasi di backend (dijelaskan pada langkah Setup Backend selanjutnya).
 
----
+## 4. Setup Backend
+Backend aplikasi Hearthy dibangun menggunakan Node.js dan Express.
 
-## 3. Setup Backend API
-Backend berada di dalam folder `backend-api`.
-
-### Langkah-langkah:
-1. Buka terminal dan masuk ke folder backend:
+1. Buka terminal dan masuk ke folder `backend-api`:
    ```bash
    cd backend-api
    ```
@@ -39,90 +42,110 @@ Backend berada di dalam folder `backend-api`.
    ```bash
    npm install
    ```
-3. Konfigurasi Environment Variables:
-   * Buat file bernama `.env` di dalam folder `backend-api`.
-   * Salin konfigurasi berikut dan sesuaikan `DB_USER` dan `DB_PASSWORD` dengan kredensial PostgreSQL Anda:
-     ```env
-     PORT=5000
-     DB_USER=postgres
-     DB_PASSWORD=password_anda
-     DB_HOST=localhost
-     DB_NAME=hearthy_db
-     DB_PORT=5432
-     JWT_SECRET=hearthy_secret_key_2024_change_this_in_production
-     JWT_EXPIRES_IN=7d
-     NODE_ENV=development
-     FRONTEND_URL=http://localhost:5173
-     ```
-4. Jalankan Migrasi Database (Untuk membuat tabel secara otomatis):
+3. Buat file `.env` di dalam folder `backend-api` dan isi sesuai kredensial database yang sudah dibuat pada langkah 3:
+   ```env
+   PORT=5000
+   DB_USER=hearthy
+   DB_PASSWORD=hearthy123
+   DB_HOST=localhost
+   DB_NAME=hearthy_db
+   DB_PORT=5432
+   JWT_SECRET=hearthy_secret_key_2024
+   JWT_EXPIRES_IN=7d
+   NODE_ENV=development
+   FRONTEND_URL=http://localhost:5173
+   ```
+4. Jalankan migrasi untuk membuat tabel secara otomatis di database:
    ```bash
    npm run migrate:up
    ```
-5. Setup *Environment* Python untuk AI (Machine Learning):
-   * Pastikan `pip` sudah terinstal. Instal library Python yang dibutuhkan oleh model AI:
-     ```bash
-     pip install scikit-learn pandas numpy joblib
-     ```
-6. Jalankan Server Backend:
-   ```bash
-   npm run dev
-   ```
-   *Backend akan berjalan di `http://localhost:5000`.*
 
----
+## 5. Setup Frontend
+Frontend Hearthy dibangun menggunakan React.js dan Vite.
 
-## 4. Setup Frontend App
-Frontend berada di dalam folder `frontend-app`.
-
-### Langkah-langkah:
-1. Buka terminal baru dan masuk ke folder frontend:
+1. Buka terminal baru dan masuk ke folder `frontend-app`:
    ```bash
    cd frontend-app
    ```
-2. Instal semua dependensi React & Vite:
+2. Instal semua dependensi frontend:
    ```bash
    npm install
    ```
-3. Konfigurasi Environment Variables (Opsional):
-   * Jika Anda perlu mengubah URL API, buat file `.env` di folder `frontend-app` dan tambahkan:
-     ```env
-     VITE_API_URL=http://localhost:5000/api
-     ```
-4. Jalankan Server Frontend:
-   ```bash
-   npm run dev
+3. (Opsional) Jika perlu mengubah URL API, buat file `.env` di dalam `frontend-app` (URL secara default sudah diset untuk lokal):
+   ```env
+   VITE_API_URL=http://localhost:5000/api
    ```
-   *Frontend akan berjalan di `http://localhost:5173`.*
 
----
+## 6. Setup Streamlit
+Streamlit digunakan untuk menampilkan dashboard analitik data Cardiovascular Risk Analysis.
 
-## 5. Menjalankan Aplikasi Secara Bersamaan
-Untuk mempermudah pengembangan, Anda disarankan menggunakan dua terminal yang berjalan secara bersamaan:
+1. Buka terminal baru dan masuk ke folder proyek utama.
+2. Pastikan Python sudah terinstal. Instal dependensi yang diperlukan melalui `requirements.txt` (jika ada) atau instal manual:
+   ```bash
+   pip install streamlit pandas plotly scikit-learn numpy joblib
+   ```
 
-* **Terminal 1**: Berada di folder `backend-api` menjalankan `npm run dev`
-* **Terminal 2**: Berada di folder `frontend-app` menjalankan `npm run dev`
+## 7. Setup AI Chatbot (FastAPI)
+AI Chatbot dijalankan menggunakan FastAPI sebagai service independen.
 
-Buka browser Anda dan kunjungi `http://localhost:5173` untuk mengakses web Hearthy!
+1. Buka terminal baru di root folder proyek (`hearthy`).
+2. Instal dependensi Python tambahan yang dibutuhkan untuk backend AI:
+   ```bash
+   pip install fastapi uvicorn pydantic python-dotenv google-generativeai
+   ```
+3. Konfigurasi file `.env` di *root folder* (atau sesuai arahan) dan pastikan *API Key* Google Gemini / provider lain sudah diisi.
 
----
+## 8. Running Projek
+Agar aplikasi Hearthy berjalan secara utuh (Frontend, Backend, AI API, dan Streamlit), jalankan semua servis ini secara bersamaan di terminal yang berbeda-beda:
 
-## Struktur Folder Utama
+* **Terminal 1 (Backend Node.js)**:
+  ```bash
+  cd backend-api
+  npm run dev
+  ```
+  *(Berjalan di http://localhost:5000)*
+
+* **Terminal 2 (Frontend React/Vite)**:
+  ```bash
+  cd frontend-app
+  npm run dev
+  ```
+  *(Berjalan di http://localhost:5173)*
+
+* **Terminal 3 (AI Chatbot FastAPI)**:
+  ```bash
+  uvicorn app.main:app --reload
+  ```
+  *(Berjalan di http://localhost:8000)*
+
+* **Terminal 4 (Streamlit Dashboard)**:
+  ```bash
+  cd Streamlit
+  streamlit run app.py
+  ```
+  *(Biasanya berjalan di http://localhost:8501)*
+
+## 9. Struktur Folder dan File Beserta Fungsinya
+Berikut adalah ringkasan struktur folder utama dalam proyek Hearthy dan fungsinya:
+
 ```text
 hearthy/
-├── backend-api/           # Server Node.js
-│   ├── ai/                # Model Machine Learning & Skrip Python
-│   ├── controllers/       # Logika bisnis API
-│   ├── database/          # Migrasi & koneksi PostgreSQL
-│   ├── models/            # Model akses data (Query SQL)
-│   ├── routes/            # Definisi endpoint API (Express Router)
-│   └── package.json
-│
-├── frontend-app/          # Klien React.js
+├── app/                   # Root folder untuk API AI/Machine Learning (FastAPI)
+│   └── main.py            # Entry point FastAPI untuk servis Chatbot AI
+├── backend-api/           # Root folder untuk Backend API Node.js (Auth, Data, dll)
+│   ├── controllers/       # Logika bisnis (menangani fungsi request & response)
+│   ├── database/          # Skrip migrasi dan konfigurasi pool koneksi PostgreSQL
+│   ├── models/            # Skrip akses data / query langsung ke database
+│   ├── routes/            # Definisi endpoint (URL path dan middleware)
+│   └── package.json       # Daftar dependensi dan scripts Node.js backend
+├── frontend-app/          # Root folder untuk Klien Antarmuka (Frontend React.js)
 │   ├── src/
-│   │   ├── components/    # Komponen React (Navbar, Chatbot, dll)
-│   │   ├── page/          # Halaman Utama (Dashboard, Assessment, dll)
-│   │   ├── services/      # Fungsi pemanggil API (Axios/Fetch)
-│   │   └── App.jsx        # Pengatur Routing Utama
-│   └── package.json
-└── dokumentasi.md         # File ini
+│   │   ├── components/    # Reusable komponen UI (Navbar, Chatbot widget, dll)
+│   │   ├── page/          # Halaman-halaman utama aplikasi (Dashboard, Assessment, Login, dll)
+│   │   ├── services/      # Fungsi pemanggil API ke Backend Node.js
+│   │   └── App.jsx        # Routing dan konfigurasi navigasi halaman utama
+│   └── package.json       # Daftar dependensi dan scripts Node.js frontend
+├── Streamlit/             # Root folder untuk aplikasi analitik / dashboard data
+│   └── app.py             # Entry point dashboard visualisasi data menggunakan Streamlit
+└── dokumentasi.md         # File panduan dan dokumentasi setup proyek ini
 ```
