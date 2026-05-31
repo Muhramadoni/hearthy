@@ -117,7 +117,7 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f4f7fb] text-[#0f172a] flex flex-col font-sans print:bg-[#ffffff]">
+    <div className="min-h-screen bg-[#f0f0f0] text-[#0f172a] flex flex-col font-sans print:bg-[#ffffff]">
       <style>{`
         @media print {
           * {

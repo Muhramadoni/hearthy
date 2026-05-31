@@ -490,7 +490,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#f4f7fb] text-slate-950 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#f0f0f0] text-slate-950 flex flex-col font-sans">
       <Navbar currentPage={currentPage ?? "assessment"} onNavigate={onNavigate ?? (() => {})} />
       
       <main className="flex-1 w-full max-w-6xl mx-auto px-4 md:px-6 py-6 flex flex-col h-[calc(100vh-80px)]">

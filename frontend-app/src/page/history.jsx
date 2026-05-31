@@ -53,7 +53,7 @@ export default function HistoryPage({ currentPage, onNavigate }) {
   const filteredHistory = filterDate ? historyData.filter(h => new Date(h.created_at).toISOString().split('T')[0] === filterDate) : historyData;
 
   return (
-    <div className="min-h-screen bg-[#f4f7fb] text-slate-950 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#f0f0f0] text-slate-950 flex flex-col font-sans">
       <Navbar currentPage={currentPage ?? "history"} onNavigate={onNavigate ?? (() => {})} />
       
       <main className="flex-1 w-full max-w-screen-2xl mx-auto px-4 md:px-6 py-6 flex flex-col h-[calc(100vh-80px)]">
