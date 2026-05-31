@@ -2,6 +2,14 @@
 
 Dashboard ini dibuat menggunakan **Streamlit** untuk menganalisis risiko penyakit jantung berdasarkan faktor klinis dan gaya hidup pasien. Dashboard menampilkan ringkasan data, visualisasi risiko, hubungan antar fitur numerik, serta prioritas edukasi pencegahan berdasarkan hasil analisis.
 
+## Link Dashboard
+
+Dashboard dapat diakses secara online melalui link berikut:
+
+```text
+https://capstonedasboardheart.streamlit.app/
+```
+
 ## Deskripsi Project
 
 Project ini bertujuan untuk membantu memahami pola risiko penyakit jantung pada pasien berdasarkan beberapa indikator, seperti usia, BMI, tekanan darah, kolesterol, aktivitas fisik, durasi tidur, kualitas diet, konsumsi alkohol, dan skor risiko penyakit jantung.
@@ -112,7 +120,7 @@ numpy
 plotly
 ```
 
-## Cara Menjalankan Dashboard
+## Cara Menjalankan Dashboard Secara Lokal
 
 ### 1. Install library yang dibutuhkan
 
@@ -157,12 +165,13 @@ NEW DASHBOARD CAPSTONE/
 │
 ├── app.py
 ├── cardiovascular_risk_dataset_clean.csv
+├── requirements.txt
 └── README.md
 ```
 
 ## Cara Menggunakan Dashboard
 
-1. Jalankan file `app.py` menggunakan Streamlit.
+1. Buka dashboard melalui link online atau jalankan secara lokal.
 2. Pilih menu pada bagian kiri dashboard.
 3. Gunakan filter untuk menyesuaikan data yang ingin dianalisis.
 4. Amati perubahan KPI dan grafik berdasarkan filter aktif.
