@@ -19,7 +19,7 @@ st.set_page_config(
 # ======================================================
 # DATA PATH
 # ======================================================
-DATA_PATH = r"C:\Users\HP\Downloads\NEW DASHBOARD CAPSTONE\cardiovascular_risk_dataset_clean.csv"
+DATA_PATH = "cardiovascular_risk_dataset_clean.csv"
 
 
 # ======================================================
