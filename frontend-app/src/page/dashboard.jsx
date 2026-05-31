@@ -326,14 +326,10 @@ export default function DashboardPage({ currentPage, onNavigate }) {
               <ReactMarkdown 
                 remarkPlugins={[remarkGfm]}
                 components={{
-                  p: ({node, ...props}) => <p className="mb-4 last:mb-0" {...props} />,
-                  ul: ({node, ...props}) => <ul className="mt-4 space-y-3" {...props} />,
-                  ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-4 space-y-2" {...props} />,
-                  li: ({node, ...props}) => {
-                    const isOrdered = node.parent && node.parent.tagName === 'ol';
-                    if (isOrdered) {
-                      return <li className="pl-1 text-slate-700 leading-relaxed" {...props} />;
-                    }
+                  p: ({...props}) => <p className="mb-4 last:mb-0" {...props} />,
+                  ul: ({...props}) => <ul className="mt-4 space-y-3" {...props} />,
+                  ol: ({...props}) => <ol className="list-decimal pl-5 mb-4 space-y-2" {...props} />,
+                  li: ({...props}) => {
                     return (
                       <li className="flex gap-4 items-start rounded-2xl bg-[#1e3a5a]/[0.03] p-4 border border-[#1e3a5a]/10 shadow-sm transition-all hover:bg-[#1e3a5a]/[0.05]" {...props}>
                         <div className="mt-0.5 shrink-0 flex h-5 w-5 items-center justify-center rounded-full bg-[#1e3a5a] text-white shadow-sm">

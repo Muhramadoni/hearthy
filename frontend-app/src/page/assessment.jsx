@@ -1,579 +1,532 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
-import { getAssessments, getAssessmentById, deleteAssessment } from "../services/assessmentService.js";
 import Swal from "sweetalert2";
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { getAssessments } from "../services/assessmentService.js";
+
+// 21 Questions Configuration
+const QUESTIONS = [
+  { id: 'age', type: 'number', aiText: "Halo! Saya Hearthy AI. Mari mulai dengan mengetahui usia Anda. Berapa usia Anda saat ini?", placeholder: "Contoh: 25", suffix: "Tahun" },
+  { id: 'height', type: 'number', aiText: "Terima kasih. Selanjutnya, berapa tinggi badan Anda?", placeholder: "Contoh: 170", suffix: "cm" },
+  { id: 'weight', type: 'number', aiText: "Baik. Sekarang, berapa berat badan Anda?", placeholder: "Contoh: 65", suffix: "kg" },
+  { id: 'steps', type: 'single', aiText: "Saya sudah mencatatnya. Bagaimana dengan aktivitas harian Anda? Berapa perkiraan langkah harian Anda?", options: ["< 3.000", "3.000–5.999", "6.000–9.999", "≥ 10.000"] },
+  { id: 'activity', type: 'single', aiText: "Menarik. Seberapa sering Anda melakukan aktivitas fisik (olahraga ringan/berat) dalam seminggu?", options: ["Tidak pernah", "1–2 kali", "3–4 kali", "≥ 5 kali"] },
+  { id: 'sleep_hours', type: 'number', aiText: "Selanjutnya mengenai pola istirahat Anda. Berapa jam rata-rata Anda tidur setiap malam?", placeholder: "Contoh: 7", suffix: "Jam" },
+  { id: 'sleep_quality', type: 'single', aiText: "Lalu, bagaimana Anda menilai kualitas tidur Anda secara umum?", options: ["Sangat Baik", "Baik", "Cukup", "Buruk", "Sangat Buruk"] },
+  { id: 'diet', type: 'single', aiText: "Sekarang mari beralih ke pola makan. Bagaimana Anda menilai kualitas diet/makanan Anda sehari-hari?", options: ["Sangat Baik", "Baik", "Cukup", "Buruk"] },
+  { id: 'alcohol', type: 'single', aiText: "Seberapa sering Anda mengonsumsi minuman beralkohol?", options: ["Tidak Pernah", "Jarang", "Kadang-kadang", "Sering"] },
+  { id: 'resting_heart_rate', type: 'number', aiText: "Terima kasih informasinya. Mari kita catat tanda vital Anda. Berapa detak jantung istirahat Anda (BPM)?", placeholder: "Contoh: 72", suffix: "BPM" },
+  { id: 'cholesterol', type: 'number', aiText: "Baik. Berapa kadar Kolesterol Total Anda (mg/dL)?", placeholder: "Contoh: 200", suffix: "mg/dL" },
+  { id: 'disease', type: 'multiple', aiText: "Apakah Anda memiliki riwayat penyakit berikut? (Pilih semua yang sesuai)", options: ["Diabetes", "Hipertensi", "Penyakit Jantung", "Stroke", "Gangguan Ginjal", "Tidak Ada"] },
+  { id: 'stress1', type: 'single', aiText: "Terakhir, saya akan menanyakan beberapa pertanyaan singkat terkait tingkat stres Anda dalam sebulan terakhir. Pertama, seberapa sering Anda merasa kesal karena sesuatu yang tak terduga?", options: ["Tidak pernah", "Jarang", "Kadang-kadang", "Sering", "Sangat Sering"] },
+  { id: 'stress2', type: 'single', aiText: "Seberapa sering Anda merasa tak mampu mengendalikan hal-hal penting dalam hidup Anda?", options: ["Tidak pernah", "Jarang", "Kadang-kadang", "Sering", "Sangat Sering"] },
+  { id: 'stress3', type: 'single', aiText: "Seberapa sering Anda merasa gugup dan tertekan?", options: ["Tidak pernah", "Jarang", "Kadang-kadang", "Sering", "Sangat Sering"] },
+  { id: 'stress4', type: 'single', aiText: "Seberapa sering Anda merasa yakin dengan kemampuan Anda untuk menangani masalah pribadi?", options: ["Tidak pernah", "Jarang", "Kadang-kadang", "Sering", "Sangat Sering"] },
+  { id: 'stress5', type: 'single', aiText: "Seberapa sering Anda merasa segala sesuatu berjalan sesuai keinginan Anda?", options: ["Tidak pernah", "Jarang", "Kadang-kadang", "Sering", "Sangat Sering"] },
+  { id: 'stress6', type: 'single', aiText: "Seberapa sering Anda merasa tak mampu mengatasi semua hal yang harus Anda lakukan?", options: ["Tidak pernah", "Jarang", "Kadang-kadang", "Sering", "Sangat Sering"] },
+  { id: 'stress7', type: 'single', aiText: "Seberapa sering Anda mampu mengendalikan rasa jengkel dalam hidup Anda?", options: ["Tidak pernah", "Jarang", "Kadang-kadang", "Sering", "Sangat Sering"] },
+  { id: 'stress8', type: 'single', aiText: "Seberapa sering Anda merasa menguasai keadaan?", options: ["Tidak pernah", "Jarang", "Kadang-kadang", "Sering", "Sangat Sering"] },
+  { id: 'stress9', type: 'single', aiText: "Seberapa sering Anda merasa marah karena hal-hal yang terjadi di luar kendali Anda?", options: ["Tidak pernah", "Jarang", "Kadang-kadang", "Sering", "Sangat Sering"] },
+  { id: 'stress10', type: 'single', aiText: "Terakhir, seberapa sering Anda merasa kesulitan menumpuk sangat tinggi sehingga tidak dapat diatasi?", options: ["Tidak pernah", "Jarang", "Kadang-kadang", "Sering", "Sangat Sering"] },
+];
 
 export default function AssessmentPage({ currentPage, onNavigate }) {
-  const [messages, setMessages] = useState(() => {
-    const activeId = sessionStorage.getItem("hearthy_active_history_id");
-    if (activeId) {
-      return [{ text: "Memuat riwayat...", sender: "bot" }];
-    }
-    
-    const savedMessages = sessionStorage.getItem("hearthy_agent_messages");
-    if (savedMessages) {
-      return JSON.parse(savedMessages);
-    }
-
-    return [];
-  });
-  
-  const [collectedData, setCollectedData] = useState(() => {
-    const saved = sessionStorage.getItem("hearthy_agent_collected");
-    return saved ? JSON.parse(saved) : {};
-  });
-
+  const [phase, setPhase] = useState(1); // 1: Welcome, 2: Wizard, 3: Loading, 4: Result
+  const [currentStep, setCurrentStep] = useState(0);
+  const [answers, setAnswers] = useState({});
   const [inputValue, setInputValue] = useState("");
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const [historyRecords, setHistoryRecords] = useState([]);
-  const [selectedDate, setSelectedDate] = useState("");
-  const [activeDropdown, setActiveDropdown] = useState(null);
-  const [isInputDisabled, setIsInputDisabled] = useState(false);
-  const [isAgentTyping, setIsAgentTyping] = useState(false);
-  const messagesEndRef = useRef(null);
+  const [selectedMultiple, setSelectedMultiple] = useState([]);
+  
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
+  const [predictionResult, setPredictionResult] = useState(null);
+  const [screeningData, setScreeningData] = useState(null);
 
-  useEffect(() => {
-    const handleClickOutside = () => setActiveDropdown(null);
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    sessionStorage.setItem("hearthy_agent_messages", JSON.stringify(messages));
-    sessionStorage.setItem("hearthy_agent_collected", JSON.stringify(collectedData));
-  }, [messages, collectedData]);
-
-  useEffect(() => {
-    const activeId = sessionStorage.getItem("hearthy_active_history_id");
-    if (!activeId && messages.length === 0 && !isAgentTyping) {
-      sendToAgent("Halo, saya ingin memulai asesmen risiko jantung.");
-    }
-  }, [messages]);
-
-  useEffect(() => {
-    const activeId = sessionStorage.getItem("hearthy_active_history_id");
-    if (activeId) {
-      handleHistoryClick(activeId);
-    }
-  }, []);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, isAgentTyping]);
-
-  useEffect(() => {
-    document.title = "Assessment - Web Hearty";
-  }, []);
-
-  useEffect(() => {
-    async function loadHistory() {
-      try {
-        const res = await getAssessments(100, 0);
-        const assessments = (res.assessments || [])
-          .filter((a) => a.type === "cardiovascular")
-          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-        setHistoryRecords(assessments);
-      } catch (err) {
-        console.error("Failed to load history", err);
-      }
-    }
-    loadHistory();
-  }, []);
-
-  const sendToAgent = async (userMessage) => {
-    const token = localStorage.getItem("hearthy_token");
-    if (!token) {
-      setMessages(prev => [...prev, { text: "Anda harus login untuk menggunakan fitur ini.", sender: "bot" }]);
-      return;
-    }
-
-    if (userMessage.toLowerCase() === "mulai asesmen baru" || userMessage.toLowerCase() === "baru") {
-      handleNewChat();
-      return;
-    }
-
-    if (userMessage !== "Halo, saya ingin memulai asesmen risiko jantung.") {
-      setMessages(prev => [...prev, { text: userMessage, sender: "user" }]);
-    }
-    
-    setInputValue("");
-    setIsAgentTyping(true);
-    setIsInputDisabled(true);
-
+  // Mapping Backend
+  const submitToBackend = async (finalAnswers) => {
     try {
-      const activeId = sessionStorage.getItem("hearthy_active_history_id");
-      const endpoint = activeId 
-        ? `http://localhost:5000/api/assessments/chat/${activeId}`
-        : "http://localhost:5000/api/assessments/chat";
+      const heightM = (parseFloat(finalAnswers.height) || 170) / 100;
+      const weightKg = parseFloat(finalAnswers.weight) || 65;
+      const bmi = weightKg / (heightM * heightM);
 
-      const res = await fetch(endpoint, {
+      const dailyStepsMap = { "< 3.000": 1500, "3.000–5.999": 4500, "6.000–9.999": 8000, "≥ 10.000": 12000 };
+      const activityMap = { "Tidak pernah": 0, "1–2 kali": 1.5, "3–4 kali": 3.5, "≥ 5 kali": 6.0 };
+      const dietMap = { "Sangat Baik": 9, "Baik": 7, "Cukup": 5, "Buruk": 3 };
+      const alcoholMap = { "Tidak Pernah": 0, "Jarang": 1, "Kadang-kadang": 3, "Sering": 7 };
+      const stressMap = {
+        "Tidak pernah": "Tidak pernah",
+        "Jarang": "Hampir tidak pernah",
+        "Kadang-kadang": "Kadang-kadang",
+        "Sering": "Cukup sering",
+        "Sangat Sering": "Sangat sering"
+      };
+
+      const hasHeartDisease = (finalAnswers.disease || []).includes("Penyakit Jantung");
+      const hasHypertension = (finalAnswers.disease || []).includes("Hipertensi");
+
+      const mappedData = {
+        age: parseFloat(finalAnswers.age) || 25,
+        bmi: parseFloat(bmi.toFixed(2)),
+        systolic_bp: hasHypertension ? 140 : 120,
+        diastolic_bp: hasHypertension ? 90 : 80,
+        cholesterol_mg_dl: parseFloat(finalAnswers.cholesterol) || 200,
+        resting_heart_rate: parseFloat(finalAnswers.resting_heart_rate) || 72,
+        family_history_heart_disease: hasHeartDisease,
+        diet_quality_score: dietMap[finalAnswers.diet] || 5,
+        alcohol_units_per_week: alcoholMap[finalAnswers.alcohol] || 0,
+        daily_steps: dailyStepsMap[finalAnswers.steps] || 5000,
+        physical_activity_hours_per_week: activityMap[finalAnswers.activity] || 0,
+        sleep_hours: parseFloat(finalAnswers.sleep_hours) || 7,
+        stress1: stressMap[finalAnswers.stress1] || "Tidak pernah",
+        stress2: stressMap[finalAnswers.stress2] || "Tidak pernah",
+        stress3: stressMap[finalAnswers.stress3] || "Tidak pernah",
+        stress4: stressMap[finalAnswers.stress4] || "Tidak pernah",
+        stress5: stressMap[finalAnswers.stress5] || "Tidak pernah",
+        stress6: stressMap[finalAnswers.stress6] || "Tidak pernah",
+        stress7: stressMap[finalAnswers.stress7] || "Tidak pernah",
+        stress8: stressMap[finalAnswers.stress8] || "Tidak pernah",
+        stress9: stressMap[finalAnswers.stress9] || "Tidak pernah",
+        stress10: stressMap[finalAnswers.stress10] || "Tidak pernah",
+      };
+      
+      setScreeningData(mappedData);
+
+      const token = localStorage.getItem("hearthy_token");
+      const res = await fetch("http://localhost:5000/api/assessments/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({
-          message: userMessage,
-          chat_history: messages.filter(m => m.type !== 'result'),
-          collected_data: collectedData
+          message: "Saya sudah mengisi semua data. Analisis data saya sekarang.",
+          chat_history: [],
+          collected_data: mappedData
         })
       });
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || "Gagal menghubungi AI");
-      }
-      
-      const resJson = await res.json();
-      const aiData = resJson.data;
-
-      if (aiData.final_chat_history) {
-        setMessages(aiData.final_chat_history);
-      } else {
-        setMessages(prev => [...prev, { text: aiData.reply, sender: "bot" }]);
-      }
-      
-      if (aiData.collected_data) {
-        setCollectedData(aiData.collected_data);
-      }
-      if (aiData.is_complete && aiData.prediction_result) {
-        
-        if (aiData.assessment_id) {
-          sessionStorage.setItem("hearthy_active_history_id", aiData.assessment_id);
-        }
-      } else {
-        setIsInputDisabled(false);
-      }
-
-    } catch (error) {
-      setMessages(prev => [
-        ...prev,
-        { text: `❌ Terjadi kesalahan: ${error.message}. Silakan coba ketik ulang jawaban Anda.`, sender: "bot" }
-      ]);
-      setIsInputDisabled(false);
-    } finally {
-      setIsAgentTyping(false);
-    }
-  };
-
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
-    sendToAgent(inputValue);
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleSend();
-    }
-  };
-
-  const handleNewChat = () => {
-    sessionStorage.removeItem("hearthy_active_history_id");
-    sessionStorage.removeItem("hearthy_agent_messages");
-    sessionStorage.removeItem("hearthy_agent_collected");
-    setMessages([]);
-    setCollectedData({});
-    setInputValue("");
-    setIsInputDisabled(false);
-  };
-
-  const handleHistoryClick = async (id) => {
-    if (activeDropdown === id) return;
-
-    try {
-      sessionStorage.setItem("hearthy_active_history_id", id);
-      const res = await getAssessmentById(id);
-      const data = res.assessment;
-      const dateStr = new Date(data.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
-
-      if (data.chat_history && data.chat_history.length > 0) {
-        setMessages(data.chat_history);
-      } else {
-        const ans = data.answers || {};
-        const severityStr = data.severity === 'high' ? 'Tinggi' : data.severity === 'moderate' ? 'Sedang' : 'Rendah';
-        const score = data.score || 0;
-        const insights = data.aiInsights || "Perhatikan gaya hidup dan pola makan Anda.";
-
-        setMessages([
-          { text: `📅 Menampilkan riwayat percakapan asesmen tanggal ${dateStr} WIB.`, sender: "bot" },
-          { type: "result", data: { score, severityStr, insights, finalAnswers: ans }, sender: "bot" }
-        ]);
-      }
-      
-      setIsInputDisabled(true);
-      setInputValue("");
-      setIsHistoryOpen(false);
+      if (!res.ok) throw new Error("Gagal menghubungkan ke server.");
+      const json = await res.json();
+      setPredictionResult(json.data);
     } catch (err) {
       console.error(err);
-      setMessages([{ text: "Gagal memuat detail riwayat. Silakan coba lagi.", sender: "bot" }]);
+      Swal.fire({
+        title: "Terjadi Kesalahan",
+        text: "Gagal memproses prediksi. Silakan coba lagi nanti.",
+        icon: "error"
+      });
+      setPhase(2); 
     }
   };
 
-  const handleDeleteHistory = async (e, id) => {
-    e.stopPropagation();
-    setActiveDropdown(null);
+  useEffect(() => {
+    if (phase === 3) {
+      // Fake loading animation sequence
+      const intervals = [
+        { time: 1000, step: 1 }, // Mengumpulkan data
+        { time: 2000, step: 2 }, // BMI
+        { time: 3000, step: 3 }, // Aktivitas
+        { time: 4000, step: 4 }, // Pola tidur
+        { time: 5000, step: 5 }, // Stres
+        { time: 6000, step: 6 }, // Faktor risiko
+        { time: 7000, step: 7 }, // Prediksi
+      ];
 
-    const result = await Swal.fire({
-      title: "Hapus Riwayat?",
-      text: "Riwayat asesmen ini akan dihapus secara permanen.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Ya, Hapus",
-      cancelButtonText: "Batal",
-      confirmButtonColor: "#e53e3e",
-      cancelButtonColor: "#e2e8f0",
-      customClass: {
-        cancelButton: "!text-slate-900",
-        popup: "!rounded-3xl",
-        title: "!text-[#1e3a5a]",
-      },
-      reverseButtons: true,
-    });
+      intervals.forEach(({ time, step }) => {
+        setTimeout(() => setLoadingStep(step), time);
+      });
 
-    if (result.isConfirmed) {
-      try {
-        await deleteAssessment(id);
-        setHistoryRecords((prev) => prev.filter((r) => r.id !== id));
-        Swal.fire({
-          title: "Terhapus!",
-          text: "Riwayat telah berhasil dihapus.",
-          icon: "success",
-          confirmButtonColor: "#1e3a5a",
-          customClass: { popup: "!rounded-3xl" },
-        });
-      } catch (err) {
-        Swal.fire({
-          title: "Gagal",
-          text: err.message || "Gagal menghapus riwayat.",
-          icon: "error",
-          confirmButtonColor: "#1e3a5a",
-          customClass: { popup: "!rounded-3xl" },
-        });
+      // API Call in background
+      submitToBackend(answers).then(() => {
+        setTimeout(() => {
+          setPhase(4);
+        }, 8000); // Ensures min 8s animation
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
+
+  const handleNextStep = (val) => {
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setAnswers(prev => ({ ...prev, [QUESTIONS[currentStep].id]: val }));
+      setInputValue("");
+      setSelectedMultiple([]);
+      setIsTransitioning(false);
+      
+      if (currentStep < QUESTIONS.length - 1) {
+        setCurrentStep(prev => prev + 1);
+      } else {
+        setPhase(3);
       }
-    }
+    }, 1200); // delay for checkmark animation
   };
 
-  const filteredHistoryRecords = historyRecords.filter((record) => {
-    if (!selectedDate) return true;
-    const recordDate = new Date(record.created_at).toISOString().split('T')[0];
-    return recordDate === selectedDate;
-  });
+  const handleNumberSubmit = () => {
+    if (!inputValue) return;
+    handleNextStep(inputValue);
+  };
 
-  return (
-    <div className="min-h-screen bg-[#f0f0f0] text-slate-950 flex flex-col">
-      <Navbar
-        currentPage={currentPage ?? "assessment"}
-        onNavigate={onNavigate ?? (() => {})}
-      />
+  const handleMultipleToggle = (opt) => {
+    if (opt === "Tidak Ada") {
+      setSelectedMultiple(["Tidak Ada"]);
+      return;
+    }
+    let newSel = [...selectedMultiple].filter(x => x !== "Tidak Ada");
+    if (newSel.includes(opt)) {
+      newSel = newSel.filter(x => x !== opt);
+    } else {
+      newSel.push(opt);
+    }
+    setSelectedMultiple(newSel);
+  };
 
-      <main className="flex-1 mx-auto w-full max-w-5xl px-4 md:px-6 py-2 md:py-4 flex flex-col h-[calc(100vh-120px)]">
-        <div className="bg-white rounded-[32px] shadow-[0_24px_80px_-28px_rgba(15,23,42,0.16)] ring-1 ring-slate-200/70 flex flex-col h-full overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-slate-100 z-10 relative">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-[#1e3a5a] flex items-center justify-center">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-white">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-base font-bold text-slate-900">Hearthy - Asesmen AI</h2>
-              <p className="text-xs text-slate-500">Wawancara Medis Terpandu</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => setIsHistoryOpen(true)}
-              title="Riwayat Asesmen"
-              className="p-2.5 hover:bg-slate-100 rounded-full transition text-slate-500 hover:text-slate-700"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
-            </button>
-            <button
-              onClick={handleNewChat}
-              title="Chat Baru"
-              className="p-2.5 hover:bg-slate-100 rounded-full transition text-slate-500 hover:text-slate-700"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-            </button>
-          </div>
-        </div>
+  const handleMultipleSubmit = () => {
+    if (selectedMultiple.length === 0) return;
+    handleNextStep(selectedMultiple);
+  };
 
-        <div className="flex-1 overflow-y-auto px-6 py-6 bg-slate-50/50">
-          <div className="w-full space-y-5">
-            {messages.map((msg, idx) => (
-              <div
-                key={idx}
-                className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`px-5 py-4 rounded-2xl text-[15px] shadow-sm transition-all ${
-                    msg.type === "result"
-                      ? "w-full max-w-[95vw] sm:max-w-[85%] lg:max-w-[800px]"
-                      : "max-w-[85%] sm:max-w-[70%] lg:max-w-[600px]"
-                  } ${
-                    msg.sender === "user"
-                      ? "bg-[#1e3a5a] text-white rounded-tr-sm"
-                      : "bg-white border border-slate-200 text-slate-800 rounded-tl-sm"
-                  }`}
-                >
-                  {msg.type === "result" ? (
-                    <div className="flex flex-col w-full max-h-[60vh] sm:max-h-[500px]">
-                      <div className="flex items-center gap-2 text-[#1e3a5a] font-bold pb-3 border-b border-slate-100 shrink-0">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-green-500">
-                          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                          <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                        </svg>
-                        Analisis Selesai
-                      </div>
-                      
-                      <div className="flex flex-col gap-3 overflow-y-auto pr-2 mt-3 pb-2">
-                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2 text-sm shrink-0">
-                        <p className="font-semibold text-slate-700 border-b border-slate-200 pb-1 mb-2">Ringkasan Data Skrining</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                          <p><span className="text-slate-500">Usia:</span> {msg.data.finalAnswers.age} thn</p>
-                          <p><span className="text-slate-500">BMI:</span> {msg.data.finalAnswers.bmi}</p>
-                          <p><span className="text-slate-500">Tensi:</span> {msg.data.finalAnswers.systolic_bp}/{msg.data.finalAnswers.diastolic_bp} mmHg</p>
-                          <p><span className="text-slate-500">Kolesterol:</span> {msg.data.finalAnswers.cholesterol_mg_dl} mg/dL</p>
-                          <p><span className="text-slate-500">Detak Jantung:</span> {msg.data.finalAnswers.resting_heart_rate} bpm</p>
-                          <p><span className="text-slate-500">Gula Diet:</span> {msg.data.finalAnswers.diet_quality_score}/10</p>
-                          <p><span className="text-slate-500">Aktivitas:</span> {msg.data.finalAnswers.physical_activity_hours_per_week} jam/mgg</p>
-                          <p><span className="text-slate-500">Langkah:</span> {msg.data.finalAnswers.daily_steps}</p>
-                          <p className="col-span-2"><span className="text-slate-500">Riwayat Keluarga:</span> {msg.data.finalAnswers.family_history_heart_disease ? "Ya" : "Tidak"}</p>
-                        </div>
-                      </div>
+  const renderWelcomeScreen = () => {
 
-                      <div className="bg-[#1e3a5a]/5 p-4 rounded-xl border border-[#1e3a5a]/10 mt-1 shrink-0">
-                        <p className="text-sm font-semibold text-slate-700 mb-2">Hasil Prediksi Risiko Kardiovaskular</p>
-                        <div className="flex items-center gap-3 mb-3">
-                          <span className="text-4xl font-bold text-[#1e3a5a]">{msg.data.score}%</span>
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                            msg.data.severityStr === 'Tinggi' ? 'bg-red-100 text-red-700' : 
-                            msg.data.severityStr === 'Sedang' ? 'bg-yellow-100 text-yellow-700' : 
-                            'bg-green-100 text-green-700'
-                          }`}>{msg.data.severityStr}</span>
-                        </div>
-                        <div className="text-sm text-slate-700 leading-relaxed text-justify prose prose-sm max-w-none">
-                          <strong className="block mb-2">Rekomendasi AI:</strong>
-                          <ReactMarkdown 
-                            remarkPlugins={[remarkGfm]}
-                            components={{
-                              p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
-                              ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-2 space-y-1" {...props} />,
-                              ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-2 space-y-1" {...props} />,
-                              li: ({node, ...props}) => <li className="pl-1" {...props} />,
-                              strong: ({node, ...props}) => <strong className="font-bold text-inherit" {...props} />,
-                              h3: ({node, ...props}) => <h3 className="text-base font-bold mt-4 mb-2" {...props} />
-                            }}
-                          >
-                            {msg.data.insights}
-                          </ReactMarkdown>
-                        </div>
-                      </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-sm leading-relaxed prose prose-sm max-w-none">
-                      <ReactMarkdown 
-                        remarkPlugins={[remarkGfm]}
-                        components={{
-                          p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
-                          ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-2 space-y-1" {...props} />,
-                          ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-2 space-y-1" {...props} />,
-                          li: ({node, ...props}) => <li className="pl-1" {...props} />,
-                          strong: ({node, ...props}) => <strong className="font-bold text-inherit" {...props} />
-                        }}
-                      >
-                        {msg.text}
-                      </ReactMarkdown>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-            
-            {isAgentTyping && (
-              <div className="flex justify-start">
-                <div className="px-5 py-3.5 rounded-2xl text-[15px] max-w-[85%] bg-white border border-slate-200 text-slate-800 rounded-tl-sm flex items-center gap-2">
-                  <div className="flex gap-1">
-                    <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></span>
-                    <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></span>
-                    <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></span>
-                  </div>
-                </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-        </div>
-
-        <div className="px-6 py-4 bg-white border-t border-slate-100 z-10 relative">
-          <div className="w-full flex gap-3">
-            <input
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={handleKeyPress}
-              disabled={isInputDisabled}
-              className={`flex-1 border-2 border-slate-200 rounded-2xl px-5 py-3.5 text-[15px] focus:border-[#1e3a5a] focus:ring-4 focus:ring-[#1e3a5a]/10 focus:outline-none transition-all ${
-                isInputDisabled ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-white text-slate-900"
-              }`}
-              placeholder={isInputDisabled ? "Asesmen selesai..." : "Ketik pesan Anda di sini..."}
-            />
-            <button
-              onClick={() => handleSend()}
-              disabled={isInputDisabled || isAgentTyping || !inputValue.trim()}
-              className={`px-6 py-3.5 rounded-2xl font-medium transition-all flex items-center justify-center gap-2 ${
-                isInputDisabled || isAgentTyping || !inputValue.trim()
-                  ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-                  : "bg-[#1e3a5a] text-white hover:bg-[#173652] hover:shadow-lg hover:shadow-[#1e3a5a]/20"
-              }`}
-            >
-              <span className="hidden sm:inline">Kirim</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                <line x1="22" y1="2" x2="11" y2="13"></line>
-                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-              </svg>
-            </button>
-          </div>
-        </div>
-        </div>
-      </main>
-      {isHistoryOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/40 transition-opacity"
-          onClick={() => setIsHistoryOpen(false)}
-        />
-      )}
-      <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-96 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
-          isHistoryOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <div className="flex items-center justify-between p-4 border-b border-slate-200">
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-full bg-[#1e3a5a] flex items-center justify-center">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
-            </div>
-            <h2 className="text-lg font-semibold text-slate-950">Riwayat Asesmen</h2>
-          </div>
-          <button
-            onClick={() => setIsHistoryOpen(false)}
-            title="Tutup"
-            className="p-2 hover:bg-slate-100 rounded-full transition text-slate-500"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
+    return (
+      <div className="flex flex-col h-full animate-fade-in custom-scrollbar overflow-y-auto px-4 md:px-12 py-10">
+        <div className="flex flex-col items-center justify-center space-y-6 text-center max-w-3xl mx-auto mb-16">
+          <div className="w-24 h-24 bg-gradient-to-br from-[#1e3a5a] to-[#2a5280] rounded-[2rem] flex items-center justify-center shadow-2xl shadow-[#1e3a5a]/20 mb-4 transform transition hover:scale-105">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-12 h-12 text-white">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
             </svg>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-[#1e3a5a] tracking-tight leading-tight">Asesmen Prediksi Risiko Kardiovaskular AI</h1>
+          <p className="text-lg md:text-xl text-slate-500 leading-relaxed max-w-2xl">
+            Hearthy akan memandu Anda melalui beberapa pertanyaan untuk memahami kondisi kesehatan, gaya hidup, dan faktor risiko yang dapat memengaruhi kesehatan jantung Anda.
+          </p>
+          <button 
+            onClick={() => setPhase(2)}
+            className="mt-10 px-12 py-5 bg-[#1e3a5a] text-white rounded-full font-bold text-xl shadow-xl hover:shadow-2xl hover:bg-[#152840] hover:-translate-y-1 transition-all duration-300"
+          >
+            Mulai Asesmen Sekarang
           </button>
         </div>
-        <div className="p-4 bg-white border-b border-slate-100 flex items-center gap-2">
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="flex-1 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-[#1e3a5a] focus:border-[#1e3a5a] block w-full px-3 py-2 outline-none transition"
-          />
-          {selectedDate && (
-            <button
-              onClick={() => setSelectedDate("")}
-              title="Hapus Filter"
-              className="p-2 hover:bg-slate-100 rounded-xl transition text-slate-500 border border-slate-200"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-          )}
+      </div>
+    );
+  };
+
+  const renderWizardScreen = () => {
+    const q = QUESTIONS[currentStep];
+    const progress = Math.round(((currentStep) / QUESTIONS.length) * 100);
+
+    return (
+      <div className="flex flex-col h-full animate-fade-in relative">
+        {/* Progress Header */}
+        <div className="flex flex-col mb-8 mt-2 px-4 md:px-12">
+          <div className="flex justify-between items-center mb-2">
+            <div>
+              <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Asesmen Prediksi Risiko Kardiovaskular AI</h2>
+              <p className="text-slate-800 font-bold text-lg">Pertanyaan {currentStep + 1} dari {QUESTIONS.length}</p>
+            </div>
+            <span className="text-2xl font-black text-[#1e3a5a]">{progress}%</span>
+          </div>
+          <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+            <div className="bg-[#1e3a5a] h-2.5 rounded-full transition-all duration-500 ease-out" style={{ width: `${progress}%` }}></div>
+          </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
-          {filteredHistoryRecords.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-slate-400 text-sm">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-12 h-12 mb-3 text-slate-300">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
-              Belum ada riwayat asesmen pada tanggal tersebut.
-            </div>
-          ) : (
-            filteredHistoryRecords.map((record) => {
-              const d = new Date(record.created_at);
-              const dateStr = d.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
-              const timeStr = d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) + " WIB";
-              const severityColor = record.severity === "high" ? "bg-red-100 text-red-700"
-                : record.severity === "moderate" ? "bg-yellow-100 text-yellow-700"
-                : "bg-green-100 text-green-700";
+        {/* Content Card */}
+        <div className="flex-1 flex items-center justify-center px-4 md:px-12 py-12 overflow-y-auto custom-scrollbar">
+          <div className="w-full max-w-4xl bg-white lg:bg-transparent lg:shadow-none p-6 sm:p-8 rounded-3xl">
+            {isTransitioning ? (
+              <div className="flex flex-col items-center justify-center space-y-4 py-20 animate-scale-in">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                  <svg className="w-8 h-8 text-green-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                </div>
+                <p className="text-xl font-bold text-slate-700">Jawaban tersimpan</p>
+              </div>
+            ) : (
+              <div className="animate-fade-up">
+                {/* AI Bubble */}
+                <div className="flex items-start gap-4 mb-10">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#1e3a5a] to-[#254b75] rounded-2xl flex items-center justify-center shadow-lg shrink-0">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6 text-white"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                  </div>
+                  <div className="bg-slate-50 border border-slate-100 p-5 rounded-2xl rounded-tl-none shadow-sm">
+                    <p className="text-xl font-semibold text-slate-800 leading-relaxed">{q.aiText}</p>
+                  </div>
+                </div>
 
-              return (
-                <div key={record.id} className="relative group">
-                  <button
-                    onClick={() => handleHistoryClick(record.id)}
-                    className="w-full text-left rounded-2xl bg-white p-4 pr-10 border border-slate-200 shadow-sm hover:shadow-md hover:border-[#1e3a5a]/30 transition-all block"
-                  >
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold text-slate-900 group-hover:text-[#1e3a5a] transition-colors">{dateStr}</p>
-                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${severityColor}`}>
-                        {record.severity || "unknown"}
-                      </span>
-                    </div>
-                    <div className="mt-2 flex items-center justify-between">
-                      <span className="text-xs text-slate-500">{timeStr}</span>
-                      <span className="text-xs font-medium text-slate-500">Skor: {record.score || 0}%</span>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveDropdown(activeDropdown === record.id ? null : record.id);
-                    }}
-                    className="absolute top-4 right-3 p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors"
-                    title="Opsi"
-                  >
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                      <circle cx="12" cy="5" r="2"></circle>
-                      <circle cx="12" cy="12" r="2"></circle>
-                      <circle cx="12" cy="19" r="2"></circle>
-                    </svg>
-                  </button>
-
-                  {activeDropdown === record.id && (
-                    <div className="absolute top-12 right-2 w-32 bg-white rounded-xl shadow-lg border border-slate-100 z-50 overflow-hidden">
-                      <button
-                        onClick={(e) => handleDeleteHistory(e, record.id)}
-                        className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                {/* Inputs */}
+                <div className="pl-16">
+                  {q.type === 'number' && (
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <div className="relative flex-1">
+                        <input 
+                          type="number" 
+                          value={inputValue}
+                          onChange={(e) => setInputValue(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && handleNumberSubmit()}
+                          placeholder={q.placeholder}
+                          className="w-full text-2xl font-bold text-slate-800 bg-white border-2 border-slate-200 rounded-2xl py-4 pl-6 pr-16 focus:border-[#1e3a5a] focus:ring-4 focus:ring-[#1e3a5a]/10 outline-none transition-all"
+                          autoFocus
+                        />
+                        <span className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 font-bold">{q.suffix}</span>
+                      </div>
+                      <button 
+                        onClick={handleNumberSubmit}
+                        disabled={!inputValue}
+                        className="px-8 py-4 bg-[#1e3a5a] text-white font-bold rounded-2xl disabled:bg-slate-200 disabled:text-slate-400 hover:bg-[#152840] transition-colors"
                       >
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                          <polyline points="3 6 5 6 21 6"></polyline>
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        </svg>
-                        Hapus
+                        Lanjut
+                      </button>
+                    </div>
+                  )}
+
+                  {q.type === 'single' && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {q.options.map((opt, i) => (
+                        <button 
+                          key={i}
+                          onClick={() => handleNextStep(opt)}
+                          className="text-left px-6 py-5 bg-white border-2 border-slate-100 hover:border-[#1e3a5a] hover:shadow-lg rounded-2xl transition-all group flex items-center justify-between"
+                        >
+                          <span className="font-bold text-slate-700 group-hover:text-[#1e3a5a] text-lg">{opt}</span>
+                          <div className="w-6 h-6 rounded-full border-2 border-slate-200 group-hover:border-[#1e3a5a] flex items-center justify-center">
+                             <div className="w-2.5 h-2.5 rounded-full bg-[#1e3a5a] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {q.type === 'multiple' && (
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {q.options.map((opt, i) => {
+                          const isSelected = selectedMultiple.includes(opt);
+                          return (
+                            <button 
+                              key={i}
+                              onClick={() => handleMultipleToggle(opt)}
+                              className={`text-left px-6 py-4 border-2 rounded-2xl transition-all flex items-center justify-between ${isSelected ? 'border-[#1e3a5a] bg-[#1e3a5a]/5 shadow-md' : 'bg-white border-slate-100 hover:border-slate-300'}`}
+                            >
+                              <span className={`font-bold text-lg ${isSelected ? 'text-[#1e3a5a]' : 'text-slate-700'}`}>{opt}</span>
+                              <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors ${isSelected ? 'bg-[#1e3a5a] border-[#1e3a5a]' : 'border-slate-300'}`}>
+                                {isSelected && <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <button 
+                        onClick={handleMultipleSubmit}
+                        disabled={selectedMultiple.length === 0}
+                        className="w-full py-4 bg-[#1e3a5a] text-white font-bold text-lg rounded-2xl disabled:bg-slate-200 disabled:text-slate-400 hover:bg-[#152840] transition-colors"
+                      >
+                        Lanjut
                       </button>
                     </div>
                   )}
                 </div>
-              );
-            })
-          )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
+    );
+  };
+
+  const renderAnalysisScreen = () => {
+    const stepsText = [
+      "Mengumpulkan data pengguna",
+      "Menghitung BMI",
+      "Mengevaluasi aktivitas fisik",
+      "Menganalisis pola tidur",
+      "Mengukur tingkat stres",
+      "Mengidentifikasi faktor risiko",
+      "Menghasilkan prediksi kesehatan"
+    ];
+
+    return (
+      <div className="flex flex-col items-center justify-center h-full animate-fade-in py-10">
+        <div className="w-32 h-32 relative mb-10">
+          <div className="absolute inset-0 bg-blue-100 rounded-full animate-ping opacity-75"></div>
+          <div className="relative w-full h-full bg-gradient-to-tr from-[#1e3a5a] to-[#3b82f6] rounded-full flex items-center justify-center shadow-2xl">
+             <svg className="w-16 h-16 text-white animate-spin-slow" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+               <path d="M5 22h14" />
+               <path d="M5 2h14" />
+               <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22" />
+               <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" />
+             </svg>
+          </div>
+        </div>
+        <h2 className="text-2xl font-bold text-[#1e3a5a] mb-8">Hearthy sedang menganalisis data Anda...</h2>
+        
+        <div className="space-y-4 w-full max-w-sm">
+          {stepsText.map((text, idx) => {
+            const isActive = loadingStep >= idx + 1;
+            return (
+              <div key={idx} className={`flex items-center gap-4 transition-all duration-500 ${isActive ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}>
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isActive ? 'bg-green-500' : 'bg-slate-200'}`}>
+                  <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <span className={`font-semibold text-lg ${isActive ? 'text-slate-800' : 'text-slate-400'}`}>{text}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  const renderResultScreen = () => {
+    if (!predictionResult || !predictionResult.prediction_result) {
+       return <div className="p-10 text-center">Data hasil analisis tidak ditemukan.</div>;
+    }
+
+    const { risk_score, risk_category, recommendations } = predictionResult.prediction_result;
+    const { final_chat_history } = predictionResult;
+    
+    // Find the result message in chat history for insights
+    const resultMsg = final_chat_history?.find(m => m.type === 'result');
+    const insights = resultMsg?.data?.insights || recommendations || "Perhatikan selalu gaya hidup Anda.";
+
+    const riskMap = { "Low": "Rendah", "Medium": "Sedang", "High": "Tinggi", "low": "Rendah", "moderate": "Sedang", "high": "Tinggi" };
+    const mappedRisk = riskMap[risk_category] || risk_category;
+    const isHigh = risk_category?.toLowerCase() === 'high';
+    const isMed = risk_category?.toLowerCase() === 'medium' || risk_category?.toLowerCase() === 'moderate';
+    
+    const scoreColor = isHigh ? 'text-[#ef4444]' : isMed ? 'text-[#eab308]' : 'text-[#22c55e]';
+    const bgColor = isHigh ? 'bg-[#fef2f2]' : isMed ? 'bg-[#fefce8]' : 'bg-[#f0fdf4]';
+
+    const ans = predictionResult?.collected_data || screeningData || {};
+    const displayData = [
+      `Usia: ${ans.age || "-"} Tahun`,
+      `BMI: ${ans.bmi || "-"}`,
+      `Tekanan Darah: ${ans.systolic_bp || "-"}/${ans.diastolic_bp || "-"} mmHg`,
+      `Kolesterol: ${ans.cholesterol_mg_dl || "-"} mg/dL`,
+      `Denyut Jantung: ${ans.resting_heart_rate || "-"} BPM`,
+      `Langkah: ${ans.daily_steps || "-"} langkah`,
+      `Tidur: ${ans.sleep_hours || "-"} jam`,
+      `Riwayat Keluarga: ${ans.family_history_heart_disease ? "Ya" : "Tidak"}`,
+      `Kualitas Diet (0-7): ${ans.diet_quality_score || "-"}`,
+      `Aktivitas Fisik: ${ans.physical_activity_hours_per_week || "-"} jam/minggu`,
+      `Tingkat Stres (0-10): ${ans.stress_level !== undefined ? ans.stress_level : "-"}`,
+      `Alkohol: ${ans.alcohol_units_per_week || "-"} unit/minggu`,
+    ];
+
+    return (
+      <div className="flex flex-col h-full overflow-y-auto px-4 md:px-10 py-8 animate-fade-in custom-scrollbar">
+        <h2 className="text-3xl font-extrabold text-[#1e3a5a] mb-8 text-center">Hasil Prediksi Risiko Kardiovaskular</h2>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full max-w-5xl mx-auto">
+          {/* Left Col - Score Card */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className={`p-8 rounded-[32px] border-2 ${isHigh ? 'border-[#fee2e2] shadow-[0_20px_25px_-5px_rgba(254,226,226,0.5)]' : 'border-[#f1f5f9] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)]'}`}>
+               <p className="text-[#64748b] font-bold uppercase tracking-widest text-sm mb-2 text-center">Skor Risiko</p>
+               <div className="flex items-end justify-center gap-2 mb-6">
+                 <span className={`text-7xl font-black ${scoreColor} leading-none`}>{Math.round(risk_score)}</span>
+                 <span className="text-2xl font-bold text-[#cbd5e1] mb-2">/ 100</span>
+               </div>
+               
+               <div className={`p-4 rounded-2xl flex items-center justify-between ${bgColor}`}>
+                 <span className="font-bold text-[#334155]">Tingkat Risiko</span>
+                 <span className={`px-4 py-1.5 rounded-full text-sm font-black uppercase ${
+                    isHigh ? 'bg-[#fecaca] text-[#991b1b]' : 
+                    isMed ? 'bg-[#fef08a] text-[#854d0e]' : 'bg-[#bbf7d0] text-[#166534]'
+                 }`}>{mappedRisk}</span>
+               </div>
+            </div>
+
+            <div className="bg-[#ffffff] p-6 rounded-3xl border border-[#f1f5f9] shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)]">
+              <p className="text-[#1e293b] font-bold text-lg mb-4">Data Skrining</p>
+              <div className="space-y-3">
+                {displayData.map((item, index) => (
+                  <div
+                    key={index}
+                    className="rounded-3xl bg-[#E8EBEE] px-5 py-4 text-sm text-slate-800 shadow-sm"
+                  >
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Col - AI Insights */}
+          <div className="lg:col-span-7 flex flex-col gap-6">
+            <div 
+              className="p-8 rounded-[32px] text-[#ffffff] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]"
+              style={{ background: 'linear-gradient(to bottom right, #1e3a5a, #254b75)' }}
+            >
+               <div className="mb-6 border-b border-[#3b5b82] pb-4">
+                 <h3 className="text-2xl font-bold">Hasil Analisis</h3>
+               </div>
+               <div className="max-w-none text-[#eff6ff]">
+                  <ReactMarkdown 
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      p: ({...props}) => <p className="mb-4 leading-relaxed text-[#eff6ff]" {...props} />,
+                      ul: ({...props}) => <ul className="list-disc pl-5 mb-4 space-y-2 text-[#eff6ff]" {...props} />,
+                      li: ({...props}) => <li className="pl-1" {...props} />,
+                      strong: ({...props}) => <strong className="font-bold text-[#ffffff]" {...props} />,
+                    }}
+                  >
+                    {insights}
+                  </ReactMarkdown>
+               </div>
+            </div>
+
+            <button 
+              onClick={() => window.location.reload()}
+              className="mt-auto py-5 bg-white border-2 border-slate-200 text-slate-700 font-bold text-lg rounded-2xl hover:border-[#1e3a5a] hover:text-[#1e3a5a] transition-all"
+            >
+              Ulangi Asesmen
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-[#f4f7fb] text-slate-950 flex flex-col font-sans">
+      <Navbar currentPage={currentPage ?? "assessment"} onNavigate={onNavigate ?? (() => {})} />
+      
+      <main className="flex-1 w-full max-w-6xl mx-auto px-4 md:px-6 py-6 flex flex-col h-[calc(100vh-80px)]">
+        <div className="bg-white rounded-[40px] shadow-[0_20px_60px_-15px_rgba(15,23,42,0.08)] border border-slate-100 flex flex-col h-full overflow-hidden">
+          {phase === 1 && renderWelcomeScreen()}
+          {phase === 2 && renderWizardScreen()}
+          {phase === 3 && renderAnalysisScreen()}
+          {phase === 4 && renderResultScreen()}
+        </div>
+      </main>
+
+      <style>{`
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fade-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scale-in { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        .animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
+        .animate-fade-up { animation: fade-up 0.5s ease-out forwards; }
+        .animate-scale-in { animation: scale-in 0.3s ease-out forwards; }
+        
+        @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .animate-spin-slow { animation: spin-slow 3s linear infinite; }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; border: 3px solid transparent; background-clip: content-box; }
+        .custom-scrollbar:hover::-webkit-scrollbar-thumb { background-color: #94a3b8; }
+        
+        /* Hide number input arrows */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        input[type="number"] {
+          -moz-appearance: textfield;
+        }
+      `}</style>
     </div>
   );
 }

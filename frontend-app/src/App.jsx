@@ -7,9 +7,10 @@ import LoginPage from "./page/login.jsx";
 import RegisterPage from "./page/register.jsx";
 import ResetPasswordPage from "./page/reset.jsx";
 import HistoryDetailPage from "./page/history-detail.jsx";
+import HistoryPage from "./page/history.jsx";
 import { isAuthenticated } from "./services/authService";
 
-const PROTECTED_PAGES = ["dashboard", "assessment", "history-detail", "profile"];
+const PROTECTED_PAGES = ["dashboard", "assessment", "history", "history-detail", "profile"];
 
 export default function App() {
   const getInitialPage = () => {
@@ -57,6 +58,12 @@ export default function App() {
       )}
       {currentPage === "history-detail" && (
         <HistoryDetailPage
+          currentPage={currentPage}
+          onNavigate={handleNavigate}
+        />
+      )}
+      {currentPage === "history" && (
+        <HistoryPage
           currentPage={currentPage}
           onNavigate={handleNavigate}
         />
