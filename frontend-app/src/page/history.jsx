@@ -45,15 +45,21 @@ export default function HistoryPage({ currentPage, onNavigate }) {
 
   useEffect(() => {
     document.title = "Riwayat Asesmen - Web Hearty";
-    getAssessments(50, 0).then(res => {
-      setHistoryData(res.assessments || []);
-    }).catch(err => console.error("Gagal memuat history", err));
+    const fetchData = async () => {
+      try {
+        const res = await getAssessments(50, 0);
+        setHistoryData(res.assessments || []);
+      } catch (err) {
+        console.error("Gagal memuat history", err);
+      }
+    };
+    fetchData();
   }, []);
 
   const filteredHistory = filterDate ? historyData.filter(h => new Date(h.created_at).toISOString().split('T')[0] === filterDate) : historyData;
 
   return (
-    <div className="min-h-screen bg-[#f0f0f0] text-slate-950 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#f0f0f0] text-slate-950 flex flex-col">
       <Navbar currentPage={currentPage ?? "history"} onNavigate={onNavigate ?? (() => {})} />
       
       <main className="flex-1 w-full max-w-screen-2xl mx-auto px-4 md:px-6 py-6 flex flex-col h-[calc(100vh-80px)]">
@@ -67,8 +73,8 @@ export default function HistoryPage({ currentPage, onNavigate }) {
                     <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                   </div>
                   <div>
-                    <h3 className="text-3xl font-extrabold text-[#1e3a5a]">Riwayat Asesmen</h3>
-                    <p className="text-slate-500 font-medium mt-1">Daftar pemeriksaan Anda sebelumnya</p>
+                    <h3 className="text-2xl md:text-3xl font-extrabold text-[#1e3a5a]">Riwayat Asesmen</h3>
+                    <p className="text-slate-500 font-medium mt-1 text-sm md:text-base">Daftar pemeriksaan Anda sebelumnya</p>
                   </div>
                 </div>
                 
@@ -106,8 +112,8 @@ export default function HistoryPage({ currentPage, onNavigate }) {
                         <span className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2 block group-hover:text-[#1e3a5a] transition-colors">
                           {new Date(h.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                         </span>
-                        <h4 className="text-xl font-bold text-slate-800 mb-1">{h.score} / 100</h4>
-                        <p className="text-slate-500 font-medium">{h.severity}</p>
+                        <h4 className="text-lg md:text-xl font-bold text-slate-800 mb-1">{h.score}%</h4>
+                        <p className="text-slate-500 font-medium text-sm md:text-base">{h.severity}</p>
                       </div>
                       <div className="flex items-center gap-4">
                         <div className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-lg ${

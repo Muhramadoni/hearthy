@@ -3,22 +3,20 @@ import Navbar from "../components/Navbar.jsx";
 import Swal from "sweetalert2";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { getAssessments } from "../services/assessmentService.js";
 
-// 21 Questions Configuration
 const QUESTIONS = [
   { id: 'age', type: 'number', aiText: "Halo! Saya Hearthy AI. Mari mulai dengan mengetahui usia Anda. Berapa usia Anda saat ini?", placeholder: "Contoh: 25", suffix: "Tahun" },
   { id: 'height', type: 'number', aiText: "Terima kasih. Selanjutnya, berapa tinggi badan Anda?", placeholder: "Contoh: 170", suffix: "cm" },
   { id: 'weight', type: 'number', aiText: "Baik. Sekarang, berapa berat badan Anda?", placeholder: "Contoh: 65", suffix: "kg" },
-  { id: 'steps', type: 'single', aiText: "Saya sudah mencatatnya. Bagaimana dengan aktivitas harian Anda? Berapa perkiraan langkah harian Anda?", options: ["< 3.000", "3.000–5.999", "6.000–9.999", "≥ 10.000"] },
-  { id: 'activity', type: 'single', aiText: "Menarik. Seberapa sering Anda melakukan aktivitas fisik (olahraga ringan/berat) dalam seminggu?", options: ["Tidak pernah", "1–2 kali", "3–4 kali", "≥ 5 kali"] },
+  { id: 'steps', type: 'single', aiText: "Saya sudah mencatatnya. Bagaimana dengan aktivitas harian Anda? Berapa perkiraan langkah harian Anda?", options: ["Kurang Aktif (< 5.000 langkah)", "Cukup Aktif (5.000-7.499 langkah)", "Aktif (7.500-9.999 langkah)", "Sangat Aktif (≥ 10.000 langkah)"] },
+  { id: 'activity', type: 'single', aiText: "Menarik. Berapa jam Anda melakukan aktivitas fisik (olahraga ringan/berat) dalam seminggu?", options: ["Kurang (< 1.25 jam/minggu)", "Cukup (1.25-2.5 jam/minggu)", "Baik (≥ 2.5 jam/minggu)"] },
   { id: 'sleep_hours', type: 'number', aiText: "Selanjutnya mengenai pola istirahat Anda. Berapa jam rata-rata Anda tidur setiap malam?", placeholder: "Contoh: 7", suffix: "Jam" },
-  { id: 'sleep_quality', type: 'single', aiText: "Lalu, bagaimana Anda menilai kualitas tidur Anda secara umum?", options: ["Sangat Baik", "Baik", "Cukup", "Buruk", "Sangat Buruk"] },
+  { id: 'blood_pressure', type: 'text', aiText: "Selanjutnya, berapa tekanan darah Anda? Masukkan Sistolik dan Diastolik dipisahkan dengan garis miring (/).", placeholder: "Contoh: 120/80", suffix: "mmHg" },
   { id: 'diet', type: 'single', aiText: "Sekarang mari beralih ke pola makan. Bagaimana Anda menilai kualitas diet/makanan Anda sehari-hari?", options: ["Sangat Baik", "Baik", "Cukup", "Buruk"] },
-  { id: 'alcohol', type: 'single', aiText: "Seberapa sering Anda mengonsumsi minuman beralkohol?", options: ["Tidak Pernah", "Jarang", "Kadang-kadang", "Sering"] },
+  { id: 'alcohol', type: 'single', aiText: "Seberapa banyak unit minuman beralkohol yang Anda konsumsi dalam seminggu?", options: ["Tidak Minum (0 unit)", "Rendah (1-7 unit/minggu)", "Sedang (8-14 unit/minggu)", "Tinggi (> 14 unit/minggu)"] },
   { id: 'resting_heart_rate', type: 'number', aiText: "Terima kasih informasinya. Mari kita catat tanda vital Anda. Berapa detak jantung istirahat Anda (BPM)?", placeholder: "Contoh: 72", suffix: "BPM" },
   { id: 'cholesterol', type: 'number', aiText: "Baik. Berapa kadar Kolesterol Total Anda (mg/dL)?", placeholder: "Contoh: 200", suffix: "mg/dL" },
-  { id: 'disease', type: 'multiple', aiText: "Apakah Anda memiliki riwayat penyakit berikut? (Pilih semua yang sesuai)", options: ["Diabetes", "Hipertensi", "Penyakit Jantung", "Stroke", "Gangguan Ginjal", "Tidak Ada"] },
+  { id: 'disease', type: 'multiple', aiText: "Apakah Anda memiliki riwayat penyakit terkait kardiovaskular (seperti Hipertensi atau Penyakit Jantung)?", options: ["Ya", "Tidak"] },
   { id: 'stress1', type: 'single', aiText: "Terakhir, saya akan menanyakan beberapa pertanyaan singkat terkait tingkat stres Anda dalam sebulan terakhir. Pertama, seberapa sering Anda merasa kesal karena sesuatu yang tak terduga?", options: ["Tidak pernah", "Jarang", "Kadang-kadang", "Sering", "Sangat Sering"] },
   { id: 'stress2', type: 'single', aiText: "Seberapa sering Anda merasa tak mampu mengendalikan hal-hal penting dalam hidup Anda?", options: ["Tidak pernah", "Jarang", "Kadang-kadang", "Sering", "Sangat Sering"] },
   { id: 'stress3', type: 'single', aiText: "Seberapa sering Anda merasa gugup dan tertekan?", options: ["Tidak pernah", "Jarang", "Kadang-kadang", "Sering", "Sangat Sering"] },
@@ -32,7 +30,7 @@ const QUESTIONS = [
 ];
 
 export default function AssessmentPage({ currentPage, onNavigate }) {
-  const [phase, setPhase] = useState(1); // 1: Welcome, 2: Wizard, 3: Loading, 4: Result
+  const [phase, setPhase] = useState(1);
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState({});
   const [inputValue, setInputValue] = useState("");
@@ -42,18 +40,18 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
   const [loadingStep, setLoadingStep] = useState(0);
   const [predictionResult, setPredictionResult] = useState(null);
   const [screeningData, setScreeningData] = useState(null);
+  const [showAnalysisModal, setShowAnalysisModal] = useState(false);
 
-  // Mapping Backend
   const submitToBackend = async (finalAnswers) => {
     try {
       const heightM = (parseFloat(finalAnswers.height) || 170) / 100;
       const weightKg = parseFloat(finalAnswers.weight) || 65;
       const bmi = weightKg / (heightM * heightM);
 
-      const dailyStepsMap = { "< 3.000": 1500, "3.000–5.999": 4500, "6.000–9.999": 8000, "≥ 10.000": 12000 };
-      const activityMap = { "Tidak pernah": 0, "1–2 kali": 1.5, "3–4 kali": 3.5, "≥ 5 kali": 6.0 };
+      const dailyStepsMap = { "Kurang Aktif (< 5.000 langkah)": 4000, "Cukup Aktif (5.000-7.499 langkah)": 6000, "Aktif (7.500-9.999 langkah)": 8500, "Sangat Aktif (≥ 10.000 langkah)": 12000 };
+      const activityMap = { "Kurang (< 1.25 jam/minggu)": 1.0, "Cukup (1.25-2.5 jam/minggu)": 2.0, "Baik (≥ 2.5 jam/minggu)": 3.5 };
       const dietMap = { "Sangat Baik": 9, "Baik": 7, "Cukup": 5, "Buruk": 3 };
-      const alcoholMap = { "Tidak Pernah": 0, "Jarang": 1, "Kadang-kadang": 3, "Sering": 7 };
+      const alcoholMap = { "Tidak Minum (0 unit)": 0, "Rendah (1-7 unit/minggu)": 4, "Sedang (8-14 unit/minggu)": 11, "Tinggi (> 14 unit/minggu)": 16 };
       const stressMap = {
         "Tidak pernah": "Tidak pernah",
         "Jarang": "Hampir tidak pernah",
@@ -62,17 +60,26 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
         "Sangat Sering": "Sangat sering"
       };
 
-      const hasHeartDisease = (finalAnswers.disease || []).includes("Penyakit Jantung");
-      const hasHypertension = (finalAnswers.disease || []).includes("Hipertensi");
+      const hasDisease = (finalAnswers.disease || []).includes("Ya");
+      
+      let systolic = 120;
+      let diastolic = 80;
+      if (finalAnswers.blood_pressure) {
+        const parts = finalAnswers.blood_pressure.split('/');
+        if (parts.length === 2) {
+          systolic = parseFloat(parts[0]) || 120;
+          diastolic = parseFloat(parts[1]) || 80;
+        }
+      }
 
       const mappedData = {
         age: parseFloat(finalAnswers.age) || 25,
         bmi: parseFloat(bmi.toFixed(2)),
-        systolic_bp: hasHypertension ? 140 : 120,
-        diastolic_bp: hasHypertension ? 90 : 80,
+        systolic_bp: systolic,
+        diastolic_bp: diastolic,
         cholesterol_mg_dl: parseFloat(finalAnswers.cholesterol) || 200,
         resting_heart_rate: parseFloat(finalAnswers.resting_heart_rate) || 72,
-        family_history_heart_disease: hasHeartDisease,
+        family_history_heart_disease: hasDisease ? 1 : 0,
         diet_quality_score: dietMap[finalAnswers.diet] || 5,
         alcohol_units_per_week: alcoholMap[finalAnswers.alcohol] || 0,
         daily_steps: dailyStepsMap[finalAnswers.steps] || 5000,
@@ -122,27 +129,27 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
 
   useEffect(() => {
     if (phase === 3) {
-      // Fake loading animation sequence
       const intervals = [
-        { time: 1000, step: 1 }, // Mengumpulkan data
-        { time: 2000, step: 2 }, // BMI
-        { time: 3000, step: 3 }, // Aktivitas
-        { time: 4000, step: 4 }, // Pola tidur
-        { time: 5000, step: 5 }, // Stres
-        { time: 6000, step: 6 }, // Faktor risiko
-        { time: 7000, step: 7 }, // Prediksi
+        { time: 1000, step: 1 },
+        { time: 2000, step: 2 },
+        { time: 3000, step: 3 },
+        { time: 4000, step: 4 },
+        { time: 5000, step: 5 },
+        { time: 6000, step: 6 },
+        { time: 7000, step: 7 },
       ];
 
       intervals.forEach(({ time, step }) => {
         setTimeout(() => setLoadingStep(step), time);
       });
 
-      // API Call in background
-      submitToBackend(answers).then(() => {
+      const runSubmit = async () => {
+        await submitToBackend(answers);
         setTimeout(() => {
           setPhase(4);
-        }, 8000); // Ensures min 8s animation
-      });
+        }, 8000);
+      };
+      runSubmit();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
@@ -160,26 +167,52 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
       } else {
         setPhase(3);
       }
-    }, 1200); // delay for checkmark animation
+    }, 1200);
   };
 
-  const handleNumberSubmit = () => {
+  const handleInputSubmit = () => {
     if (!inputValue) return;
     handleNextStep(inputValue);
   };
 
   const handleMultipleToggle = (opt) => {
-    if (opt === "Tidak Ada") {
-      setSelectedMultiple(["Tidak Ada"]);
+    if (selectedMultiple.length > 0 && !selectedMultiple.includes(opt)) {
+      Swal.fire({
+        title: 'Ubah Pilihan?',
+        text: "Apakah Anda yakin ingin mengubah pilihan Anda?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#1e3a5a',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, ubah',
+        cancelButtonText: 'Batal'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          setSelectedMultiple([opt]);
+        }
+      });
       return;
     }
-    let newSel = [...selectedMultiple].filter(x => x !== "Tidak Ada");
-    if (newSel.includes(opt)) {
-      newSel = newSel.filter(x => x !== opt);
-    } else {
-      newSel.push(opt);
+
+    if (selectedMultiple.includes(opt)) {
+      Swal.fire({
+        title: 'Batalkan Pilihan?',
+        text: "Apakah Anda yakin ingin membatalkan pilihan ini?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#1e3a5a',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, batalkan',
+        cancelButtonText: 'Batal'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          setSelectedMultiple([]);
+        }
+      });
+      return;
     }
-    setSelectedMultiple(newSel);
+
+    setSelectedMultiple([opt]);
   };
 
   const handleMultipleSubmit = () => {
@@ -218,21 +251,19 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
 
     return (
       <div className="flex flex-col h-full animate-fade-in relative">
-        {/* Progress Header */}
-        <div className="flex flex-col mb-8 mt-2 px-4 md:px-12">
+        <div className="flex flex-col mb-8 mt-6 px-8 md:px-12">
           <div className="flex justify-between items-center mb-2">
             <div>
-              <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Asesmen Prediksi Risiko Kardiovaskular AI</h2>
-              <p className="text-slate-800 font-bold text-lg">Pertanyaan {currentStep + 1} dari {QUESTIONS.length}</p>
+              <h2 className="text-xs md:text-sm font-bold text-slate-400 uppercase tracking-wider">Asesmen Prediksi Risiko Kardiovaskular AI</h2>
+              <p className="text-slate-800 font-bold text-base md:text-lg">Pertanyaan {currentStep + 1} dari {QUESTIONS.length}</p>
             </div>
-            <span className="text-2xl font-black text-[#1e3a5a]">{progress}%</span>
+            <span className="text-xl md:text-2xl font-black text-[#1e3a5a]">{progress}%</span>
           </div>
           <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
             <div className="bg-[#1e3a5a] h-2.5 rounded-full transition-all duration-500 ease-out" style={{ width: `${progress}%` }}></div>
           </div>
         </div>
 
-        {/* Content Card */}
         <div className="flex-1 flex items-center justify-center px-4 md:px-12 py-12 overflow-y-auto custom-scrollbar">
           <div className="w-full max-w-4xl bg-white lg:bg-transparent lg:shadow-none p-6 sm:p-8 rounded-3xl">
             {isTransitioning ? (
@@ -246,34 +277,32 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
               </div>
             ) : (
               <div className="animate-fade-up">
-                {/* AI Bubble */}
                 <div className="flex items-start gap-4 mb-10">
                   <div className="w-12 h-12 bg-gradient-to-br from-[#1e3a5a] to-[#254b75] rounded-2xl flex items-center justify-center shadow-lg shrink-0">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6 text-white"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                   </div>
                   <div className="bg-slate-50 border border-slate-100 p-5 rounded-2xl rounded-tl-none shadow-sm">
-                    <p className="text-xl font-semibold text-slate-800 leading-relaxed">{q.aiText}</p>
+                    <p className="text-base md:text-xl font-semibold text-slate-800 leading-relaxed">{q.aiText}</p>
                   </div>
                 </div>
 
-                {/* Inputs */}
                 <div className="pl-16">
-                  {q.type === 'number' && (
+                  {(q.type === 'number' || q.type === 'text') && (
                     <div className="flex flex-col sm:flex-row gap-4">
                       <div className="relative flex-1">
                         <input 
-                          type="number" 
+                          type={q.type} 
                           value={inputValue}
                           onChange={(e) => setInputValue(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && handleNumberSubmit()}
+                          onKeyDown={(e) => e.key === 'Enter' && handleInputSubmit()}
                           placeholder={q.placeholder}
-                          className="w-full text-2xl font-bold text-slate-800 bg-white border-2 border-slate-200 rounded-2xl py-4 pl-6 pr-16 focus:border-[#1e3a5a] focus:ring-4 focus:ring-[#1e3a5a]/10 outline-none transition-all"
+                          className="w-full text-lg md:text-2xl font-bold text-slate-800 bg-white border-2 border-slate-200 rounded-2xl py-4 pl-6 pr-16 focus:border-[#1e3a5a] focus:ring-4 focus:ring-[#1e3a5a]/10 outline-none transition-all"
                           autoFocus
                         />
                         <span className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 font-bold">{q.suffix}</span>
                       </div>
                       <button 
-                        onClick={handleNumberSubmit}
+                        onClick={handleInputSubmit}
                         disabled={!inputValue}
                         className="px-8 py-4 bg-[#1e3a5a] text-white font-bold rounded-2xl disabled:bg-slate-200 disabled:text-slate-400 hover:bg-[#152840] transition-colors"
                       >
@@ -290,7 +319,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                           onClick={() => handleNextStep(opt)}
                           className="text-left px-6 py-5 bg-white border-2 border-slate-100 hover:border-[#1e3a5a] hover:shadow-lg rounded-2xl transition-all group flex items-center justify-between"
                         >
-                          <span className="font-bold text-slate-700 group-hover:text-[#1e3a5a] text-lg">{opt}</span>
+                          <span className="font-bold text-slate-700 group-hover:text-[#1e3a5a] text-base md:text-lg">{opt}</span>
                           <div className="w-6 h-6 rounded-full border-2 border-slate-200 group-hover:border-[#1e3a5a] flex items-center justify-center">
                              <div className="w-2.5 h-2.5 rounded-full bg-[#1e3a5a] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                           </div>
@@ -310,7 +339,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                               onClick={() => handleMultipleToggle(opt)}
                               className={`text-left px-6 py-4 border-2 rounded-2xl transition-all flex items-center justify-between ${isSelected ? 'border-[#1e3a5a] bg-[#1e3a5a]/5 shadow-md' : 'bg-white border-slate-100 hover:border-slate-300'}`}
                             >
-                              <span className={`font-bold text-lg ${isSelected ? 'text-[#1e3a5a]' : 'text-slate-700'}`}>{opt}</span>
+                              <span className={`font-bold text-base md:text-lg ${isSelected ? 'text-[#1e3a5a]' : 'text-slate-700'}`}>{opt}</span>
                               <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors ${isSelected ? 'bg-[#1e3a5a] border-[#1e3a5a]' : 'border-slate-300'}`}>
                                 {isSelected && <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>}
                               </div>
@@ -360,7 +389,7 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
              </svg>
           </div>
         </div>
-        <h2 className="text-2xl font-bold text-[#1e3a5a] mb-8">Hearthy sedang menganalisis data Anda...</h2>
+        <h2 className="text-2xl font-bold text-[#1e3a5a] mb-8 text-center px-4">Hearthy sedang menganalisis data Anda...</h2>
         
         <div className="space-y-4 w-full max-w-sm">
           {stepsText.map((text, idx) => {
@@ -387,7 +416,6 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
     const { risk_score, risk_category, recommendations } = predictionResult.prediction_result;
     const { final_chat_history } = predictionResult;
     
-    // Find the result message in chat history for insights
     const resultMsg = final_chat_history?.find(m => m.type === 'result');
     const insights = resultMsg?.data?.insights || recommendations || "Perhatikan selalu gaya hidup Anda.";
 
@@ -419,14 +447,13 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
       <div className="flex flex-col h-full overflow-y-auto px-4 md:px-10 py-8 animate-fade-in custom-scrollbar">
         <h2 className="text-3xl font-extrabold text-[#1e3a5a] mb-8 text-center">Hasil Prediksi Risiko Kardiovaskular</h2>
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full max-w-5xl mx-auto">
-          {/* Left Col - Score Card */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className={`p-8 rounded-[32px] border-2 ${isHigh ? 'border-[#fee2e2] shadow-[0_20px_25px_-5px_rgba(254,226,226,0.5)]' : 'border-[#f1f5f9] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)]'}`}>
+        <div className="flex flex-col gap-6 w-full max-w-3xl mx-auto pb-8">
+          <div className="w-full space-y-6">
+            <div className={`p-8 rounded-[32px] border-2 ${isHigh ? 'bg-[#fff5f5] border-[#fee2e2] shadow-sm' : isMed ? 'bg-[#fffbeb] border-[#fef3c7] shadow-sm' : 'bg-[#f0fdf4] border-[#dcfce7] shadow-sm'}`}>
                <p className="text-[#64748b] font-bold uppercase tracking-widest text-sm mb-2 text-center">Skor Risiko</p>
                <div className="flex items-end justify-center gap-2 mb-6">
                  <span className={`text-7xl font-black ${scoreColor} leading-none`}>{Math.round(risk_score)}</span>
-                 <span className="text-2xl font-bold text-[#cbd5e1] mb-2">/ 100</span>
+                 <span className="text-2xl font-bold text-[#cbd5e1] mb-2">%</span>
                </div>
                
                <div className={`p-4 rounded-2xl flex items-center justify-between ${bgColor}`}>
@@ -438,62 +465,71 @@ export default function AssessmentPage({ currentPage, onNavigate }) {
                </div>
             </div>
 
-            <div className="bg-[#ffffff] p-6 rounded-3xl border border-[#f1f5f9] shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)]">
+            <div className="bg-[#f8fafc] p-6 rounded-3xl border border-[#e2e8f0] shadow-sm">
               <p className="text-[#1e293b] font-bold text-lg mb-4">Data Skrining</p>
               <div className="space-y-3">
                 {displayData.map((item, index) => (
                   <div
                     key={index}
-                    className="rounded-3xl bg-[#E8EBEE] px-5 py-4 text-sm text-slate-800 shadow-sm"
+                    className="rounded-2xl bg-[#ffffff] px-5 py-4 text-sm text-slate-800 shadow-sm border border-[#f1f5f9]"
                   >
                     {item}
                   </div>
                 ))}
               </div>
             </div>
-          </div>
-
-          {/* Right Col - AI Insights */}
-          <div className="lg:col-span-7 flex flex-col gap-6">
-            <div 
-              className="p-8 rounded-[32px] text-[#ffffff] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]"
-              style={{ background: 'linear-gradient(to bottom right, #1e3a5a, #254b75)' }}
-            >
-               <div className="mb-6 border-b border-[#3b5b82] pb-4">
-                 <h3 className="text-2xl font-bold">Hasil Analisis</h3>
-               </div>
-               <div className="max-w-none text-[#eff6ff]">
-                  <ReactMarkdown 
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                      p: ({...props}) => <p className="mb-4 leading-relaxed text-[#eff6ff]" {...props} />,
-                      ul: ({...props}) => <ul className="list-disc pl-5 mb-4 space-y-2 text-[#eff6ff]" {...props} />,
-                      li: ({...props}) => <li className="pl-1" {...props} />,
-                      strong: ({...props}) => <strong className="font-bold text-[#ffffff]" {...props} />,
-                    }}
-                  >
-                    {insights}
-                  </ReactMarkdown>
-               </div>
             </div>
+
+            <button
+              onClick={() => setShowAnalysisModal(true)}
+              className="w-full bg-white border-2 border-[#1e3a5a] text-[#1e3a5a] p-5 rounded-3xl font-bold hover:bg-[#1e3a5a] hover:text-white transition-all flex items-center justify-between shadow-sm group"
+            >
+              <span className="text-lg">Baca Hasil Analisis Anda</span>
+              <svg className="w-6 h-6 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
 
             <button 
               onClick={() => window.location.reload()}
-              className="mt-auto py-5 bg-white border-2 border-slate-200 text-slate-700 font-bold text-lg rounded-2xl hover:border-[#1e3a5a] hover:text-[#1e3a5a] transition-all"
+              className="w-full py-5 bg-white border-2 border-slate-200 text-slate-700 font-bold text-lg rounded-3xl hover:border-slate-300 transition-all"
             >
               Ulangi Asesmen
             </button>
           </div>
-        </div>
+
+        {showAnalysisModal && (
+          <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[88px] md:pt-[120px] p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+            <div className="bg-white rounded-3xl w-full max-w-screen-2xl max-h-[calc(100vh-108px)] md:max-h-[calc(100vh-140px)] flex flex-col shadow-2xl overflow-hidden animate-scale-in">
+              <div className="p-6 sm:p-8 bg-gradient-to-br from-[#1e3a5a] to-[#254b75] text-white flex justify-between items-center shrink-0">
+                <h3 className="text-2xl font-bold">Hasil Analisis</h3>
+                <button onClick={() => setShowAnalysisModal(false)} className="text-white/80 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+              </div>
+              <div className="p-6 sm:p-8 overflow-y-auto custom-scrollbar text-slate-800">
+                <ReactMarkdown 
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    p: ({...props}) => <p className="mb-4 leading-relaxed" {...props} />,
+                    ul: ({...props}) => <ul className="list-disc pl-5 mb-4 space-y-2" {...props} />,
+                    li: ({...props}) => <li className="pl-1" {...props} />,
+                    strong: ({...props}) => <strong className="font-bold text-slate-900" {...props} />,
+                  }}
+                >
+                  {insights}
+                </ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen bg-[#f0f0f0] text-slate-950 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#f0f0f0] text-slate-950 flex flex-col">
       <Navbar currentPage={currentPage ?? "assessment"} onNavigate={onNavigate ?? (() => {})} />
       
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 md:px-6 py-6 flex flex-col h-[calc(100vh-80px)]">
+      <main className="flex-1 w-full max-w-screen-2xl mx-auto px-4 md:px-6 py-6 flex flex-col h-[calc(100vh-80px)]">
         <div className="bg-white rounded-[40px] shadow-[0_20px_60px_-15px_rgba(15,23,42,0.08)] border border-slate-100 flex flex-col h-full overflow-hidden">
           {phase === 1 && renderWelcomeScreen()}
           {phase === 2 && renderWizardScreen()}

@@ -9,6 +9,7 @@ import html2pdf from "html2pdf.js";
 export default function HistoryDetailPage({ currentPage, onNavigate }) {
   const [assessment, setAssessment] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showAnalysisModal, setShowAnalysisModal] = useState(false);
 
   const loadDetail = async () => {
     try {
@@ -29,7 +30,10 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
 
   useEffect(() => {
     document.title = "Detail History - Hearthy";
-    loadDetail();
+    const fetchIt = async () => {
+      await loadDetail();
+    };
+    fetchIt();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -117,7 +121,7 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f0f0f0] text-[#0f172a] flex flex-col font-sans print:bg-[#ffffff]">
+    <div className="min-h-screen bg-[#f0f0f0] text-[#0f172a] flex flex-col print:bg-[#ffffff]">
       <style>{`
         @media print {
           * {
@@ -135,7 +139,7 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
         />
       </div>
 
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 md:px-6 py-6 flex flex-col h-[calc(100vh-80px)]">
+      <main className="flex-1 w-full max-w-screen-2xl mx-auto px-4 md:px-6 py-6 flex flex-col h-[calc(100vh-80px)]">
         <div className="bg-[#ffffff] rounded-[40px] shadow-[0_20px_60px_-15px_rgba(15,23,42,0.08)] border border-[#f1f5f9] flex flex-col h-full overflow-hidden">
           
           <div className="flex justify-between items-center p-6 border-b border-[#f1f5f9]">
@@ -162,14 +166,13 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
                 <p className="text-[#64748b] mt-2 font-medium">Tanggal Asesmen: {new Date(assessment.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
               </div>
               
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full max-w-5xl mx-auto">
-                {/* Left Col - Score Card */}
-                <div className="lg:col-span-5 space-y-6">
-                <div className={`p-8 rounded-[32px] border-2 ${isHigh ? 'border-[#fee2e2] shadow-[0_20px_25px_-5px_rgba(254,226,226,0.5)]' : 'border-[#f1f5f9] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)]'}`}>
+              <div className="flex flex-col gap-6 w-full max-w-3xl mx-auto pb-8">
+                <div className="w-full space-y-6">
+                <div className={`p-8 rounded-[32px] border-2 ${isHigh ? 'bg-[#fff5f5] border-[#fee2e2] shadow-sm' : isMed ? 'bg-[#fffbeb] border-[#fef3c7] shadow-sm' : 'bg-[#f0fdf4] border-[#dcfce7] shadow-sm'}`}>
                   <p className="text-[#64748b] font-bold uppercase tracking-widest text-sm mb-2 text-center">Skor Risiko</p>
                   <div className="flex items-end justify-center gap-2 mb-6">
                     <span className={`text-7xl font-black ${scoreColor} leading-none`}>{score}</span>
-                    <span className="text-2xl font-bold text-[#cbd5e1] mb-2">/ 100</span>
+                    <span className="text-2xl font-bold text-[#cbd5e1] mb-2">%</span>
                   </div>
                   
                   <div className={`p-4 rounded-2xl flex items-center justify-between ${bgColor}`}>
@@ -181,58 +184,64 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
                   </div>
                 </div>
 
-                <div className="bg-[#ffffff] p-6 rounded-3xl border border-[#f1f5f9] shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)]">
+                <div className="bg-[#f8fafc] p-6 rounded-3xl border border-[#e2e8f0] shadow-sm">
                   <p className="text-[#1e293b] font-bold text-lg mb-4">Data Skrining</p>
                   <div className="space-y-3">
                     {screeningData.map((item, index) => (
                       <div
                         key={index}
-                        className="rounded-3xl bg-[#E8EBEE] px-5 py-4 text-sm text-slate-800 shadow-sm"
+                        className="rounded-2xl bg-[#ffffff] px-5 py-4 text-sm text-slate-800 shadow-sm border border-[#f1f5f9]"
                       >
                         {item}
                       </div>
                     ))}
                   </div>
                 </div>
+                </div>
+
+                <button
+                  onClick={() => setShowAnalysisModal(true)}
+                  className="w-full bg-white border-2 border-[#1e3a5a] text-[#1e3a5a] p-5 rounded-3xl font-bold hover:bg-[#1e3a5a] hover:text-white transition-all flex items-center justify-between shadow-sm group"
+                >
+                  <span className="text-lg">Baca Hasil Analisis Anda</span>
+                  <svg className="w-6 h-6 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
               </div>
 
-              {/* Right Col - AI Insights */}
-              <div className="lg:col-span-7 flex flex-col gap-6">
-                <div 
-                  className="p-8 rounded-[32px] text-[#ffffff] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]"
-                  style={{ background: 'linear-gradient(to bottom right, #1e3a5a, #254b75)' }}
-                >
-                  <div className="mb-6 border-b border-[#3b5b82] pb-4">
-                    <h3 className="text-2xl font-bold">Hasil Analisis</h3>
-                  </div>
-                  <div className="max-w-none text-[#eff6ff]">
+              {showAnalysisModal && (
+                <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[88px] md:pt-[120px] p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+                  <div className="bg-white rounded-3xl w-full max-w-screen-2xl max-h-[calc(100vh-108px)] md:max-h-[calc(100vh-140px)] flex flex-col shadow-2xl overflow-hidden animate-scale-in">
+                    <div className="p-6 sm:p-8 bg-gradient-to-br from-[#1e3a5a] to-[#254b75] text-white flex justify-between items-center shrink-0">
+                      <h3 className="text-2xl font-bold">Hasil Analisis</h3>
+                      <button onClick={() => setShowAnalysisModal(false)} className="text-white/80 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                      </button>
+                    </div>
+                    <div className="p-6 sm:p-8 overflow-y-auto custom-scrollbar text-slate-800 text-left">
                       <ReactMarkdown 
                         remarkPlugins={[remarkGfm]}
                         components={{
-                          p: ({...props}) => <p className="mb-4 leading-relaxed text-[#eff6ff]" {...props} />,
-                          ul: ({...props}) => <ul className="list-disc pl-5 mb-4 space-y-2 text-[#eff6ff]" {...props} />,
+                          p: ({...props}) => <p className="mb-4 leading-relaxed" {...props} />,
+                          ul: ({...props}) => <ul className="list-disc pl-5 mb-4 space-y-2" {...props} />,
                           li: ({...props}) => <li className="pl-1" {...props} />,
-                          strong: ({...props}) => <strong className="font-bold text-[#ffffff]" {...props} />,
+                          strong: ({...props}) => <strong className="font-bold text-slate-900" {...props} />,
                         }}
                       >
                         {insights}
                       </ReactMarkdown>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
 
-            {/* Removed on-screen Skrining to keep it looking like prediction screen */}
-            </div>
           </div>
         </div>
       </main>
 
-      {/* HIDDEN PDF TEMPLATE (Mobile-like clean layout) */}
       <div className="overflow-hidden h-0 w-0 absolute pointer-events-none">
-        <div id="pdf-export-template" className="w-[600px] bg-[#ffffff] p-8 font-sans text-[#0f172a]">
+        <div id="pdf-export-template" className="w-[600px] bg-[#ffffff] p-8 text-[#0f172a]">
           
-          {/* Header */}
           <div className="border-b-2 border-[#f1f5f9] pb-6 mb-6 flex justify-between items-end">
             <div>
               <h1 className="text-3xl font-extrabold text-[#1e3a5a] mb-1">Hearthy Report</h1>
@@ -244,13 +253,12 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
             </div>
           </div>
 
-          {/* Score & Risk */}
           <div className="flex gap-4 mb-6" style={{ pageBreakInside: 'avoid' }}>
             <div className="flex-1 bg-[#f8fafc] p-6 rounded-3xl border border-[#f1f5f9] text-center">
               <p className="text-[#64748b] text-xs font-bold uppercase tracking-widest mb-2">Skor Risiko</p>
               <div className="flex items-end justify-center gap-1">
                 <span className={`text-5xl font-black ${scoreColor} leading-none`}>{score}</span>
-                <span className="text-lg font-bold text-[#cbd5e1] mb-1">/ 100</span>
+                <span className="text-lg font-bold text-[#cbd5e1] mb-1">%</span>
               </div>
             </div>
             <div className={`flex-1 p-6 rounded-3xl border text-center flex flex-col justify-center items-center ${isHigh ? 'bg-[#fef2f2] border-[#fee2e2]' : isMed ? 'bg-[#fefce8] border-[#fef08a]' : 'bg-[#f0fdf4] border-[#bbf7d0]'}`}>
@@ -259,7 +267,6 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
             </div>
           </div>
 
-          {/* Data Skrining Awal */}
           <div className="mb-6" style={{ pageBreakInside: 'avoid' }}>
             <h2 className="text-lg font-bold text-[#1e3a5a] mb-3 border-b border-[#f1f5f9] pb-2">1. Data Medis & Gaya Hidup</h2>
             <div className="bg-[#f8fafc] p-5 rounded-2xl border border-[#f1f5f9]">
@@ -273,7 +280,6 @@ export default function HistoryDetailPage({ currentPage, onNavigate }) {
             </div>
           </div>
 
-          {/* AI Insights */}
           <div className="break-inside-avoid">
             <h2 className="text-lg font-bold text-[#1e3a5a] mb-3 border-b border-[#f1f5f9] pb-2">2. Analisis & Rekomendasi (AI)</h2>
             <div className="text-[#334155] text-sm leading-relaxed bg-[#f8fafc] p-5 rounded-2xl border border-[#f1f5f9]">
