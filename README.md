@@ -1,7 +1,7 @@
 # Dokumentasi Setup Proyek Hearthy
 
 ## 1. Penjelasan Tentang Website dan Tujuannya
-Hearthy adalah platform *preventive healthcare* berbasis web yang dirancang untuk membantu pengguna memantau dan mendeteksi risiko penyakit, khususnya penyakit kardiovaskular. Dengan memanfaatkan teknologi *Machine Learning* dan *Artificial Intelligence* (AI), Hearthy menyediakan hasil analisis instan, wawasan (*insights*) kesehatan yang personal, serta chatbot interaktif yang siap memberikan edukasi pencegahan. Tujuannya adalah untuk meningkatkan kesadaran masyarakat akan pentingnya gaya hidup sehat serta memberikan sarana deteksi dini yang mudah diakses.
+Hearthy adalah platform *preventive healthcare* berbasis web yang dirancang untuk membantu pengguna memantau dan mendeteksi risiko penyakit, khususnya penyakit kardiovaskular. Dengan memanfaatkan teknologi *Machine Learning* dan *Artificial Intelligence* (AI), Hearthy menyediakan hasil analisis instan, wawasan (*insights*) kesehatan yang personal, serta AI yang siap memberikan edukasi pencegahan. Tujuannya adalah untuk meningkatkan kesadaran masyarakat akan pentingnya gaya hidup sehat serta memberikan sarana deteksi dini yang mudah diakses.
 
 ## 2. Persyaratan Sistem
 Sebelum memulai setup proyek, pastikan perangkat Anda telah memenuhi persyaratan berikut:
@@ -118,7 +118,7 @@ Agar aplikasi Hearthy berjalan secara utuh (Frontend, Backend, AI API, dan Strea
   ```
   *(Berjalan di http://localhost:5173)*
 
-* **Terminal 3 (AI Chatbot FastAPI)**:
+* **Terminal 3 (AI FastAPI)**:
   ```bash
   uvicorn app.main:app --reload
   ```
@@ -137,7 +137,7 @@ Berikut adalah ringkasan struktur folder utama dalam proyek Hearthy dan fungsiny
 ```text
 hearthy/
 ├── app/                   # Root folder untuk API AI/Machine Learning (FastAPI)
-│   └── main.py            # Entry point FastAPI untuk servis Chatbot AI
+│   └── main.py            # Entry point FastAPI untuk servis AI
 ├── backend-api/           # Root folder untuk Backend API Node.js (Auth, Data, dll)
 │   ├── controllers/       # Logika bisnis (menangani fungsi request & response)
 │   ├── database/          # Skrip migrasi dan konfigurasi pool koneksi PostgreSQL
@@ -146,7 +146,7 @@ hearthy/
 │   └── package.json       # Daftar dependensi dan scripts Node.js backend
 ├── frontend-app/          # Root folder untuk Klien Antarmuka (Frontend React.js)
 │   ├── src/
-│   │   ├── components/    # Reusable komponen UI (Navbar, Chatbot widget, dll)
+│   │   ├── components/    # Reusable komponen UI (Navbar, dll)
 │   │   ├── page/          # Halaman-halaman utama aplikasi (Dashboard, Assessment, Login, dll)
 │   │   ├── services/      # Fungsi pemanggil API ke Backend Node.js
 │   │   └── App.jsx        # Routing dan konfigurasi navigasi halaman utama
